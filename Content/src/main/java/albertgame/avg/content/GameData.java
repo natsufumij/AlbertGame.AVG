@@ -5,11 +5,22 @@ import javafx.scene.image.Image;
 
 public class GameData {
 
+    //游戏当前状态
+    //  等待用户响应
+    //  等待下一个命令
+    //  正在显示文字中
+    //  正在选择分支中
+    //  正在动画中
+
     public static final char GAME_STATE_WAIT_PRESS=0;
-    public static final char GAME_STATE_AUTO_WORDING=1;
-    public static final char GAME_STATE_WORD_DISPLAYING=2;
-    public static final char GAME_STATE_SELECTING=3;
-    public static final char GAME_ANIMATING=4;
+    public static final char GAME_STATE_WAIT_NEXT=1;
+    public static final char GAME_STATE_SELECTING=2;
+    public static final char GAME_STATE_WORD_DISPLAYING=3;
+    public static final char GAME_STATE_ANIMATING=4;
+
+    public static final char LINE_IN_BEGINS=0;
+    public static final char LINE_IN_BODY=1;
+    public static final char LINE_IN_ENDS=2;
 
     private SaveData saveData;
 
@@ -23,12 +34,23 @@ public class GameData {
     private final StringProperty[] displayWords;
 
     private final BooleanProperty wordLineShow;
+    private final BooleanProperty nameShow;
 
     private Person leftPerson;
     private Person centerPerson;
     private Person rightPerson;
 
+    private Chapter nowChapter;
+    private Play nowPlay;
+    private String[] lines;
+    private int lineIndex;
+
+    private char struckOfPlay;
+
     private char gameState;
+
+    //是否自动
+    private boolean auto;
 
     public GameData() {
         leftPerson=Person.NONE_PERSON;
@@ -45,7 +67,14 @@ public class GameData {
             displayWords[i]=text;
         }
         wordLineShow=new SimpleBooleanProperty(Boolean.TRUE);
+        nameShow=new SimpleBooleanProperty(Boolean.TRUE);
         gameState=GAME_STATE_WAIT_PRESS;
+        initChapter();
+    }
+
+    private void initChapter() {
+
+        //TODO: 初始化章节内容，本次用以测试剧本解析是否正常
     }
 
     public SaveData getSaveData() {
@@ -138,5 +167,21 @@ public class GameData {
 
     public void setGameState(char gameState) {
         this.gameState = gameState;
+    }
+
+    public boolean isAuto() {
+        return auto;
+    }
+
+    public void setAuto(boolean auto) {
+        this.auto = auto;
+    }
+
+    public boolean isNameShow() {
+        return nameShow.get();
+    }
+
+    public BooleanProperty nameShowProperty() {
+        return nameShow;
     }
 }

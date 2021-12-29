@@ -25,11 +25,12 @@
 剧本命令格式  
 
 - 对话
-  - Dialog  Word  #Text  默认命令，无名称的文字
-  - Dialog  Word  [S]  #Text  对话文字，秘密任务对话，名称？？？
-  - Dialog  Word  [M]  #Text  对话文字，以‘我’为名称
-  - Dialog  Word  [DataId]  #Text  对话文字,以id的人物名称
+  - Dialog  Word  #Text  默认文字,延续上一次对话的名称
+  - Dialog  Word  [S]  #Text  对话文字，使用名称？？？，以后都如此
+  - Dialog  Word  [M]  #Text  对话文字，以‘我’为名称，以后都如此
+  - Dialog  Word  [DataId]  #Text  对话文字,以id的人物名称，以后都如此
   - Dialog  Open  打开对话框
+  - Dialog  Clear  清空对话框及名称
   - Dialog  Close  关闭对话框
   
 - 人物

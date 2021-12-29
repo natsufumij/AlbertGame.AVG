@@ -5,7 +5,6 @@ import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.util.Duration;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public interface GameFunction {
@@ -69,11 +68,12 @@ public interface GameFunction {
                         if (index == dest) {
 
                             //如果是普通文字显示状态，则切换为等待输入状态
-                            if (data.getGameState() == GameData.GAME_STATE_WORD_DISPLAYING) {
+                            //否则为自动响应状态，无需更改状态,无需等待用户反应文字显示，直接等待下一个命令
+                            if (!data.isAuto()) {
                                 data.setGameState(GameData.GAME_STATE_WAIT_PRESS);
+                            } else {
+                                data.setGameState(GameData.GAME_STATE_WAIT_NEXT);
                             }
-                            //否则为自动响应状态，无需更改状态,无需等待用户反应文字显示，直到出现选择分支
-
                             WordDisplayExecution.super.succeeded();
                         } else {
                             //继续贴字
@@ -99,7 +99,6 @@ public interface GameFunction {
          * 判断文字显示是否完成
          * 如果未完成，则添加下一个文字
          * 如果完成，则将状态修改为WaitPress，并关闭定时任务
-         *
          */
         private void Word(FunctionArg arg) {
             String text = arg.extra[0];
@@ -113,18 +112,18 @@ public interface GameFunction {
             }
 
             Duration period;
-            if (_d.getGameState() == GameData.GAME_STATE_AUTO_WORDING) {
+            if (_d.isAuto()) {
                 period = Duration.millis(80);
             } else {
-                _d.setGameState(GameData.GAME_STATE_WORD_DISPLAYING);
                 period = Duration.millis(200);
             }
+            _d.setGameState(GameData.GAME_STATE_WORD_DISPLAYING);
             execution.setPeriod(period);
             execution.start();
         }
 
         private void Open() {
-
+            _d.wordLineShowProperty().set(true);
         }
 
         private void Clear() {

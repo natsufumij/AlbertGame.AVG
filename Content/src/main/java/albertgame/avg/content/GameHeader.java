@@ -1,6 +1,8 @@
 package albertgame.avg.content;
 
 import javafx.beans.property.StringProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.effect.Bloom;
@@ -12,25 +14,21 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class GameHeader extends Parent {
 
     public static final String[] buttonNames = {
             "SKIP", "AUTO", "SAVE", "LOAD", "BACK"
     };
 
-    public static final char BUTTON_ID_SKIP = 0;
-    public static final char BUTTON_ID_AUTO = 1;
-    public static final char BUTTON_ID_SAVE = 2;
-    public static final char BUTTON_ID_LOAD = 3;
-    public static final char BUTTON_ID_BACK = 4;
-
     private ImageView background;
 
     private ImageView leftPerson;
     private ImageView centerPerson;
     private ImageView rightPerson;
-
-    private ImageView wordPaneFrame;
 
     private final Button[] buttonList = new Button[buttonNames.length];
 
@@ -100,9 +98,18 @@ public class GameHeader extends Parent {
             super.getChildren().add(t);
         }
 
+        List<EventHandler<ActionEvent>> eventHandlers = new ArrayList<>(Arrays.asList(
+                new SkipEventHandler(),
+                new AutoEventHandler(),
+                new SaveEventHandler(),
+                new LoadEventHandler(),
+                new BackEventHandler()
+        ));
+
         double prefX = ConfigCenter.TOOL_DISPLAY_X_R - 55;
-        for (int i = buttonList.length-1; i != -1; --i) {
+        for (int i = buttonList.length - 1; i != -1; --i) {
             Button button = new Button(buttonNames[i]);
+            button.setOnAction(eventHandlers.get(i));
             button.setLayoutX(prefX);
             button.setPrefSize(50, 28);
             button.setLayoutY(ConfigCenter.TOOL_DISPLAY_Y);
@@ -121,7 +128,7 @@ public class GameHeader extends Parent {
         }
 
         data.wordLineShowProperty().bindBidirectional(wordPaneFrameV2_b.visibleProperty());
-        data.wordLineShowProperty().bindBidirectional(name.visibleProperty());
+        data.nameShowProperty().bindBidirectional(name.visibleProperty());
     }
 
     public ImageView getBackground() {
@@ -140,7 +147,47 @@ public class GameHeader extends Parent {
         return rightPerson;
     }
 
-    public ImageView getWordPaneFrame() {
-        return wordPaneFrame;
+    static class SkipEventHandler implements EventHandler<ActionEvent> {
+
+        @Override
+        public void handle(ActionEvent event) {
+            System.out.println("Skip");
+
+        }
+    }
+
+    static class AutoEventHandler implements EventHandler<ActionEvent> {
+
+        @Override
+        public void handle(ActionEvent event) {
+            System.out.println("Auto");
+            GameData d=ManageCenter.getCenter().getGameData();
+            boolean aut=d.isAuto();
+            d.setAuto(!aut);
+        }
+    }
+
+    static class SaveEventHandler implements EventHandler<ActionEvent> {
+
+        @Override
+        public void handle(ActionEvent event) {
+            //TODO: 调出存档界面
+        }
+    }
+
+    static class LoadEventHandler implements EventHandler<ActionEvent> {
+
+        @Override
+        public void handle(ActionEvent event) {
+            //TODO: 调出存档界面
+        }
+    }
+
+    static class BackEventHandler implements EventHandler<ActionEvent> {
+
+        @Override
+        public void handle(ActionEvent event) {
+            //TODO: 返回主界面
+        }
     }
 }

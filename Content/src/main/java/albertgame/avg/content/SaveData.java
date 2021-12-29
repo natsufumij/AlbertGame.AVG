@@ -14,6 +14,7 @@ public class SaveData {
     private Date savedDate;
 
     private String playName;
+    private Character struckOfPlay;
     private Integer playIndex;
 
     private Map<String, String> savedAttributes;
@@ -147,5 +148,13 @@ public class SaveData {
 
     public void setDisplayWordLine(List<String> displayWordLine) {
         this.displayWordLine = displayWordLine;
+    }
+
+    public Character getStruckOfPlay() {
+        return struckOfPlay;
+    }
+
+    public void setStruckOfPlay(Character struckOfPlay) {
+        this.struckOfPlay = struckOfPlay;
     }
 }

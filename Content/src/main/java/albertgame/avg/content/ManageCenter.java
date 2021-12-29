@@ -9,9 +9,9 @@ public class ManageCenter {
     private static ManageCenter center;
 
     public static ManageCenter getCenter() {
-        if(center==null){
-            synchronized (ManageCenter.class){
-                center=new ManageCenter();
+        if (center == null) {
+            synchronized (ManageCenter.class) {
+                center = new ManageCenter();
                 center.init();
             }
         }
@@ -43,6 +43,13 @@ public class ManageCenter {
         manageState = 0;
     }
 
+    public void update() {
+
+        //如果正在等待下一条命令，
+        //则读取剧本中下一条命令，并执行
+        //TODO: 执行剧本的命令，更新剧本执行的相关数据
+    }
+
     public Parent getNowScene() {
         return nowScene;
     }
@@ -54,6 +61,7 @@ public class ManageCenter {
     public void setManageState(char manageState) {
         if (this.manageState == manageState) return;
 
+        //TODO: 等待完善开始界面与存档界面
         switch (manageState) {
             case 0:
             case 2:

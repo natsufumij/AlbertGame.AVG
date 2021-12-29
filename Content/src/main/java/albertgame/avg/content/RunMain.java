@@ -1,13 +1,12 @@
 package albertgame.avg.content;
 
 import javafx.application.Application;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class RunMain extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage){
 
         ManageCenter center=ManageCenter.getCenter();
         center.setStage(primaryStage);
