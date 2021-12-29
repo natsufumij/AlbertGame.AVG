@@ -3,9 +3,7 @@ package albertgame.avg.content;
 
 import jakarta.xml.bind.annotation.XmlRootElement;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 一份游戏存档
@@ -23,18 +21,20 @@ public class SaveData {
     private String backMusicName;
     private String backImage;
 
-    private String leftPersonName;
-    private String centerPersonName;
-    private String rightPersonName;
+    private String leftPersonId;
+    private String centerPersonId;
+    private String rightPersonId;
 
     private String leftPersonState;
     private String centerPersonState;
     private String rightPersonState;
 
-    private String titleText;
+    private String displayName;
+    private List<String> displayWordLine;
 
     public SaveData() {
         savedAttributes=new HashMap<>();
+        displayWordLine=new ArrayList<>();
     }
 
     public Date getSavedDate() {
@@ -53,11 +53,11 @@ public class SaveData {
         this.playName = playName;
     }
 
-    public int getPlayIndex() {
+    public Integer getPlayIndex() {
         return playIndex;
     }
 
-    public void setPlayIndex(int playIndex) {
+    public void setPlayIndex(Integer playIndex) {
         this.playIndex = playIndex;
     }
 
@@ -77,28 +77,36 @@ public class SaveData {
         this.backImage = backImage;
     }
 
-    public String getLeftPersonName() {
-        return leftPersonName;
+    public String getLeftPersonId() {
+        return leftPersonId;
     }
 
-    public void setLeftPersonName(String leftPersonName) {
-        this.leftPersonName = leftPersonName;
+    public void setLeftPersonId(String leftPersonId) {
+        this.leftPersonId = leftPersonId;
     }
 
-    public String getCenterPersonName() {
-        return centerPersonName;
+    public String getCenterPersonId() {
+        return centerPersonId;
     }
 
-    public void setCenterPersonName(String centerPersonName) {
-        this.centerPersonName = centerPersonName;
+    public void setCenterPersonId(String centerPersonId) {
+        this.centerPersonId = centerPersonId;
     }
 
-    public String getRightPersonName() {
-        return rightPersonName;
+    public String getRightPersonId() {
+        return rightPersonId;
     }
 
-    public void setRightPersonName(String rightPersonName) {
-        this.rightPersonName = rightPersonName;
+    public void setRightPersonId(String rightPersonId) {
+        this.rightPersonId = rightPersonId;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getLeftPersonState() {
@@ -125,15 +133,19 @@ public class SaveData {
         this.rightPersonState = rightPersonState;
     }
 
-    public String getTitleText() {
-        return titleText;
-    }
-
-    public void setTitleText(String titleText) {
-        this.titleText = titleText;
-    }
-
     public Map<String, String> getSavedAttributes() {
         return savedAttributes;
+    }
+
+    public void setSavedAttributes(Map<String, String> savedAttributes) {
+        this.savedAttributes = savedAttributes;
+    }
+
+    public List<String> getDisplayWordLine() {
+        return displayWordLine;
+    }
+
+    public void setDisplayWordLine(List<String> displayWordLine) {
+        this.displayWordLine = displayWordLine;
     }
 }

@@ -11,6 +11,8 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.media' ]
 }
 
+mainClassName = 'albertgame.avg.content.Main'
+
 repositories {
     mavenCentral()
 }
@@ -21,4 +23,8 @@ dependencies {
 
 test {
     useTestNG()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
 }
