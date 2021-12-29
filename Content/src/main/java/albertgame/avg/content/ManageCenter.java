@@ -6,16 +6,16 @@ import javafx.stage.Stage;
 
 public class ManageCenter {
 
-    static {
-        synchronized (ManageCenter.class) {
-            center = new ManageCenter();
-        }
-        ManageCenter.center.init();
-    }
-
     private static ManageCenter center;
 
     public static ManageCenter getCenter() {
+        if(center==null){
+            synchronized (ManageCenter.class){
+                center=new ManageCenter();
+                center.init();
+            }
+        }
+
         return center;
     }
 
@@ -75,10 +75,6 @@ public class ManageCenter {
 
     public GameHeader getHeader() {
         return header;
-    }
-
-    public Stage getStage() {
-        return stage;
     }
 
     public void setStage(Stage stage) {
