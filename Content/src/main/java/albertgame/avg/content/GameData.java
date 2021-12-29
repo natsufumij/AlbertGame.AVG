@@ -5,17 +5,10 @@ import javafx.scene.image.Image;
 
 public class GameData {
 
-    static {
-        synchronized (GameData.class){
-            GameData.gameData=new GameData();
-        }
-    }
-
-    public static GameData get(){
-        return gameData;
-    }
-
-    private static GameData gameData;
+    public static final char GAME_STATE_WAIT_PRESS=0;
+    public static final char GAME_STATE_WORD_DISPLAYING=1;
+    public static final char GAME_STATE_SELECTING=2;
+    public static final char GAME_ANIMATING=3;
 
     private SaveData saveData;
 
@@ -34,7 +27,9 @@ public class GameData {
     private Person centerPerson;
     private Person rightPerson;
 
-    private GameData() {
+    private char gameState;
+
+    public GameData() {
         leftPerson=Person.NONE_PERSON;
         centerPerson=Person.NONE_PERSON;
         rightPerson=Person.NONE_PERSON;
@@ -49,6 +44,7 @@ public class GameData {
             displayWordLine[i]=text;
         }
         wordLineShow=new SimpleBooleanProperty(Boolean.TRUE);
+        gameState=GAME_STATE_WAIT_PRESS;
     }
 
     public SaveData getSaveData() {
@@ -121,5 +117,13 @@ public class GameData {
 
     public Person getRightPerson() {
         return rightPerson;
+    }
+
+    public char getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(char gameState) {
+        this.gameState = gameState;
     }
 }

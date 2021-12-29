@@ -13,12 +13,26 @@ public class ConfigCenter {
     public static final int PERSON_HEIGHT = WINDOW_HEIGHT;
     public static final int PERSON_WIDTH = WINDOW_WIDTH / 3;
 
-    public static final int WORD_LINE_COLUMN=30;
-    public static final int WORD_LINE_ROW=3;
+    public static final int WORD_LINE_COLUMN = 30;
+    public static final int WORD_LINE_ROW = 3;
 
-    public static final Font WORD_FONT=new Font(16.0);
+    public static final Font WORD_FONT = new Font(18.0);
 
-    public static final int WORD_TAP=3;
+    public static final int WORD_TAP = 3;
+    public static final int WORD_LINE_TAP=5;
+    public static final int WORD_PANEL_DISPLAY_X = 0;
+    public static final int WORD_PANEL_DISPLAY_Y = WINDOW_HEIGHT / 4 * 3 - 60;
+    public static final int WORD_PANEL_WIDTH=WINDOW_WIDTH;
+    public static final int WORD_PANEL_HEIGHT=160;
+
+    public static final int WORD_START_X=WINDOW_WIDTH / 5;
+    public static final int WORD_START_Y=WINDOW_HEIGHT / 4 * 3;
+
+    public static final int NAME_DISPLAY_X = WINDOW_WIDTH / 5 - 20;
+    public static final int NAME_DISPLAY_Y = WINDOW_HEIGHT / 4 * 3 - 30;
+
+    public static final int TOOL_DISPLAY_X_R=840 ;
+    public static final int TOOL_DISPLAY_Y=WINDOW_HEIGHT - WORD_PANEL_HEIGHT - 40;
 
     public static final String WINDOW_TITLE = "AlbertGame.AVG";
 
