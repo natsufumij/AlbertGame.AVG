@@ -12,9 +12,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class GameHeader extends Parent {
 
     public static final String[] buttonNames = {
@@ -34,13 +31,8 @@ public class GameHeader extends Parent {
     private ImageView rightPerson;
 
     private ImageView wordPaneFrame;
-    private Rectangle wordPaneFrameV2_b;
-    private Rectangle wordPaneFrameV2_name;
 
-    private Button[] buttonList = new Button[buttonNames.length];
-
-    private Text name;
-    private Text[] words;
+    private final Button[] buttonList = new Button[buttonNames.length];
 
     public GameHeader(GameData data) {
         initHead(data);
@@ -70,14 +62,14 @@ public class GameHeader extends Parent {
 
         rightPerson.setTranslateX(ConfigCenter.PERSON_WIDTH * 2);
 
-        name = new Text("SECRET PLAYER");
+        Text name = new Text("SECRET PLAYER");
         name.setFont(ConfigCenter.WORD_FONT);
         name.setTranslateX(ConfigCenter.NAME_DISPLAY_X);
         name.setTranslateY(ConfigCenter.NAME_DISPLAY_Y);
         name.setStroke(Color.WHITE);
         name.setEffect(new Bloom(0.1));
 
-        wordPaneFrameV2_b = new Rectangle(ConfigCenter.WORD_PANEL_WIDTH,
+        Rectangle wordPaneFrameV2_b = new Rectangle(ConfigCenter.WORD_PANEL_WIDTH,
                 ConfigCenter.WORD_PANEL_HEIGHT, Color.color(0.2, 0.2, 0.2, 0.5));
         wordPaneFrameV2_b.setTranslateY(ConfigCenter.WORD_PANEL_DISPLAY_Y);
         wordPaneFrameV2_b.setTranslateX(ConfigCenter.WORD_PANEL_DISPLAY_X);
@@ -88,7 +80,7 @@ public class GameHeader extends Parent {
         super.getChildren().addAll(wordPaneFrameV2_b);
         super.getChildren().addAll(name);
 
-        words = new Text[ConfigCenter.WORD_LINE_ROW * ConfigCenter.WORD_LINE_COLUMN];
+        Text[] words = new Text[ConfigCenter.WORD_LINE_ROW * ConfigCenter.WORD_LINE_COLUMN];
         Font f;
         for (int i = 0; i != words.length; ++i) {
             int row = i / ConfigCenter.WORD_LINE_COLUMN;
@@ -118,16 +110,18 @@ public class GameHeader extends Parent {
             prefX -= 55;
         }
 
-
         data.backgroundImageProperty().bindBidirectional(background.imageProperty());
         data.leftPersonImageProperty().bindBidirectional(leftPerson.imageProperty());
         data.rightPersonImageProperty().bindBidirectional(rightPerson.imageProperty());
         data.nameDisplayProperty().bindBidirectional(name.textProperty());
-        for (int i = 0; i != data.getDisplayWordLine().length; ++i) {
-            StringProperty text = data.getDisplayWordLine()[i];
+        for (int i = 0; i != data.getDisplayWords().length; ++i) {
+            StringProperty text = data.getDisplayWords()[i];
             text.bindBidirectional(words[i].textProperty());
             text.setValue("我");
         }
+
+        data.wordLineShowProperty().bindBidirectional(wordPaneFrameV2_b.visibleProperty());
+        data.wordLineShowProperty().bindBidirectional(name.visibleProperty());
     }
 
     public ImageView getBackground() {

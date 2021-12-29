@@ -6,22 +6,23 @@ import javafx.scene.image.Image;
 public class GameData {
 
     public static final char GAME_STATE_WAIT_PRESS=0;
-    public static final char GAME_STATE_WORD_DISPLAYING=1;
-    public static final char GAME_STATE_SELECTING=2;
-    public static final char GAME_ANIMATING=3;
+    public static final char GAME_STATE_AUTO_WORDING=1;
+    public static final char GAME_STATE_WORD_DISPLAYING=2;
+    public static final char GAME_STATE_SELECTING=3;
+    public static final char GAME_ANIMATING=4;
 
     private SaveData saveData;
 
-    private ObjectProperty<Image> backgroundImage;
+    private final ObjectProperty<Image> backgroundImage;
 
-    private ObjectProperty<Image> leftPersonImage;
-    private ObjectProperty<Image> centerPersonImage;
-    private ObjectProperty<Image> rightPersonImage;
+    private final ObjectProperty<Image> leftPersonImage;
+    private final ObjectProperty<Image> centerPersonImage;
+    private final ObjectProperty<Image> rightPersonImage;
 
-    private StringProperty nameDisplay;
-    private StringProperty[] displayWordLine;
+    private final StringProperty nameDisplay;
+    private final StringProperty[] displayWords;
 
-    private BooleanProperty wordLineShow;
+    private final BooleanProperty wordLineShow;
 
     private Person leftPerson;
     private Person centerPerson;
@@ -38,10 +39,10 @@ public class GameData {
         centerPersonImage=new SimpleObjectProperty<>();
         rightPersonImage=new SimpleObjectProperty<>();
         nameDisplay=new SimpleStringProperty();
-        displayWordLine=new StringProperty[ConfigCenter.WORD_LINE_ROW*ConfigCenter.WORD_LINE_COLUMN];
-        for(int i=0;i!=displayWordLine.length;++i){
+        displayWords =new StringProperty[ConfigCenter.WORD_LINE_ROW*ConfigCenter.WORD_LINE_COLUMN];
+        for(int i = 0; i!= displayWords.length; ++i){
             StringProperty text=new SimpleStringProperty(" ");
-            displayWordLine[i]=text;
+            displayWords[i]=text;
         }
         wordLineShow=new SimpleBooleanProperty(Boolean.TRUE);
         gameState=GAME_STATE_WAIT_PRESS;
@@ -95,8 +96,8 @@ public class GameData {
         return nameDisplay;
     }
 
-    public StringProperty[] getDisplayWordLine() {
-        return displayWordLine;
+    public StringProperty[] getDisplayWords() {
+        return displayWords;
     }
 
     public boolean isWordLineShow() {
@@ -117,6 +118,18 @@ public class GameData {
 
     public Person getRightPerson() {
         return rightPerson;
+    }
+
+    public void setLeftPerson(Person leftPerson) {
+        this.leftPerson = leftPerson;
+    }
+
+    public void setCenterPerson(Person centerPerson) {
+        this.centerPerson = centerPerson;
+    }
+
+    public void setRightPerson(Person rightPerson) {
+        this.rightPerson = rightPerson;
     }
 
     public char getGameState() {
