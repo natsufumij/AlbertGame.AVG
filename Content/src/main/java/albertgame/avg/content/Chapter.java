@@ -1,13 +1,20 @@
 package albertgame.avg.content;
 
-public record Chapter(String id, boolean end, ChapterOptionUnion chapterOptionUnion) {
+import albertgame.avg.content.Play.OptionStruck;
 
-    record ChapterStruck(String name, Play startPlay) {
+import java.util.Map;
 
-    }
+public record Chapter
+        (String id,
+         String name,
+         Play startPlay,
+         OptionStruck nextChapter) {
 
-    record ChapterOptionUnion(ChapterStruck chapterStruck,
-                              Play.OptionStruck[] optionStruck,
-                              ChapterStruck[] destStruck) {
+    public String nextChapter(Map<String, Integer> data) {
+        if (nextChapter == OptionStruck.NONE_OPTION)
+            return OptionStruck.NONE_ID;
+
+        return nextChapter.struckNextOption(data);
     }
 }
+

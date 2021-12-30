@@ -4,6 +4,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ManageCenter {
 
     private static ManageCenter center;
@@ -36,11 +39,15 @@ public class ManageCenter {
     private GameData gameData;
     //游戏场景界面
     private GameHeader header;
+    //游戏功能
+    private Map<String,GameFunction> functionMap;
 
     private void init() {
         gameData = new GameData();
         header = new GameHeader(gameData);
         manageState = 0;
+        functionMap=new HashMap<>();
+        functionMap.put("Dialog",new GameFunction.WordFunction());
     }
 
     public void update() {
@@ -48,6 +55,9 @@ public class ManageCenter {
         //如果正在等待下一条命令，
         //则读取剧本中下一条命令，并执行
         //TODO: 执行剧本的命令，更新剧本执行的相关数据
+        if(gameData.getGameState()==GameData.GAME_STATE_WAIT_NEXT){
+            gameData.nextPlayLine();
+        }
     }
 
     public Parent getNowScene() {
@@ -88,5 +98,9 @@ public class ManageCenter {
     public void setStage(Stage stage) {
         this.stage = stage;
         stage.setResizable(false);
+    }
+
+    public Map<String, GameFunction> getFunctionMap() {
+        return functionMap;
     }
 }

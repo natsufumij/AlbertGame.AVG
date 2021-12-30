@@ -17,7 +17,7 @@ public class SaveData {
     private Character struckOfPlay;
     private Integer playIndex;
 
-    private Map<String, String> savedAttributes;
+    private Map<String, Integer> savedAttributes;
 
     private String backMusicName;
     private String backImage;
@@ -134,11 +134,11 @@ public class SaveData {
         this.rightPersonState = rightPersonState;
     }
 
-    public Map<String, String> getSavedAttributes() {
+    public Map<String, Integer> getSavedAttributes() {
         return savedAttributes;
     }
 
-    public void setSavedAttributes(Map<String, String> savedAttributes) {
+    public void setSavedAttributes(Map<String, Integer> savedAttributes) {
         this.savedAttributes = savedAttributes;
     }
 

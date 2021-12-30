@@ -3,6 +3,9 @@ package albertgame.avg.content;
 import javafx.beans.property.*;
 import javafx.scene.image.Image;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class GameData {
 
     //游戏当前状态
@@ -12,15 +15,11 @@ public class GameData {
     //  正在选择分支中
     //  正在动画中
 
-    public static final char GAME_STATE_WAIT_PRESS=0;
-    public static final char GAME_STATE_WAIT_NEXT=1;
-    public static final char GAME_STATE_SELECTING=2;
-    public static final char GAME_STATE_WORD_DISPLAYING=3;
-    public static final char GAME_STATE_ANIMATING=4;
-
-    public static final char LINE_IN_BEGINS=0;
-    public static final char LINE_IN_BODY=1;
-    public static final char LINE_IN_ENDS=2;
+    public static final char GAME_STATE_WAIT_PRESS = 0;
+    public static final char GAME_STATE_WAIT_NEXT = 1;
+    public static final char GAME_STATE_SELECTING = 2;
+    public static final char GAME_STATE_WORD_DISPLAYING = 3;
+    public static final char GAME_STATE_ANIMATING = 4;
 
     private SaveData saveData;
 
@@ -39,13 +38,14 @@ public class GameData {
     private Person leftPerson;
     private Person centerPerson;
     private Person rightPerson;
+    private final Map<String, Person> playedPersons;
 
+    private final Map<String, Chapter> chapterSet;
+    private final Map<String, Play> playSet;
     private Chapter nowChapter;
     private Play nowPlay;
-    private String[] lines;
+    private Play.BodyStruck struck;
     private int lineIndex;
-
-    private char struckOfPlay;
 
     private char gameState;
 
@@ -53,28 +53,75 @@ public class GameData {
     private boolean auto;
 
     public GameData() {
-        leftPerson=Person.NONE_PERSON;
-        centerPerson=Person.NONE_PERSON;
-        rightPerson=Person.NONE_PERSON;
-        backgroundImage=new SimpleObjectProperty<>();
-        leftPersonImage=new SimpleObjectProperty<>();
-        centerPersonImage=new SimpleObjectProperty<>();
-        rightPersonImage=new SimpleObjectProperty<>();
-        nameDisplay=new SimpleStringProperty();
-        displayWords =new StringProperty[ConfigCenter.WORD_LINE_ROW*ConfigCenter.WORD_LINE_COLUMN];
-        for(int i = 0; i!= displayWords.length; ++i){
-            StringProperty text=new SimpleStringProperty(" ");
-            displayWords[i]=text;
+        leftPerson = Person.NONE_PERSON;
+        centerPerson = Person.NONE_PERSON;
+        rightPerson = Person.NONE_PERSON;
+        playedPersons = new HashMap<>();
+        backgroundImage = new SimpleObjectProperty<>();
+        leftPersonImage = new SimpleObjectProperty<>();
+        centerPersonImage = new SimpleObjectProperty<>();
+        rightPersonImage = new SimpleObjectProperty<>();
+        nameDisplay = new SimpleStringProperty();
+        displayWords = new StringProperty[ConfigCenter.WORD_LINE_ROW * ConfigCenter.WORD_LINE_COLUMN];
+        for (int i = 0; i != displayWords.length; ++i) {
+            StringProperty text = new SimpleStringProperty(" ");
+            displayWords[i] = text;
         }
-        wordLineShow=new SimpleBooleanProperty(Boolean.TRUE);
-        nameShow=new SimpleBooleanProperty(Boolean.TRUE);
-        gameState=GAME_STATE_WAIT_PRESS;
+        wordLineShow = new SimpleBooleanProperty(Boolean.TRUE);
+        nameShow = new SimpleBooleanProperty(Boolean.TRUE);
+        gameState = GAME_STATE_WAIT_PRESS;
+        chapterSet = new HashMap<>();
+        playSet = new HashMap<>();
         initChapter();
     }
 
     private void initChapter() {
 
         //TODO: 初始化章节内容，本次用以测试剧本解析是否正常
+    }
+
+    public Map<String, Person> getPlayedPersons() {
+        return playedPersons;
+    }
+
+    public void nextPlayLine() {
+        if (lineIndex == struck.expressions().length) {
+
+            //如果有下一个body块
+            if (struck.optionStruck() != Play.OptionStruck.NONE_OPTION) {
+                //查找下一个body块
+                Play.BodyStruck nextStruck = nowPlay.nextBodyStruck(struck.id(), this.saveData.getSavedAttributes());
+                resetStruck(nowChapter,nowPlay,nextStruck);
+            } else {
+
+                //body块结束，并且没有下一块
+                //寻找下一个play
+                String destId = nowPlay.nextPlay(this.saveData.getSavedAttributes());
+                Play play = playSet.get(destId);
+                final String beginStruckName="begins";
+
+                //找到了play，寻找begins，作为第一个body块
+                if (play != null) {
+                    resetStruck(nowChapter,play,play.bodyStruckMap().get(beginStruckName));
+                } else {
+
+                    //如果没有下一个play，则切换到下一章节，重设play，和body块
+                    destId = nowChapter.nextChapter(this.saveData.getSavedAttributes());
+                    Chapter chapter = chapterSet.get(destId);
+                    if (chapter != null) {
+                        Play p=chapter.startPlay();
+                        resetStruck(chapter,p,p.bodyStruckMap().get(beginStruckName));
+                    }
+                }
+            }
+        }
+    }
+
+    private void resetStruck(Chapter c, Play p, Play.BodyStruck struck){
+        this.nowChapter=c;
+        this.nowPlay=p;
+        this.struck=struck;
+        lineIndex=0;
     }
 
     public SaveData getSaveData() {
@@ -183,5 +230,13 @@ public class GameData {
 
     public BooleanProperty nameShowProperty() {
         return nameShow;
+    }
+
+    public Map<String, Chapter> getChapterSet() {
+        return chapterSet;
+    }
+
+    public Map<String, Play> getPlaySet() {
+        return playSet;
     }
 }
