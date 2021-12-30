@@ -48,6 +48,7 @@ public class ManageCenter {
         manageState = 0;
         functionMap=new HashMap<>();
         functionMap.put("Dialog",new GameFunction.WordFunction());
+        initChapter();
     }
 
     public void update() {
@@ -59,6 +60,19 @@ public class ManageCenter {
             gameData.nextPlayLine();
         }
     }
+
+    public void initChapter() {
+
+        //TODO: 初始化章节内容，本次用以测试剧本解析是否正常
+        GameFunction.WordFunction function=new GameFunction.WordFunction();
+        GameFunction.FunctionArg arg=new GameFunction.FunctionArg("Dialog","Word","S",new String[]{
+                "这真是一个好日子啊啊啊啊啊啊啊啊啊啊啊 啊啊啊啊"
+        });
+        GameFunction.FunctionArg arg0=new GameFunction.FunctionArg("Dialog","Clear","", GameFunction.NONE_EXTRA);
+        function.fun(gameData,header, arg0);
+        function.fun(gameData,header,arg);
+    }
+
 
     public Parent getNowScene() {
         return nowScene;

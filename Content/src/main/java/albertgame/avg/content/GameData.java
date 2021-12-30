@@ -72,13 +72,8 @@ public class GameData {
         gameState = GAME_STATE_WAIT_PRESS;
         chapterSet = new HashMap<>();
         playSet = new HashMap<>();
-        initChapter();
     }
 
-    private void initChapter() {
-
-        //TODO: 初始化章节内容，本次用以测试剧本解析是否正常
-    }
 
     public Map<String, Person> getPlayedPersons() {
         return playedPersons;

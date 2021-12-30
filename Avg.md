@@ -106,11 +106,10 @@
   Start9->Start10 
 #Options:
   OptionSelect1:
-    A=B+C, D=B*C+2, S=F/2-3, K=9%2
-    [0]={A=2 | D=2 | S=3}
-    [1]={A>2 & D<2>}
-    [2]={S>3 & K=1}
-    [3]={else}
+    A=2 | D=2 | S=3
+    A>2 & D<2>
+    S>3 & K=1
+    Else
   ...   
 
 ```
@@ -131,11 +130,10 @@
   Start9->Start10 
 #Options:
   OptionSelect1:
-    A=B+C, D=B*C+2, S=F/2-3, K=9%2
-    [0]={A=2 | D=2 | S=3}
-    [1]={A>2 & D<2>}
-    [2]={S>3 & K=1}
-    [3]={else}
+    A=2 | D=2 | S=3
+    A>2 & D<2>
+    S>3 & K=1
+    Else
   OptionSelect2:
     ...  
   ...   

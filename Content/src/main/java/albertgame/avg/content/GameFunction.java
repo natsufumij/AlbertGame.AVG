@@ -1,15 +1,19 @@
 package albertgame.avg.content;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.util.Duration;
 
 import java.util.concurrent.Executors;
 
 public interface GameFunction {
 
-    String[] NONE_EXTRA=null;
+    String[] NONE_EXTRA = null;
 
     record FunctionArg(String type, String name, String value, String[] extra) {
     }
@@ -65,63 +69,9 @@ public interface GameFunction {
             }
         }
 
-
-        private static class WordDisplayExecution extends ScheduledService<Void> {
-
-            GameData data;
-            String destWords;
-            int index;
-            int dest;
-
-            public WordDisplayExecution(GameData data, String destWords) {
-                reset(data, destWords);
-            }
-
-            void reset(GameData data, String destWords) {
-                this.data = data;
-                this.destWords = destWords;
-                clearWord();
-                index = 0;
-                dest = destWords.length();
-            }
-
-            private void clearWord() {
-                for (StringProperty s : data.getDisplayWords()) {
-                    s.setValue(" ");
-                }
-            }
-
-            @Override
-            protected Task<Void> createTask() {
-                return new Task<>() {
-                    @Override
-                    protected Void call() {
-                        if (index == dest) {
-                            //如果是普通文字显示状态，则切换为等待输入状态
-                            //否则为自动响应状态，无需更改状态,无需等待用户反应文字显示，直接等待下一个命令
-                            if (!data.isAuto()) {
-                                data.setGameState(GameData.GAME_STATE_WAIT_PRESS);
-                            } else {
-                                data.setGameState(GameData.GAME_STATE_WAIT_NEXT);
-                            }
-                            WordDisplayExecution.super.succeeded();
-                        } else {
-                            //继续贴字
-                            char c = destWords.charAt(index);
-                            data.getDisplayWords()[index].setValue(String.valueOf(c));
-                            ++index;
-                        }
-
-                        super.succeeded();
-                        return null;
-                    }
-                };
-            }
-        }
-
-
-        //文字显示定时任务
-        WordDisplayExecution execution;
+        Timeline line;
+        String destWords;
+        int index = 0, dest;
 
         /**
          * 将需要显示的文字暂存，修改状态为Displaying，并开启一个定时任务将文字贴到WordPanel上，
@@ -132,26 +82,44 @@ public interface GameFunction {
          */
         private void Word(String text) {
 
-            if (execution == null) {
-                execution = new WordDisplayExecution(this._d, text);
-                execution.setDelay(Duration.ZERO);
-                execution.setExecutor(Executors.newFixedThreadPool(1));
-            } else if (execution.isRunning()) {
-                execution.cancel();
-            }
+            index = 0;
+            destWords = text;
+            dest = destWords.length();
 
-            Duration period;
-            if (_d.isAuto()) {
-                period = Duration.millis(80);
+            if (line == null) {
+                line = new Timeline();
+                line.setCycleCount(Timeline.INDEFINITE);
+                Duration period;
+                if (_d.isAuto()) {
+                    period = Duration.millis(80);
+                } else {
+                    period = Duration.millis(200);
+                }
+                KeyFrame keyFrame = new KeyFrame(period, "WordDisplaying", event -> {
+                    if (index == dest) {
+                        //如果是普通文字显示状态，则切换为等待输入状态
+                        //否则为自动响应状态，无需更改状态,无需等待用户反应文字显示，直接等待下一个命令
+                        if (!this._d.isAuto()) {
+                            this._d.setGameState(GameData.GAME_STATE_WAIT_PRESS);
+                        } else {
+                            this._d.setGameState(GameData.GAME_STATE_WAIT_NEXT);
+                        }
+                        line.stop();
+                    } else {
+                        //继续贴字
+                        char c = destWords.charAt(index);
+                        this._d.getDisplayWords()[index].setValue(String.valueOf(c));
+                        ++index;
+                    }
+                });
+                line.getKeyFrames().add(keyFrame);
             } else {
-                period = Duration.millis(200);
+                line.stop();
             }
-            _d.setGameState(GameData.GAME_STATE_WORD_DISPLAYING);
-            execution.setPeriod(period);
-            execution.start();
+            line.play();
         }
 
-        private void SetName(String name){
+        private void SetName(String name) {
             _d.nameDisplayProperty().setValue(name);
         }
 
@@ -162,7 +130,7 @@ public interface GameFunction {
 
         private void Clear() {
             _d.nameDisplayProperty().setValue(" ");
-            for(StringProperty s:_d.getDisplayWords()){
+            for (StringProperty s : _d.getDisplayWords()) {
                 s.setValue(" ");
             }
         }
