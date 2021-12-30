@@ -1,6 +1,8 @@
 package albertgame.avg.content;
 
 
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
 import java.util.*;
@@ -11,13 +13,20 @@ import java.util.*;
 @XmlRootElement
 public class SaveData {
 
-    private Date savedDate;
+    private Integer year;
+    private Integer month;
+    private Integer day;
+    private Integer hour;
+    private Integer minute;
+    private Integer second;
 
     private String playName;
     private Character struckOfPlay;
     private Integer playIndex;
 
-    private Map<String, Integer> savedAttributes;
+    @XmlElementWrapper(name = "savedAttributes")
+    @XmlElement(name = "attribute")
+    private List<String> savedAttributes;
 
     private String backMusicName;
     private String backImage;
@@ -34,16 +43,56 @@ public class SaveData {
     private List<String> displayWordLine;
 
     public SaveData() {
-        savedAttributes=new HashMap<>();
+        savedAttributes=new ArrayList<>();
         displayWordLine=new ArrayList<>();
     }
 
-    public Date getSavedDate() {
-        return savedDate;
+    public Integer getYear() {
+        return year;
     }
 
-    public void setSavedDate(Date savedDate) {
-        this.savedDate = savedDate;
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    public Integer getMonth() {
+        return month;
+    }
+
+    public void setMonth(Integer month) {
+        this.month = month;
+    }
+
+    public Integer getDay() {
+        return day;
+    }
+
+    public void setDay(Integer day) {
+        this.day = day;
+    }
+
+    public Integer getHour() {
+        return hour;
+    }
+
+    public void setHour(Integer hour) {
+        this.hour = hour;
+    }
+
+    public Integer getMinute() {
+        return minute;
+    }
+
+    public void setMinute(Integer minute) {
+        this.minute = minute;
+    }
+
+    public Integer getSecond() {
+        return second;
+    }
+
+    public void setSecond(Integer second) {
+        this.second = second;
     }
 
     public String getPlayName() {
@@ -134,11 +183,11 @@ public class SaveData {
         this.rightPersonState = rightPersonState;
     }
 
-    public Map<String, Integer> getSavedAttributes() {
+    public List<String> getSavedAttributes() {
         return savedAttributes;
     }
 
-    public void setSavedAttributes(Map<String, Integer> savedAttributes) {
+    public void setSavedAttributes(List<String> savedAttributes) {
         this.savedAttributes = savedAttributes;
     }
 

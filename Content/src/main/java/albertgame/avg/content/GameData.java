@@ -35,10 +35,13 @@ public class GameData {
     private final BooleanProperty wordLineShow;
     private final BooleanProperty nameShow;
 
+    private final Map<String,Integer> data;
+
     private Person leftPerson;
     private Person centerPerson;
     private Person rightPerson;
     private final Map<String, Person> playedPersons;
+    private final Map<String, Person.PersonData> personDataMap;
 
     private final Map<String, Chapter> chapterSet;
     private final Map<String, Play> playSet;
@@ -71,7 +74,16 @@ public class GameData {
         nameShow = new SimpleBooleanProperty(Boolean.TRUE);
         gameState = GAME_STATE_WAIT_PRESS;
         chapterSet = new HashMap<>();
+        data=new HashMap<>();
         playSet = new HashMap<>();
+        personDataMap=new HashMap<>();
+
+        testInit();
+    }
+
+    private void testInit() {
+        Person.PersonData personData=new Person.PersonData("bishojo","美少女","1",new String[]{"1"});
+        personDataMap.put("bishojo",personData);
     }
 
 
@@ -85,13 +97,13 @@ public class GameData {
             //如果有下一个body块
             if (struck.optionStruck() != Play.OptionStruck.NONE_OPTION) {
                 //查找下一个body块
-                Play.BodyStruck nextStruck = nowPlay.nextBodyStruck(struck.id(), this.saveData.getSavedAttributes());
+                Play.BodyStruck nextStruck = nowPlay.nextBodyStruck(struck.id(), this.data);
                 resetStruck(nowChapter,nowPlay,nextStruck);
             } else {
 
                 //body块结束，并且没有下一块
                 //寻找下一个play
-                String destId = nowPlay.nextPlay(this.saveData.getSavedAttributes());
+                String destId = nowPlay.nextPlay(this.data);
                 Play play = playSet.get(destId);
                 final String beginStruckName="begins";
 
@@ -101,7 +113,7 @@ public class GameData {
                 } else {
 
                     //如果没有下一个play，则切换到下一章节，重设play，和body块
-                    destId = nowChapter.nextChapter(this.saveData.getSavedAttributes());
+                    destId = nowChapter.nextChapter(this.data);
                     Chapter chapter = chapterSet.get(destId);
                     if (chapter != null) {
                         Play p=chapter.startPlay();
@@ -233,5 +245,13 @@ public class GameData {
 
     public Map<String, Play> getPlaySet() {
         return playSet;
+    }
+
+    public Map<String, Integer> getData() {
+        return data;
+    }
+
+    public Map<String, Person.PersonData> getPersonDataMap() {
+        return personDataMap;
     }
 }

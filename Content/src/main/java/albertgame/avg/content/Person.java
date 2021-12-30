@@ -6,7 +6,10 @@ import java.util.Map;
 
 public class Person {
 
-    public static final Person NONE_PERSON=new Person();
+    public record PersonData(String id, String name, String defaultState, String[] state) {
+    }
+
+    public static final Person NONE_PERSON = new Person();
 
     private final String id;
     private final String name;
@@ -17,7 +20,7 @@ public class Person {
     private final String defaultState;
     private final Map<String, Image> stateMap;
 
-    private Person(){
+    private Person() {
         this.id = "00";
         this.name = "00";
         this.stateMap = null;
@@ -32,10 +35,10 @@ public class Person {
         this.nowStateImage = stateMap.get(defaultState);
     }
 
-    public void changeStateTo(String newState){
-        if(stateMap.containsKey(newState)){
-            nowStateImage= stateMap.get(newState);
-            nowState=newState;
+    public void changeStateTo(String newState) {
+        if (stateMap.containsKey(newState)) {
+            nowStateImage = stateMap.get(newState);
+            nowState = newState;
         }
     }
 

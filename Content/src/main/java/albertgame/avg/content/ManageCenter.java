@@ -64,13 +64,50 @@ public class ManageCenter {
     public void initChapter() {
 
         //TODO: 初始化章节内容，本次用以测试剧本解析是否正常
-        GameFunction.WordFunction function=new GameFunction.WordFunction();
-        GameFunction.FunctionArg arg=new GameFunction.FunctionArg("Dialog","Word","S",new String[]{
-                "这真是一个好日子啊啊啊啊啊啊啊啊啊啊啊 啊啊啊啊"
-        });
-        GameFunction.FunctionArg arg0=new GameFunction.FunctionArg("Dialog","Clear","", GameFunction.NONE_EXTRA);
-        function.fun(gameData,header, arg0);
-        function.fun(gameData,header,arg);
+        //测试会话功能
+//        GameFunction.WordFunction function=new GameFunction.WordFunction();
+//        GameFunction.FunctionArg arg=new GameFunction.FunctionArg("Dialog","Word","S",new String[]{
+//                "这真是一个好日子啊啊啊啊啊啊啊啊啊啊啊 啊啊啊啊"
+//        });
+//        GameFunction.FunctionArg arg0=new GameFunction.FunctionArg("Dialog","Clear","", GameFunction.NONE_EXTRA);
+//        function.fun(gameData,header, arg0);
+//        function.fun(gameData,header,arg);
+
+        GameFunction.FunctionArg arg1=new GameFunction.FunctionArg(
+                "Person","In","bishojo",GameFunction.NONE_EXTRA);
+        GameFunction.FunctionArg arg2=new GameFunction.FunctionArg(
+                "Person","Show","R",new String[]{"bishojo"}
+        );
+        GameFunction.FunctionArg arg3=new GameFunction.FunctionArg(
+                "Person","Hide","R",GameFunction.NONE_EXTRA
+        );
+
+        //测试人物功能
+        GameFunction.PersonFunction personFunction=new GameFunction.PersonFunction();
+        personFunction.fun(gameData,header,arg1);
+        personFunction.fun(gameData,header,arg2);
+        personFunction.fun(gameData,header,arg3);
+
+        GameFunction.FunctionArg arg4=new GameFunction.FunctionArg(
+                "Audio","Bgm.Play","bgm1",GameFunction.NONE_EXTRA
+        );
+        GameFunction.FunctionArg arg5=new GameFunction.FunctionArg(
+                "Audio","Sound.Play","audio1",GameFunction.NONE_EXTRA);
+
+        //测试音频功能
+        GameFunction.AudioFunction audioFunction=new GameFunction.AudioFunction();
+        audioFunction.fun(gameData,header,arg4);
+        audioFunction.fun(gameData,header,arg5);
+
+        GameFunction.FunctionArg arg6=new GameFunction.FunctionArg(
+                "Select","SwitchA","你喜欢什么样的游戏？",
+                new String[]{
+                   "galgame","动作类","音乐类","你猜？"
+                });
+
+        //测试选择功能
+        GameFunction.SelectFunction selectFunction=new GameFunction.SelectFunction();
+        selectFunction.fun(gameData,header,arg6);
     }
 
 

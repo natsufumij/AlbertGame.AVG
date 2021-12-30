@@ -1,14 +1,14 @@
 package albertgame.avg.content;
 
 import javafx.beans.property.StringProperty;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
 import javafx.scene.effect.Bloom;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -21,7 +21,7 @@ import java.util.List;
 public class GameHeader extends Parent {
 
     public static final String[] buttonNames = {
-            "SKIP", "AUTO", "SAVE", "LOAD", "BACK"
+            "SKI P", "AUTO", "SAVE", "LOAD", "BACK"
     };
 
     private ImageView background;
@@ -30,20 +30,28 @@ public class GameHeader extends Parent {
     private ImageView centerPerson;
     private ImageView rightPerson;
 
-    private final Button[] buttonList = new Button[buttonNames.length];
+    private MediaView mediaView;
+
+    private Rectangle globalMask;
+
+    private final Text[] buttonList = new Text[buttonNames.length];
 
     public GameHeader(GameData data) {
         initHead(data);
     }
 
     public void initHead(GameData data) {
+
+        mediaView = new MediaView();
+        super.getChildren().add(mediaView);
+
         background = new ImageView(ConfigCenter.loadScene("back_demo1", "jpeg"));
         background.setFitWidth(ConfigCenter.WINDOW_WIDTH);
         background.setFitHeight(ConfigCenter.WINDOW_HEIGHT);
 
         Image ona = ConfigCenter.loadPersonState("onna", "1", "jpg");
         Image otoko = ConfigCenter.loadPersonState("otoko", "1", "jpg");
-        Image bishojo = ConfigCenter.loadPersonState("bishojo", "1", "jpg");
+        Image bishojo = ConfigCenter.loadPersonState("bishojo", "1", "png");
 
         leftPerson = new ImageView(ona);
         leftPerson.setFitWidth(ConfigCenter.PERSON_WIDTH);
@@ -62,10 +70,11 @@ public class GameHeader extends Parent {
 
         Text name = new Text("SECRET PLAYER");
         name.setFont(ConfigCenter.WORD_FONT);
+        name.setFill(Color.WHEAT);
         name.setTranslateX(ConfigCenter.NAME_DISPLAY_X);
         name.setTranslateY(ConfigCenter.NAME_DISPLAY_Y);
-        name.setStroke(Color.WHITE);
-        name.setEffect(new Bloom(0.1));
+        name.setOnMouseEntered(event -> name.setEffect(new Bloom(0.1)));
+        name.setOnMouseExited(event -> name.setEffect(null));
 
         Rectangle wordPaneFrameV2_b = new Rectangle(ConfigCenter.WORD_PANEL_WIDTH,
                 ConfigCenter.WORD_PANEL_HEIGHT, Color.color(0.2, 0.2, 0.2, 0.5));
@@ -98,7 +107,7 @@ public class GameHeader extends Parent {
             super.getChildren().add(t);
         }
 
-        List<EventHandler<ActionEvent>> eventHandlers = new ArrayList<>(Arrays.asList(
+        List<EventHandler<MouseEvent>> eventHandlers = new ArrayList<>(Arrays.asList(
                 new SkipEventHandler(),
                 new AutoEventHandler(),
                 new SaveEventHandler(),
@@ -108,14 +117,26 @@ public class GameHeader extends Parent {
 
         double prefX = ConfigCenter.TOOL_DISPLAY_X_R - 55;
         for (int i = buttonList.length - 1; i != -1; --i) {
-            Button button = new Button(buttonNames[i]);
-            button.setOnAction(eventHandlers.get(i));
+            Text button = new Text(buttonNames[i]);
+            button.setOnMouseClicked(eventHandlers.get(i));
+            button.setOnMouseEntered(event -> button.setEffect(new Bloom(0.1)));
+            button.setOnMouseExited(event -> button.setEffect(null));
             button.setLayoutX(prefX);
-            button.setPrefSize(50, 28);
             button.setLayoutY(ConfigCenter.TOOL_DISPLAY_Y);
+            button.setFont(ConfigCenter.WORD_FONT);
+            button.setStroke(Color.WHITE);
             super.getChildren().add(button);
             prefX -= 55;
         }
+
+
+        globalMask = new Rectangle(ConfigCenter.WINDOW_WIDTH, ConfigCenter.WINDOW_HEIGHT);
+        globalMask.setFill(Color.color(0.2, 0.2, 0.2, 0.5));
+        globalMask.setTranslateX(0);
+        globalMask.setTranslateY(0);
+
+        globalMask.setVisible(false);
+        super.getChildren().add(globalMask);
 
         data.backgroundImageProperty().bindBidirectional(background.imageProperty());
         data.leftPersonImageProperty().bindBidirectional(leftPerson.imageProperty());
@@ -147,46 +168,53 @@ public class GameHeader extends Parent {
         return rightPerson;
     }
 
-    static class SkipEventHandler implements EventHandler<ActionEvent> {
+    public MediaView getMediaView() {
+        return mediaView;
+    }
+
+    public Rectangle getGlobalMask() {
+        return globalMask;
+    }
+
+    static class SkipEventHandler implements EventHandler<MouseEvent> {
 
         @Override
-        public void handle(ActionEvent event) {
+        public void handle(MouseEvent event) {
             System.out.println("Skip");
-
         }
     }
 
-    static class AutoEventHandler implements EventHandler<ActionEvent> {
+    static class AutoEventHandler implements EventHandler<MouseEvent> {
 
         @Override
-        public void handle(ActionEvent event) {
+        public void handle(MouseEvent event) {
             System.out.println("Auto");
-            GameData d=ManageCenter.getCenter().getGameData();
-            boolean aut=d.isAuto();
+            GameData d = ManageCenter.getCenter().getGameData();
+            boolean aut = d.isAuto();
             d.setAuto(!aut);
         }
     }
 
-    static class SaveEventHandler implements EventHandler<ActionEvent> {
+    static class SaveEventHandler implements EventHandler<MouseEvent> {
 
         @Override
-        public void handle(ActionEvent event) {
+        public void handle(MouseEvent event) {
             //TODO: 调出存档界面
         }
     }
 
-    static class LoadEventHandler implements EventHandler<ActionEvent> {
+    static class LoadEventHandler implements EventHandler<MouseEvent> {
 
         @Override
-        public void handle(ActionEvent event) {
+        public void handle(MouseEvent event) {
             //TODO: 调出存档界面
         }
     }
 
-    static class BackEventHandler implements EventHandler<ActionEvent> {
+    static class BackEventHandler implements EventHandler<MouseEvent> {
 
         @Override
-        public void handle(ActionEvent event) {
+        public void handle(MouseEvent event) {
             //TODO: 返回主界面
         }
     }
