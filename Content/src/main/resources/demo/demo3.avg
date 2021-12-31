@@ -4,6 +4,11 @@ Demo2
 
 #Body
 >>begins
+[Dialog  Clear]
+[Dialog  Close]
+[View  Scene  back_demo1]
+[View  Lighting  3000]
+[Dialog  Open]
 第一天，去村落里的山洞里探险。
 第二天，休息一天，组织毕业典礼练习，组织楼房内电影观看。
 第三天，爬山，爬到山顶上观光。
