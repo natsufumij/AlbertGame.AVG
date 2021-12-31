@@ -516,7 +516,6 @@ public interface GameFunction {
             timeline.setCycleCount(dest);
             timeline.setOnFinished(event -> {
                 data.setGameState(GameData.GAME_STATE_WAIT_NEXT);
-                header.removeGlobalMask();
             });
 
             data.setGameState(GameData.GAME_STATE_ANIMATING);
