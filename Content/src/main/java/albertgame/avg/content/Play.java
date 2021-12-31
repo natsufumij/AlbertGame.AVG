@@ -19,7 +19,7 @@ public record Play
     public BodyStruck nextBodyStruck(String id, Map<String, Integer> data) {
         BodyStruck struck=bodyStruckMap.get(id);
         String dis=struck.optionStruck.struckNextOption(data);
-        if(dis==OptionStruck.NONE_ID){
+        if(Objects.equals(dis, OptionStruck.NONE_ID)){
             return BodyStruck.NONE_BODY;
         }else {
             return bodyStruckMap.get(dis);
@@ -160,27 +160,12 @@ public record Play
 
         try {
             File file = ConfigCenter.loadFileInClasspath("demo/demo2.avg");
-            if (file.exists() && file.isFile()) {
-                InputStreamReader reader = null;
-                reader = new InputStreamReader(new FileInputStream(file),
-                        StandardCharsets.UTF_8);
-                BufferedReader r = new BufferedReader(reader);
-                String line;
-                while ((line = r.readLine()) != null) {
-                    line = line.strip();
-                    line=line.strip();
-                    if(!line.isBlank()){
-                        parseFile(bodyNodeHS,stack,line);
-                    }
-                }
-                parseFile(bodyNodeHS,stack,END_SIGN);
-            }
+            Play p=loadPlay(file);
+            System.out.println("Ok.");
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        Play p=loadPlay(bodyNodeHS);
-        System.out.println("Ok.");
     }
 
     private static final String END_SIGN = "<<<end>>>";
@@ -206,8 +191,7 @@ public record Play
             }
 
             BodyNodeH one = new BodyNodeH();
-            String name = line.substring(1);
-            one.name = name;
+            one.name = line.substring(1);
             stack.push(one);
         } else if (line.startsWith(">>")) {
             //维持只有一个#，最多只有一个>>
@@ -242,12 +226,12 @@ public record Play
             String f = s.substring(1, ind);
             f = f.strip();
             ArrayList<String[]> arrayList=new ArrayList<>();
-            arrayList.add(f.split("  "));
+            arrayList.add(f.split(" {2}"));
             return arrayList;
         } else if (s.startsWith("@")) {
             String f = s.substring(1);
             f = f.strip();
-            String[] x = f.split("  ");
+            String[] x = f.split(" {2}");
             if (x.length != 2) return Collections.emptyList();
 
             ArrayList<String[]> arrayList = new ArrayList<>();
@@ -289,7 +273,7 @@ public record Play
 
         try {
             if (file.exists() && file.isFile()) {
-                InputStreamReader reader = null;
+                InputStreamReader reader;
                 reader = new InputStreamReader(new FileInputStream(file),
                         StandardCharsets.UTF_8);
                 BufferedReader r = new BufferedReader(reader);
@@ -319,21 +303,28 @@ public record Play
         BodyNodeH progressN=null;
         String id = "00", name = "00";
         for (BodyNodeH b : hs) {
-            if (b.name.equals("Info")) {
-                id = b.texts.get(0);
-                name = b.texts.get(1);
-            } else if (b.name.equals("Body")) {
-                bodyN = b;
-            } else if (b.name.equals("Options")) {
-                for (BodyNodeH h : b.children) {
-                    optionMap.put(h.name, h.texts.toArray(new String[0]));
-                }
-            } else if (b.name.equals("Progress")) {
-                progressN=b;
-            } else if (b.name.equals("NextPlays")) {
-                nextPlayIds = b.texts.get(0).split(",");
-            } else if (b.name.equals("NextOptions")) {
-                nextOps = b.texts.toArray(new String[0]);
+            switch (b.name) {
+                case "Info":
+                    id = b.texts.get(0);
+                    name = b.texts.get(1);
+                    break;
+                case "Body":
+                    bodyN = b;
+                    break;
+                case "Options":
+                    for (BodyNodeH h : b.children) {
+                        optionMap.put(h.name, h.texts.toArray(new String[0]));
+                    }
+                    break;
+                case "Progress":
+                    progressN = b;
+                    break;
+                case "NextPlays":
+                    nextPlayIds = b.texts.get(0).split(",");
+                    break;
+                case "NextOptions":
+                    nextOps = b.texts.toArray(new String[0]);
+                    break;
             }
         }
 
@@ -348,16 +339,13 @@ public record Play
         }
 
         //生成Map<String, BodyStruck>
+        assert bodyN != null;
         for (BodyNodeH h : bodyN.children) {
             String hid = h.name;
             List<String> exs = h.texts;
             OptionStruck o = op.get(hid);
             BodyStruck struck;
-            if (o == null) {
-                struck = new BodyStruck(hid, exs, OptionStruck.NONE_OPTION);
-            } else {
-                struck = new BodyStruck(hid, exs, o);
-            }
+            struck = new BodyStruck(hid, exs, Objects.requireNonNullElse(o, OptionStruck.NONE_OPTION));
             refreshBodyStruck(struck);
             bodyStruckMap.put(hid, struck);
         }
@@ -378,12 +366,12 @@ public record Play
         for(String s:struck.expressions){
             List<String[]> dest=parseCmd(s);
             for(String[] sr:dest){
-                String ax="  ";
+                StringBuilder ax= new StringBuilder("  ");
                 for(String sd:sr){
-                    ax+=sd+"  ";
+                    ax.append(sd).append("  ");
                 }
-                ax=ax.strip();
-                destList.add(ax);
+                ax = new StringBuilder(ax.toString().strip());
+                destList.add(ax.toString());
             }
         }
         struck.expressions.clear();

@@ -36,9 +36,10 @@
 - 人物
   - Person  In  #DataId 人物进入场景缓存
   - Person  Out  #DataId 人物换出场景缓存
-  - Person  Show  #Position(L/R)  #DataId 在左边、右边显示人物
-  - Person  Hide  #Position(L/R) 隐藏左边、右边
-  - Person  Change.State  #Position(L/R)  #newState 改变左边、右边人物的状态
+  - Person  Show  #Position(L/C/R)  #DataId 在左边、右边显示人物
+  - Person  No.Show  #Position(L/C/R)  去掉显示的人物位置
+  - Person  Hide  #Position(L/C/R) 隐藏左边、右边
+  - Person  Change.State  #Position(L/C/R)  #newState 改变左边、右边人物的状态
   
 - 属性存储
   - Storage  Save#Name  #Value 保存为某个值

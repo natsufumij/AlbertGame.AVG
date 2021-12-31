@@ -154,6 +154,7 @@ public interface GameFunction {
     //  - Person  In  #DataId 人物进入场景缓存
     //  - Person  Out  #DataId 人物换出场景缓存
     //  - Person  Show  #Position(L/R)  #DataId 在左边、右边显示人物
+    //  - Person  No.Show  #Position(L/C/R)  去掉显示的人物位置
     //  - Person  Hide  #Position(L/R) 隐藏左边、右边
     //  - Person  Change.State  #Position(L/R)  #newState 改变左边、右边人物的状态
     class PersonFunction implements GameFunction {
@@ -164,6 +165,7 @@ public interface GameFunction {
                 case "In" -> In(data, arg.value);
                 case "Out" -> Out(data, arg.value);
                 case "Show" -> Show(data, header, arg.value, arg.extra[0]);
+                case "No.Show"->NoShow(data,header,arg.value);
                 case "Hide" -> Hide(data, header, arg.value);
                 case "Change.State" -> ChangeState(data, arg.value, arg.extra[0]);
             }
@@ -192,6 +194,26 @@ public interface GameFunction {
             if (!d.getPlayedPersons().containsKey(pid)) return;
 
             d.getPlayedPersons().remove(pid);
+        }
+
+        private void NoShow(GameData d, GameHeader h, String pos){
+            switch (pos) {
+                case "L" -> {
+                    d.setLeftPerson(null);
+                    d.leftPersonImageProperty().set(null);
+                    h.getLeftPerson().setVisible(true);
+                }
+                case "C" -> {
+                    d.setCenterPerson(null);
+                    d.centerPersonImageProperty().set(null);
+                    h.getCenterPerson().setVisible(true);
+                }
+                case "R" -> {
+                    d.setRightPerson(null);
+                    d.rightPersonImageProperty().set(null);
+                    h.getRightPerson().setVisible(true);
+                }
+            }
         }
 
         private void Show(GameData d, GameHeader h, String pos, String pid) {
@@ -227,24 +249,36 @@ public interface GameFunction {
 
         private void ChangeState(GameData d, String pos, String newState) {
             Person p;
+            final String FAILED="ChangeState Failed: Don't Change On A Null Person";
             switch (pos) {
                 case "L" -> {
                     p = d.getLeftPerson();
+                    if(p==null){
+                        System.out.println(FAILED);
+                        return;
+                    }
                     p.changeStateTo(newState);
                     d.leftPersonImageProperty().set(p.getNowStateImage());
                 }
                 case "C" -> {
                     p = d.getCenterPerson();
+                    if(p==null){
+                        System.out.println(FAILED);
+                        return;
+                    }
                     p.changeStateTo(newState);
                     d.centerPersonImageProperty().set(p.getNowStateImage());
                 }
                 case "R" -> {
                     p = d.getRightPerson();
+                    if(p==null){
+                        System.out.println(FAILED);
+                        return;
+                    }
                     p.changeStateTo(newState);
                     d.rightPersonImageProperty().set(p.getNowStateImage());
                 }
             }
-
         }
     }
 
