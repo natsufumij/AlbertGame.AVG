@@ -5,6 +5,7 @@ import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.text.Font;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Objects;
@@ -19,15 +20,20 @@ public class ConfigCenter {
 
     public static final int WORD_LINE_COLUMN = 30;
     public static final int WORD_LINE_ROW = 3;
+    public static final int WORD_MAX_SIZE=WORD_LINE_COLUMN*WORD_LINE_ROW;
 
     public static final Font WORD_FONT = new Font(18.0);
+
+    public static final Font SELECT_FONT = new Font(24.0);
+    public static final int SELECT_WIDTH=600;
+    public static final int SELECT_HEIGHT=36;
 
     public static final int WORD_TAP = 3;
     public static final int WORD_LINE_TAP = 5;
     public static final int WORD_PANEL_DISPLAY_X = 0;
     public static final int WORD_PANEL_DISPLAY_Y = WINDOW_HEIGHT / 4 * 3 - 60;
     public static final int WORD_PANEL_WIDTH = WINDOW_WIDTH;
-    public static final int WORD_PANEL_HEIGHT = 160;
+    public static final int WORD_PANEL_HEIGHT = 240;
 
     public static final int WORD_START_X = WINDOW_WIDTH / 5;
     public static final int WORD_START_Y = WINDOW_HEIGHT / 4 * 3;
@@ -38,16 +44,24 @@ public class ConfigCenter {
     public static final int TOOL_DISPLAY_X_R = 840;
     public static final int TOOL_DISPLAY_Y = WINDOW_HEIGHT / 4 * 3 - 30;
 
+    public static final int SELECT_MAX_SIZE=5;
+    public static final int SELECT_Y=200;
+    public static final int SELECT_X=220;
+
     public static final String WINDOW_TITLE = "AlbertGame.AVG";
 
     public static final Image WINDOW_ICON = loadImage("config/icon", "jpeg");
 
-    public static Image loadScene(String name, String format) {
-        return loadImage("play/scene/" + name, format);
+    public static File loadFileInClasspath(String path){
+        return new File(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResource(path)).getFile());
     }
 
-    public static Image loadPersonState(String id, String state, String format) {
-        return loadImage("play/person/" + id + "_" + state, format);
+    public static Image loadScene(String name) {
+        return loadImage("play/scene/" + name,"jpg");
+    }
+
+    public static Image loadPersonState(String id, String state) {
+        return loadImage("play/person/" + id + "_" + state, "png");
     }
 
     public static Image loadImage(String path, String format) {

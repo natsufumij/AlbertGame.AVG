@@ -51,6 +51,7 @@ public class GameData {
     private int lineIndex;
 
     private char gameState;
+    private String nowSelectId;
 
     //是否自动
     private boolean auto;
@@ -85,7 +86,6 @@ public class GameData {
         Person.PersonData personData=new Person.PersonData("bishojo","美少女","1",new String[]{"1"});
         personDataMap.put("bishojo",personData);
     }
-
 
     public Map<String, Person> getPlayedPersons() {
         return playedPersons;
@@ -249,6 +249,14 @@ public class GameData {
 
     public Map<String, Integer> getData() {
         return data;
+    }
+
+    public String getNowSelectId() {
+        return nowSelectId;
+    }
+
+    public void setNowSelectId(String nowSelectId) {
+        this.nowSelectId = nowSelectId;
     }
 
     public Map<String, Person.PersonData> getPersonDataMap() {

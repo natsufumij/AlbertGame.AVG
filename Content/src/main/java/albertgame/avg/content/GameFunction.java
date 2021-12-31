@@ -5,10 +5,13 @@ import javafx.animation.Timeline;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 import java.util.HashMap;
@@ -24,7 +27,7 @@ public interface GameFunction {
     void fun(GameData data, GameHeader header, FunctionArg arg);
 
     /**
-     * - Dialog  Word  #Text  默认文字,延续上一次对话的名称
+     * - Dialog  Word  #Text  旁白文字
      * - Dialog  Word  S  #Text  对话文字，使用名称？？？，以后都如此
      * - Dialog  Word  M  #Text  对话文字，以‘我’为名称，以后都如此
      * - Dialog  Word  DataId  #Text  对话文字,以id的人物名称，以后都如此
@@ -55,8 +58,11 @@ public interface GameFunction {
                                 SetName(p.getName());
                             }
                         }
+                        Clear();
                         Word(arg.extra[0]);
                     } else {
+                        SetName("");
+                        Clear();
                         Word(arg.value);
                     }
                     break;
@@ -94,9 +100,9 @@ public interface GameFunction {
                 line.setCycleCount(Timeline.INDEFINITE);
                 Duration period;
                 if (_d.isAuto()) {
-                    period = Duration.millis(80);
+                    period = Duration.millis(30);
                 } else {
-                    period = Duration.millis(200);
+                    period = Duration.millis(100);
                 }
                 KeyFrame keyFrame = new KeyFrame(period, "WordDisplaying", event -> {
                     if (index == dest) {
@@ -119,6 +125,8 @@ public interface GameFunction {
             } else {
                 line.stop();
             }
+
+            this._d.setGameState(GameData.GAME_STATE_WORD_DISPLAYING);
             line.play();
         }
 
@@ -132,7 +140,6 @@ public interface GameFunction {
         }
 
         private void Clear() {
-            _d.nameDisplayProperty().setValue(" ");
             for (StringProperty s : _d.getDisplayWords()) {
                 s.setValue(" ");
             }
@@ -172,7 +179,7 @@ public interface GameFunction {
 
             Map<String, Image> img = new HashMap<>();
             for (String s : states) {
-                Image i = ConfigCenter.loadPersonState(pid, s, "png");
+                Image i = ConfigCenter.loadPersonState(pid, s);
                 img.put(s, i);
             }
 
@@ -346,27 +353,162 @@ public interface GameFunction {
         }
     }
 
-
-    //  - Select  #QuestionId  #Question  #[Option1,Option2,Option3]  选择问题保存Id
+    //  - Select  Go  #SelectId  #[Option1,Option2,Option3]  选择问题保存Id
     class SelectFunction implements GameFunction {
         @Override
         public void fun(GameData data, GameHeader header, FunctionArg arg) {
-
-            //应当跳出选择弹窗在正中央
-            System.out.println("QuestionId:" + arg.name);
-            System.out.println("Question:" + arg.value);
+            data.setNowSelectId(arg.value);
             for (int i = 0; i != arg.extra.length; ++i) {
                 String s = arg.extra[i];
-                System.out.println("[" + i + "]:" + s);
+                Text t=header.getSelectText()[i];
+                t.textProperty().set((i+1)+". "+s);
+                t.setVisible(true);
             }
+            data.setGameState(GameData.GAME_STATE_SELECTING);
         }
     }
 
+    //- 界面
+    //  - View  Scene  #Name 更换场景图片
+    //  - View  Shake  #L/C/R 抖动人物
+    //  - View  Darking  #3000(ms)  渐黑
+    //  - View  Lighting  #3000(s)  渐亮
     class ViewFunction implements GameFunction {
+
+        GameHeader header;
+        GameData data;
 
         @Override
         public void fun(GameData data, GameHeader header, FunctionArg arg) {
+            this.header = header;
+            this.data = data;
+            switch (arg.name) {
+                case "Scene" -> Scene(arg.value);
+                case "Shake" -> Shake(arg.value);
+                case "Darking" -> Darking(Integer.parseInt(arg.value));
+                case "Lighting" -> Lighting(Integer.parseInt(arg.value));
+            }
+        }
 
+        private void Scene(String newSceneName) {
+            Image scene = ConfigCenter.loadScene(newSceneName);
+            data.backgroundImageProperty().set(scene);
+        }
+
+        int leftCount;
+        ImageView view;
+        Timeline shakeline;
+        double rb, lb;
+        double px;
+        boolean right;
+
+        private void Shake(String pos) {
+
+            switch (pos) {
+                case "L":
+                    view = header.getLeftPerson();
+                    break;
+                case "C":
+                    view = header.getCenterPerson();
+                    break;
+                case "R":
+                    view = header.getRightPerson();
+                    break;
+                default:
+                    return;
+            }
+
+            px = view.getTranslateX();
+            rb = px + view.getFitWidth() / 20;
+            lb = px - view.getFitWidth() / 20;
+            right = true;
+            shakeline = new Timeline();
+            shakeline.setCycleCount(Timeline.INDEFINITE);
+            leftCount = 0;
+            KeyFrame frame = new KeyFrame(Duration.millis(10), event -> {
+                double nowX = view.getTranslateX();
+                //最后返回原位的动作
+                if (leftCount == 3) {
+                    if (nowX < px) {
+                        nowX += 2.5;
+                    } else {
+                        //全部动作结束
+                        shakeline.stop();
+                        nowX = px;
+                    }
+                } else {
+                    //来回移动的动作
+                    if (right) {
+                        if (nowX >= rb) {
+                            right = false;
+                        } else {
+                            nowX += 2.5;
+                        }
+                    } else {
+                        if (nowX <= lb) {
+                            //碰到左边的壁了
+                            right = true;
+                            ++leftCount;
+                        } else {
+                            nowX -= 2.5;
+                        }
+                    }
+                }
+                view.setTranslateX(nowX);
+            });
+            shakeline.getKeyFrames().add(frame);
+            shakeline.setOnFinished(event -> {
+                data.setGameState(GameData.GAME_STATE_WAIT_NEXT);
+                header.removeGlobalMask();
+            });
+
+            data.setGameState(GameData.GAME_STATE_ANIMATING);
+            header.addGlobalMask();
+            shakeline.play();
+        }
+
+        int dest;
+        int count;
+
+        private void Darking(Integer seconds) {
+            dest = seconds / 50;
+            count = 0;
+            Timeline timeline = new Timeline();
+            KeyFrame frame = new KeyFrame(Duration.millis(50), event -> {
+                ++count;
+                header.getGlobalMask().setFill(Color.color(0, 0, 0, (count / (double) dest)));
+            });
+            timeline.getKeyFrames().add(frame);
+            timeline.setCycleCount(dest);
+            timeline.setOnFinished(event -> {
+                data.setGameState(GameData.GAME_STATE_WAIT_NEXT);
+                header.removeGlobalMask();
+            });
+
+            data.setGameState(GameData.GAME_STATE_ANIMATING);
+            header.addGlobalMask();
+
+            timeline.play();
+        }
+
+        private void Lighting(Integer seconds) {
+            dest = seconds / 50;
+            count = 0;
+            Timeline timeline = new Timeline();
+            KeyFrame frame = new KeyFrame(Duration.millis(50), event -> {
+                ++count;
+                header.getGlobalMask().setFill(Color.color(0, 0, 0, (1 - (double) count / (double) dest)));
+            });
+            timeline.getKeyFrames().add(frame);
+            timeline.setCycleCount(dest);
+            timeline.setOnFinished(event -> {
+                data.setGameState(GameData.GAME_STATE_WAIT_NEXT);
+                header.removeGlobalMask();
+            });
+
+            data.setGameState(GameData.GAME_STATE_ANIMATING);
+            header.addGlobalMask();
+            timeline.play();
         }
     }
 }

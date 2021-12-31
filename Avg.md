@@ -25,10 +25,10 @@
 剧本命令格式  
 
 - 对话
-  - Dialog  Word  #Text  默认文字,延续上一次对话的名称
-  - Dialog  Word  [S]  #Text  对话文字，使用名称？？？，以后都如此
-  - Dialog  Word  [M]  #Text  对话文字，以‘我’为名称，以后都如此
-  - Dialog  Word  [DataId]  #Text  对话文字,以id的人物名称，以后都如此
+  - Dialog  Word  #Text  旁白文字
+  - Dialog  Word  @S  #Text  对话文字，使用名称？？？，以后都如此
+  - Dialog  Word  @M  #Text  对话文字，以‘我’为名称，以后都如此
+  - Dialog  Word  @DataId  #Text  对话文字,以id的人物名称，以后都如此
   - Dialog  Open  打开对话框
   - Dialog  Clear  清空对话框及名称
   - Dialog  Close  关闭对话框
@@ -54,22 +54,18 @@
   - Audio  Sound.Play #SoundName
 
 - 选项
-  - Select  Go#QuestionId  #Question  #[Option1,Option2,Option3]  选择问题保存Id
+    - Select  Go  #SelectId  #[Option1,Option2,Option3]  选择问题保存Id
   `
-  Select Go  Question.ID.A  你要选择谁? [我不选择,你选择吧,选你个头!]  则保存在选择记录里,ID.A为0-2，并且在属存储里有个同名的属性值
+  Select Go  Question.ID.A  [我不选择,你选择吧,选你个头!]  则保存在选择记录里,ID.A为0-2，并且在属存储里有个同名的属性值
   `
 
 - 界面
-  - View  Background  #Name
-  - View  Title  #newText
-  - View  Title.Show
-  - View  Title.Hide
-  - View  Time  #newText
-  - View  Time.Show
-  - View  Time.Hide
+  - View  Scene  #Name 更换场景图片
+  - View  Shake  #L/C/R 抖动人物
+  - View  Darking  #3000(ms)  渐黑
+  - View  Lighting  #3000(ms)  渐亮
 
 剧本剧情切换模式：剧本间切换、剧本内故事切换  
-
 剧本结构例:  
 ```
 #Begin:  

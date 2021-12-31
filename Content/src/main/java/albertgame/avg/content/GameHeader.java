@@ -36,6 +36,9 @@ public class GameHeader extends Parent {
 
     private final Text[] buttonList = new Text[buttonNames.length];
 
+    private final Text[] selectText = new Text[ConfigCenter.SELECT_MAX_SIZE];
+    private final Rectangle[] selectMasks = new Rectangle[ConfigCenter.SELECT_MAX_SIZE];
+
     public GameHeader(GameData data) {
         initHead(data);
     }
@@ -45,30 +48,33 @@ public class GameHeader extends Parent {
         mediaView = new MediaView();
         super.getChildren().add(mediaView);
 
-        background = new ImageView(ConfigCenter.loadScene("back_demo1", "jpeg"));
+        background = new ImageView(ConfigCenter.loadScene("back_demo1"));
         background.setFitWidth(ConfigCenter.WINDOW_WIDTH);
         background.setFitHeight(ConfigCenter.WINDOW_HEIGHT);
+        background.imageProperty().set(null);
 
-        Image ona = ConfigCenter.loadPersonState("onna", "1", "jpg");
-        Image otoko = ConfigCenter.loadPersonState("otoko", "1", "jpg");
-        Image bishojo = ConfigCenter.loadPersonState("bishojo", "1", "png");
+        Image ona = ConfigCenter.loadPersonState("onna", "1");
+        Image otoko = ConfigCenter.loadPersonState("otoko", "1");
+        Image bishojo = ConfigCenter.loadPersonState("bishojo", "1");
 
         leftPerson = new ImageView(ona);
         leftPerson.setFitWidth(ConfigCenter.PERSON_WIDTH);
         leftPerson.setFitHeight(ConfigCenter.PERSON_HEIGHT);
+        leftPerson.imageProperty().set(null);
 
         centerPerson = new ImageView(bishojo);
         centerPerson.setFitWidth(ConfigCenter.PERSON_WIDTH);
         centerPerson.setFitHeight(ConfigCenter.PERSON_HEIGHT);
         centerPerson.setTranslateX(ConfigCenter.PERSON_WIDTH);
+        centerPerson.imageProperty().set(null);
 
         rightPerson = new ImageView(otoko);
         rightPerson.setFitWidth(ConfigCenter.PERSON_WIDTH);
         rightPerson.setFitHeight(ConfigCenter.PERSON_HEIGHT);
-
         rightPerson.setTranslateX(ConfigCenter.PERSON_WIDTH * 2);
+        rightPerson.imageProperty().set(null);
 
-        Text name = new Text("SECRET PLAYER");
+        Text name = new Text("");
         name.setFont(ConfigCenter.WORD_FONT);
         name.setFill(Color.WHEAT);
         name.setTranslateX(ConfigCenter.NAME_DISPLAY_X);
@@ -125,17 +131,81 @@ public class GameHeader extends Parent {
             button.setLayoutY(ConfigCenter.TOOL_DISPLAY_Y);
             button.setFont(ConfigCenter.WORD_FONT);
             button.setStroke(Color.WHITE);
+            button.visibleProperty().bindBidirectional(data.wordLineShowProperty());
             super.getChildren().add(button);
             prefX -= 55;
         }
 
+        for (int i = 0; i != selectText.length; ++i) {
+
+            double ty=ConfigCenter.SELECT_Y + i * ConfigCenter.SELECT_FONT.getSize() *1.8 ;
+            Rectangle rectangle=new Rectangle(ConfigCenter.SELECT_WIDTH,ConfigCenter.SELECT_HEIGHT);
+            rectangle.setUserData((i+1));
+            Color selectC=Color.color(0.2,0.3,0.2,0.3);
+            Color noneC=Color.color(0.1,0.1,0.1,0.2);
+            rectangle.setArcWidth(4.0);
+            rectangle.setArcHeight(3.0);
+            rectangle.setFill(selectC);
+            rectangle.setOnMouseEntered(event -> {
+                rectangle.setFill(selectC);
+                rectangle.setEffect(new Bloom(0.1));
+            });
+            rectangle.setOnMouseExited(event -> {
+                rectangle.setFill(noneC);
+                rectangle.setEffect(null);
+            });
+            rectangle.setTranslateX(ConfigCenter.SELECT_X-10);
+            rectangle.setTranslateY(ty-27.0);
+            rectangle.setOnMouseClicked(event -> {
+                System.out.println("You Select "+(Integer)rectangle.getUserData());
+                for(int j=0;j!=selectText.length;++j){
+                    Text desist=selectText[j];
+                    desist.visibleProperty().set(false);
+                }
+                data.getData().put(data.getNowSelectId(),(Integer)rectangle.getUserData());
+                data.setGameState(GameData.GAME_STATE_WAIT_NEXT);
+            });
+
+            Text t = new Text("");
+            t.setUserData(rectangle);
+            t.setFont(ConfigCenter.SELECT_FONT);
+            t.setTranslateY(ty);
+            t.setTranslateX(ConfigCenter.SELECT_X);
+            t.setFill(Color.RED);
+            t.setOnMouseEntered(event -> {
+                rectangle.setFill(selectC);
+                rectangle.setEffect(new Bloom(0.1));
+            });
+            t.setOnMouseExited(event -> {
+                rectangle.setFill(noneC);
+                rectangle.setEffect(null);
+            });
+            t.setOnMousePressed(event -> {
+                rectangle.setEffect(new DropShadow(5.0,Color.BLACK));
+            });
+            t.setOnMouseReleased(event -> {
+                System.out.println("You Select "+(Integer)rectangle.getUserData());
+                for(int j=0;j!=selectText.length;++j){
+                    Text desist=selectText[j];
+                    desist.visibleProperty().set(false);
+                }
+                data.getData().put(data.getNowSelectId(),(Integer)rectangle.getUserData());
+                data.setGameState(GameData.GAME_STATE_WAIT_NEXT);
+            });
+
+            selectText[i]=t;
+            selectMasks[i]=rectangle;
+            t.visibleProperty().bindBidirectional(rectangle.visibleProperty());
+            t.visibleProperty().set(false);
+            super.getChildren().addAll(rectangle,t);
+        }
 
         globalMask = new Rectangle(ConfigCenter.WINDOW_WIDTH, ConfigCenter.WINDOW_HEIGHT);
-        globalMask.setFill(Color.color(0.2, 0.2, 0.2, 0.5));
+        globalMask.setFill(Color.color(0, 0, 0, 0));
         globalMask.setTranslateX(0);
         globalMask.setTranslateY(0);
-
         globalMask.setVisible(false);
+
         super.getChildren().add(globalMask);
 
         data.backgroundImageProperty().bindBidirectional(background.imageProperty());
@@ -145,7 +215,7 @@ public class GameHeader extends Parent {
         for (int i = 0; i != data.getDisplayWords().length; ++i) {
             StringProperty text = data.getDisplayWords()[i];
             text.bindBidirectional(words[i].textProperty());
-            text.setValue("我");
+            words[i].visibleProperty().bindBidirectional(data.wordLineShowProperty());
         }
 
         data.wordLineShowProperty().bindBidirectional(wordPaneFrameV2_b.visibleProperty());
@@ -172,8 +242,20 @@ public class GameHeader extends Parent {
         return mediaView;
     }
 
+    public void addGlobalMask() {
+        globalMask.setVisible(true);
+    }
+
+    public void removeGlobalMask() {
+        globalMask.setVisible(false);
+    }
+
     public Rectangle getGlobalMask() {
         return globalMask;
+    }
+
+    public Text[] getSelectText() {
+        return selectText;
     }
 
     static class SkipEventHandler implements EventHandler<MouseEvent> {
