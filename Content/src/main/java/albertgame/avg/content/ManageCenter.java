@@ -178,8 +178,17 @@ public class ManageCenter {
                     }
                 } else {
                     //没有下一个struck了
-                    demoline.stop();
-                    System.out.println("All Done.");
+                    //判断play是否有下一个剧本
+                    if(play.nextPlay()!= Play.OptionStruck.NONE_OPTION){
+                        String pid= play.nextPlay(gameData.getData());
+                        play=Play.loadPlay(ConfigCenter.loadFileInClasspath("demo/"+pid+".avg"));
+                        struck=play.bodyStruckMap().get("begins");
+                        index = 0;
+                        dest = this.struck.expressions().size();
+                    }else {
+                        demoline.stop();
+                        System.out.println("All Done.");
+                    }
                 }
             }
         });

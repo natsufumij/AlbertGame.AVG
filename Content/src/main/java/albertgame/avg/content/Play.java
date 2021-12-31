@@ -234,7 +234,7 @@ public record Play
 
     //我是和好的一个人
     //@S  你在说什么?
-    //#Person  In  DataId
+    //[Person  In  DataId]
     //,这是注释
     public static List<String[]> parseCmd(String s) {
         if (s.startsWith("[")) {
@@ -338,11 +338,13 @@ public record Play
         }
 
         //生成OptionStruck
-        for (String s : progressN.texts) {
-            s = s.replaceAll(" ", "");
-            String[] sp = s.split("->");
-            OptionStruck optionStruck = new OptionStruck(sp[1], optionMap.get(sp[1]), sp[2].split(","));
-            op.put(sp[0], optionStruck);
+        if(progressN!=null){
+            for (String s : progressN.texts) {
+                s = s.replaceAll(" ", "");
+                String[] sp = s.split("->");
+                OptionStruck optionStruck = new OptionStruck(sp[1], optionMap.get(sp[1]), sp[2].split(","));
+                op.put(sp[0], optionStruck);
+            }
         }
 
         //生成Map<String, BodyStruck>

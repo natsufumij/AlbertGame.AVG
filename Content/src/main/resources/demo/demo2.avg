@@ -1,5 +1,4 @@
 #Info
-Play
 Demo2
 第二个测试用剧本
 
@@ -46,3 +45,9 @@ Else
 >>Option2
 Pound=2
 Pound=1
+
+#NextPlays
+demo3
+
+#NextOptions
+Else
