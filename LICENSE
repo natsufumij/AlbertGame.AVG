@@ -1,17 +1,17 @@
 Albert Software Using License
 
-1. 此开源项目所有代码及资源仅用于软件开发思想上的学习，不涉及任何商业用途
-1. All code and resources in this open source project are for the study of software development ideas only and do not involve any commercial use
+1. 此开源项目所有源代码、二进制发布版仅用于软件开发思想上的学习，禁止任何商业用途
+1. All source code and binary release versions of this open source project,
+are only used for the study of software development ideas, and any commercial use is prohibited
 
-2.你可以免费使用本项目构建的二进制发布版，但后果均由你自己承担
-2. You can use the binary release version built by this project for free, but the consequences are borne by you
+2. 你可以免费浏览本项目全部的源代码，也可以复制部分源代码，如果要复制完整的单个或多个类，则需要在复制后的源代码内容顶部标上原项目信息，及此协议
+2. You can browse all the source code of the project for free or copy part of the source code. 
+If you want to copy a complete single or multiple classes, you need to mark the original project 
+information and this Agreement on the top of the copied source code
 
-3.你可以免费参考、复制本项目的部分源代码，但如果要复制完整的类或以上，需要在类名前标上原项目信息
-3. You can use part of the source code of this project, 
-but if you want to copy the complete class or above, you need to mark the original project information before the class name
+3. 没有经过作者允许，禁止将本项目以任何库的形式构建分发使用
+3. It is forbidden to build and distribute the project in the form of any library without the permission of the author
 
-4.没有经过作者允许不能将本项目以任何库的形式分发使用，如若分发，责任由分发者担任
-4. This project cannot be distributed and used in the form of any library without the permission of author. 
-If it is distributed, the distributor shall be responsible for it
-
+4. 如果你违反以上任何一项，则后果由你自己承担
+4. If you violate any of the above, the consequences shall be borne by yourself
 
