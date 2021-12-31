@@ -1,16 +1,11 @@
 package albertgame.avg.content;
 
 
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlRootElement;
-
 import java.util.*;
 
 /**
  * 一份游戏存档
  */
-@XmlRootElement
 public class SaveData {
 
     private Integer year;
@@ -24,8 +19,6 @@ public class SaveData {
     private Character struckOfPlay;
     private Integer playIndex;
 
-    @XmlElementWrapper(name = "savedAttributes")
-    @XmlElement(name = "attribute")
     private List<String> savedAttributes;
 
     private String backMusicName;

@@ -1,7 +1,8 @@
 package albertgame.avg.content;
 
-import java.util.Map;
-import java.util.Objects;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public record Play
         (String id,
@@ -9,27 +10,25 @@ public record Play
          Map<String, BodyStruck> bodyStruckMap,
          OptionStruck nextPlay) {
 
-    public String nextPlay(Map<String,Integer> data){
-        if(nextPlay==OptionStruck.NONE_OPTION)return OptionStruck.NONE_ID;
+    public String nextPlay(Map<String, Integer> data) {
+        if (nextPlay == OptionStruck.NONE_OPTION) return OptionStruck.NONE_ID;
 
         return nextPlay.struckNextOption(data);
     }
 
-    public BodyStruck nextBodyStruck(String nowStruckId, Map<String, Integer> data) {
-        BodyStruck bodyStruck = bodyStruckMap.get(nowStruckId);
-        if (bodyStruck == null) return BodyStruck.NONE_BODY;
-
-        String destId = bodyStruck.optionStruck.struckNextOption(data);
-        if (Objects.equals(destId, OptionStruck.NONE_ID)) {
+    public BodyStruck nextBodyStruck(String id, Map<String, Integer> data) {
+        BodyStruck struck=bodyStruckMap.get(id);
+        String dis=struck.optionStruck.struckNextOption(data);
+        if(dis==OptionStruck.NONE_ID){
             return BodyStruck.NONE_BODY;
-        } else {
-            return bodyStruckMap.get(destId);
+        }else {
+            return bodyStruckMap.get(dis);
         }
     }
 
     public record BodyStruck
             (String id,
-             String[] expressions,
+             List<String> expressions,
              OptionStruck optionStruck) {
 
         public static final BodyStruck NONE_BODY = null;
@@ -71,7 +70,7 @@ public record Play
         //A<=2
         private boolean parseStruck1(String expression, Map<String, Integer> data) {
             String[] vs;
-            Integer d1,d2;
+            Integer d1, d2;
             if (expression.contains("!=")) {
                 vs = expression.split("!=");
                 d1 = getReal(vs[0], data);
@@ -151,5 +150,241 @@ public record Play
             }
             return true;
         }
+
+    }
+
+    public static void main(String[] args) {
+
+        List<BodyNodeH> bodyNodeHS=new ArrayList<>();
+        Stack<BodyNodeH> stack=new Stack<>();
+
+        try {
+            File file = ConfigCenter.loadFileInClasspath("demo/demo2.avg");
+            if (file.exists() && file.isFile()) {
+                InputStreamReader reader = null;
+                reader = new InputStreamReader(new FileInputStream(file),
+                        StandardCharsets.UTF_8);
+                BufferedReader r = new BufferedReader(reader);
+                String line;
+                while ((line = r.readLine()) != null) {
+                    line = line.strip();
+                    line=line.strip();
+                    if(!line.isBlank()){
+                        parseFile(bodyNodeHS,stack,line);
+                    }
+                }
+                parseFile(bodyNodeHS,stack,END_SIGN);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Play p=loadPlay(bodyNodeHS);
+        System.out.println("Ok.");
+    }
+
+    private static final String END_SIGN = "<<<end>>>";
+
+    private static class BodyNodeH {
+        String name;
+        List<String> texts = new ArrayList<>();
+        List<BodyNodeH> children = new ArrayList<>();
+    }
+
+    private static void parseFile(List<BodyNodeH> oneList,Stack<BodyNodeH> stack,String line) {
+        if (line.isBlank()) return;
+        line = line.strip();
+
+        if (line.startsWith("#")) {
+            //#只在栈中存在一次
+            while (stack.size() > 1) {
+                stack.pop();
+            }
+            if (!stack.isEmpty()) {
+                BodyNodeH b = stack.pop();
+                oneList.add(b);
+            }
+
+            BodyNodeH one = new BodyNodeH();
+            String name = line.substring(1);
+            one.name = name;
+            stack.push(one);
+        } else if (line.startsWith(">>")) {
+            //维持只有一个#，最多只有一个>>
+            while (stack.size() > 1) {
+                stack.pop();
+            }
+            BodyNodeH second = new BodyNodeH();
+            second.name = line.substring(2);
+            BodyNodeH one = stack.peek();
+            one.children.add(second);
+            stack.push(second);
+        } else if (line.equals(END_SIGN)) {
+            while (stack.size() > 1) {
+                stack.pop();
+            }
+            if (!stack.isEmpty()) {
+                BodyNodeH b = stack.pop();
+                oneList.add(b);
+            }
+        } else {
+            stack.peek().texts.add(line);
+        }
+    }
+
+    //我是和好的一个人
+    //@S  你在说什么?
+    //#Person  In  DataId
+    //,这是注释
+    public static List<String[]> parseCmd(String s) {
+        if (s.startsWith("[")) {
+            int ind = s.indexOf("]");
+            String f = s.substring(1, ind);
+            f = f.strip();
+            ArrayList<String[]> arrayList=new ArrayList<>();
+            arrayList.add(f.split("  "));
+            return arrayList;
+        } else if (s.startsWith("@")) {
+            String f = s.substring(1);
+            f = f.strip();
+            String[] x = f.split("  ");
+            if (x.length != 2) return Collections.emptyList();
+
+            ArrayList<String[]> arrayList = new ArrayList<>();
+            int page = x[1].length() / ConfigCenter.WORD_MAX_SIZE;
+            ++page;
+            int i;
+            for (i = 0; i != page - 1; ++i) {
+                String w = x[1].substring(
+                        i * ConfigCenter.WORD_MAX_SIZE, (i + 1) * ConfigCenter.WORD_MAX_SIZE);
+                String[] cmd = new String[]{"Dialog", "Word", x[0], w};
+                arrayList.add(cmd);
+            }
+            String lastPage = x[1].substring(i * ConfigCenter.WORD_MAX_SIZE);
+            String[] cmd = new String[]{"Dialog", "Word", x[0], lastPage};
+            arrayList.add(cmd);
+            return arrayList;
+        } else if (!s.startsWith(",")) {
+            String f = s.strip();
+            ArrayList<String[]> arrayList = new ArrayList<>();
+            int page = f.length() / ConfigCenter.WORD_MAX_SIZE;
+            ++page;
+            int i;
+            for (i = 0; i != page - 1; ++i) {
+                String w = f.substring(
+                        i * ConfigCenter.WORD_MAX_SIZE, (i + 1) * ConfigCenter.WORD_MAX_SIZE);
+                String[] cmd = new String[]{"Dialog", "Word", w};
+                arrayList.add(cmd);
+            }
+            String lastPage = f.substring(i * ConfigCenter.WORD_MAX_SIZE);
+            String[] cmd = new String[]{"Dialog", "Word", lastPage};
+            arrayList.add(cmd);
+            return arrayList;
+        } else return Collections.emptyList();
+    }
+
+    public static Play loadPlay(File file){
+        List<BodyNodeH> bodyNodeHS=new ArrayList<>();
+        Stack<BodyNodeH> stack=new Stack<>();
+
+        try {
+            if (file.exists() && file.isFile()) {
+                InputStreamReader reader = null;
+                reader = new InputStreamReader(new FileInputStream(file),
+                        StandardCharsets.UTF_8);
+                BufferedReader r = new BufferedReader(reader);
+                String line;
+                while ((line = r.readLine()) != null) {
+                    line = line.strip();
+                    line=line.strip();
+                    if(!line.isBlank()){
+                        parseFile(bodyNodeHS,stack,line);
+                    }
+                }
+                parseFile(bodyNodeHS,stack,END_SIGN);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return loadPlay(bodyNodeHS);
+    }
+
+    private static Play loadPlay(List<BodyNodeH> hs) {
+        Map<String, OptionStruck> op = new HashMap<>();
+        Map<String, BodyStruck> bodyStruckMap = new HashMap<>();
+        Map<String, String[]> optionMap = new HashMap<>();
+        String[] nextPlayIds = null, nextOps = null;
+        BodyNodeH bodyN = null;
+        BodyNodeH progressN=null;
+        String id = "00", name = "00";
+        for (BodyNodeH b : hs) {
+            if (b.name.equals("Info")) {
+                id = b.texts.get(0);
+                name = b.texts.get(1);
+            } else if (b.name.equals("Body")) {
+                bodyN = b;
+            } else if (b.name.equals("Options")) {
+                for (BodyNodeH h : b.children) {
+                    optionMap.put(h.name, h.texts.toArray(new String[0]));
+                }
+            } else if (b.name.equals("Progress")) {
+                progressN=b;
+            } else if (b.name.equals("NextPlays")) {
+                nextPlayIds = b.texts.get(0).split(",");
+            } else if (b.name.equals("NextOptions")) {
+                nextOps = b.texts.toArray(new String[0]);
+            }
+        }
+
+        //生成OptionStruck
+        for (String s : progressN.texts) {
+            s = s.replaceAll(" ", "");
+            String[] sp = s.split("->");
+            OptionStruck optionStruck = new OptionStruck(sp[1], optionMap.get(sp[1]), sp[2].split(","));
+            op.put(sp[0], optionStruck);
+        }
+
+        //生成Map<String, BodyStruck>
+        for (BodyNodeH h : bodyN.children) {
+            String hid = h.name;
+            List<String> exs = h.texts;
+            OptionStruck o = op.get(hid);
+            BodyStruck struck;
+            if (o == null) {
+                struck = new BodyStruck(hid, exs, OptionStruck.NONE_OPTION);
+            } else {
+                struck = new BodyStruck(hid, exs, o);
+            }
+            refreshBodyStruck(struck);
+            bodyStruckMap.put(hid, struck);
+        }
+
+        //生成OptionStruck NextPlay
+        OptionStruck nextOp;
+        if(nextOps==null){
+            nextOp=OptionStruck.NONE_OPTION;
+        }else {
+            nextOp=new OptionStruck("This",nextOps,nextPlayIds);
+        }
+        return new Play(id, name, bodyStruckMap, nextOp);
+    }
+
+    //拼接成:Type  Name  Word  EXTRA[0]  EXTRA[1] ...
+    private static void refreshBodyStruck(BodyStruck struck){
+        List<String> destList=new ArrayList<>();
+        for(String s:struck.expressions){
+            List<String[]> dest=parseCmd(s);
+            for(String[] sr:dest){
+                String ax="  ";
+                for(String sd:sr){
+                    ax+=sd+"  ";
+                }
+                ax=ax.strip();
+                destList.add(ax);
+            }
+        }
+        struck.expressions.clear();
+        struck.expressions.addAll(destList);
     }
 }

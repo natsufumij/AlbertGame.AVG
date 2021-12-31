@@ -129,45 +129,58 @@ public class ManageCenter {
     }
 
     private Timeline demoline;
-    private final List<String[]> lines = new ArrayList<>();
+    private Play play;
+    private Play.BodyStruck struck;
     int index = 0;
     int dest;
 
     private void testLines() {
 
-        functionMap.put("Dialog",new GameFunction.WordFunction());
-        functionMap.put("Person",new GameFunction.PersonFunction());
-        functionMap.put("Store",new GameFunction.StoreFunction());
-        functionMap.put("Audio",new GameFunction.AudioFunction());
-        functionMap.put("Select",new GameFunction.SelectFunction());
-        functionMap.put("View",new GameFunction.ViewFunction());
+        functionMap.put("Dialog", new GameFunction.WordFunction());
+        functionMap.put("Person", new GameFunction.PersonFunction());
+        functionMap.put("Store", new GameFunction.StoreFunction());
+        functionMap.put("Audio", new GameFunction.AudioFunction());
+        functionMap.put("Select", new GameFunction.SelectFunction());
+        functionMap.put("View", new GameFunction.ViewFunction());
 
         demoline = new Timeline();
         demoline.setCycleCount(Timeline.INDEFINITE);
         KeyFrame frame = new KeyFrame(Duration.millis(30), event -> {
-            if(gameData.getGameState()!=GameData.GAME_STATE_WAIT_NEXT)return;
+            if (gameData.getGameState() != GameData.GAME_STATE_WAIT_NEXT) return;
 
             if (index != dest) {
-                String[] nowCmd=lines.get(index);
+                String[] nowCmd = struck.expressions().get(index).split("  ");
                 GameFunction.FunctionArg arg;
-                if(nowCmd.length==3){
-                    arg=new GameFunction.FunctionArg(
-                            nowCmd[0],nowCmd[1],nowCmd[2],GameFunction.NONE_EXTRA);
-                }else if(nowCmd.length==2){
-                    arg=new GameFunction.FunctionArg(
-                            nowCmd[0],nowCmd[1],"",GameFunction.NONE_EXTRA);
-                }else {
-                    String[] args=new String[nowCmd.length-3];
+                if (nowCmd.length == 3) {
+                    arg = new GameFunction.FunctionArg(
+                            nowCmd[0], nowCmd[1], nowCmd[2], GameFunction.NONE_EXTRA);
+                } else if (nowCmd.length == 2) {
+                    arg = new GameFunction.FunctionArg(
+                            nowCmd[0], nowCmd[1], "", GameFunction.NONE_EXTRA);
+                } else {
+                    String[] args = new String[nowCmd.length - 3];
                     System.arraycopy(nowCmd, 3, args, 0, args.length);
-                    arg=new GameFunction.FunctionArg(
-                            nowCmd[0],nowCmd[1],nowCmd[2],args);
+                    arg = new GameFunction.FunctionArg(
+                            nowCmd[0], nowCmd[1], nowCmd[2], args);
                 }
-                GameFunction function=functionMap.get(arg.type());
-                System.out.println("Function: "+arg.type()+","+arg.name()+","+arg.value());
-                function.fun(gameData,header,arg);
+                GameFunction function = functionMap.get(arg.type());
+                System.out.println("Function: " + arg.type() + "," + arg.name() + "," + arg.value());
+                function.fun(gameData, header, arg);
                 ++index;
-            }else {
-                demoline.stop();
+            } else {
+                //寻找下一个struck
+                if (struck.optionStruck() != Play.OptionStruck.NONE_OPTION) {
+                    Play.BodyStruck bodyStruck = play.nextBodyStruck(struck.id(), gameData.getData());
+                    if (bodyStruck != Play.BodyStruck.NONE_BODY) {
+                        this.struck = bodyStruck;
+                        index = 0;
+                        dest = this.struck.expressions().size();
+                    }
+                } else {
+                    //没有下一个struck了
+                    demoline.stop();
+                    System.out.println("All Done.");
+                }
             }
         });
         demoline.getKeyFrames().add(frame);
@@ -176,28 +189,9 @@ public class ManageCenter {
             @Override
             protected Void call() throws Exception {
                 try {
-                    File file = ConfigCenter.loadFileInClasspath("demo/demo.avg");
-                    if (file.exists() && file.isFile()) {
-                        InputStreamReader reader = new InputStreamReader(new FileInputStream(file),
-                                StandardCharsets.UTF_8);
-                        BufferedReader r = new BufferedReader(reader);
-                        String line;
-                        while ((line = r.readLine()) != null) {
-                            line = line.strip();
-                            List<String[]> cmds = parseCmd(line);
-                            System.out.println("");
-                            for (int i = 0; i != cmds.size(); ++i) {
-                                String[] c = cmds.get(i);
-                                for (String cs : c) {
-                                    System.out.print(cs + ",");
-                                }
-                                System.out.println("");
-                            }
-                            lines.addAll(cmds);
-                        }
-                        lines.removeIf(c -> c.length == 0);
-                        succeeded();
-                    }
+                    File file = ConfigCenter.loadFileInClasspath("demo/demo2.avg");
+                    ManageCenter.this.play=Play.loadPlay(file);
+                    succeeded();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -206,59 +200,15 @@ public class ManageCenter {
         };
 
         task.setOnSucceeded(event -> {
-            dest = lines.size();
+            struck=play.bodyStruckMap().get("begins");
+            dest=struck.expressions().size();
+            index=0;
             demoline.play();
         });
+
         Platform.runLater(task);
     }
 
-    //我是和好的一个人
-    //@S  你在说什么?
-    //#Person  In  DataId
-    //,这是注释
-    private List<String[]> parseCmd(String s) {
-        if (s.startsWith("#")) {
-            String f = s.substring(1);
-            f = f.strip();
-            return Arrays.asList(new String[]{}, f.split("  "));
-        } else if (s.startsWith("@")) {
-            String f = s.substring(1);
-            f = f.strip();
-            String[] x = f.split("  ");
-            if (x.length != 2) return Collections.emptyList();
-
-            ArrayList<String[]> arrayList = new ArrayList<>();
-            int page = x[1].length() / ConfigCenter.WORD_MAX_SIZE;
-            ++page;
-            int i;
-            for (i = 0; i != page - 1; ++i) {
-                String w = x[1].substring(
-                        i * ConfigCenter.WORD_MAX_SIZE, (i + 1) * ConfigCenter.WORD_MAX_SIZE);
-                String[] cmd = new String[]{"Dialog", "Word", x[0], w};
-                arrayList.add(cmd);
-            }
-            String lastPage = x[1].substring(i * ConfigCenter.WORD_MAX_SIZE);
-            String[] cmd = new String[]{"Dialog", "Word", x[0], lastPage};
-            arrayList.add(cmd);
-            return arrayList;
-        } else if (!s.startsWith(",")) {
-            String f = s.strip();
-            ArrayList<String[]> arrayList = new ArrayList<>();
-            int page = f.length() / ConfigCenter.WORD_MAX_SIZE;
-            ++page;
-            int i;
-            for (i = 0; i != page - 1; ++i) {
-                String w = f.substring(
-                        i * ConfigCenter.WORD_MAX_SIZE, (i + 1) * ConfigCenter.WORD_MAX_SIZE);
-                String[] cmd = new String[]{"Dialog", "Word", w};
-                arrayList.add(cmd);
-            }
-            String lastPage = f.substring(i * ConfigCenter.WORD_MAX_SIZE);
-            String[] cmd = new String[]{"Dialog", "Word", lastPage};
-            arrayList.add(cmd);
-            return arrayList;
-        } else return Collections.emptyList();
-    }
 
     public Parent getNowScene() {
         return nowScene;
@@ -285,8 +235,8 @@ public class ManageCenter {
         Scene newScene = new Scene(nowScene, ConfigCenter.WINDOW_WIDTH,
                 ConfigCenter.WINDOW_HEIGHT);
         newScene.setOnKeyReleased(event -> {
-            if(event.getCode()== KeyCode.ENTER &&
-                    ManageCenter.getCenter().gameData.getGameState()==GameData.GAME_STATE_WAIT_PRESS){
+            if (event.getCode() == KeyCode.ENTER &&
+                    ManageCenter.getCenter().gameData.getGameState() == GameData.GAME_STATE_WAIT_PRESS) {
                 ManageCenter.getCenter().gameData.setGameState(GameData.GAME_STATE_WAIT_NEXT);
             }
         });

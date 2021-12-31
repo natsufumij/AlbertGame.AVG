@@ -16,5 +16,7 @@ public record Chapter
 
         return nextChapter.struckNextOption(data);
     }
+
+
 }
 

@@ -92,7 +92,7 @@ public class GameData {
     }
 
     public void nextPlayLine() {
-        if (lineIndex == struck.expressions().length) {
+        if (lineIndex == struck.expressions().size()) {
 
             //如果有下一个body块
             if (struck.optionStruck() != Play.OptionStruck.NONE_OPTION) {

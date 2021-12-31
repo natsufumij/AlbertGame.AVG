@@ -1,6 +1,7 @@
 plugins {
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.10'
+    id 'com.gluonhq.gluonfx-gradle-plugin' version '1.0.10'
 }
 
 group 'albertgame.avg'
@@ -8,7 +9,7 @@ version '1.0-SNAPSHOT'
 
 javafx {
     version = "17"
-    modules = [ 'javafx.controls', 'javafx.media' ]
+    modules = ['javafx.controls', 'javafx.media']
 }
 
 mainClassName = 'albertgame.avg.content.RunMain'
@@ -18,11 +19,6 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
-}
-
-test {
-    useTestNG()
 }
 
 tasks.withType(JavaCompile) {
