@@ -75,7 +75,7 @@ public class GameHeader extends Parent {
         rightPerson.imageProperty().set(null);
 
         Text name = new Text("");
-        name.setFont(ConfigCenter.WORD_FONT);
+        name.setFont(ConfigCenter.NAME_FONT);
         name.setFill(Color.WHEAT);
         name.setTranslateX(ConfigCenter.NAME_DISPLAY_X);
         name.setTranslateY(ConfigCenter.NAME_DISPLAY_Y);
