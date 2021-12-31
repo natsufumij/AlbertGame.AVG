@@ -68,28 +68,31 @@
 剧本剧情切换模式：剧本间切换、剧本内故事切换  
 剧本结构例:  
 ```
-#Begin:  
-  View  Background  Back1  
-  View  Title  Title1  
-  View  Time  Time1  
-  View  Title.Show  
-  View  Time.Show  
-#End:  
-  View  Title.Hide  
-  View  Time.Hide  
-  Dialog  End  
-  Dialog  Close  
-#Body  
-  Start0:  
+#Info:
+  id
+  name
+#Body:
+  >>Begin:  
+    #View  Scene  Name1
+    #Audio  Bgm.Play  bgm1
+    #View  Lighting  3000
+  >>End:  
+    #Audio  Bgm.Stop
+    #View  Darking  3000
+  >>Start0:  
   	...  
-  Start1:  
-  	[M]这是哪里？  
-  	[M]好黑，好黑……  
-  	[M]我是谁？  
-  	[M]我在干什么？  
-  Start2:  
+  >>Start1:  
+  	@M  这是哪里？  
+  	@M  好黑，好黑……  
+  	@M  我是谁？  
+  	@M  我在干什么？  
+    @S  这是你的末日
+    @M  我的末日?
+    #Audio  Sound.Play  sound1
+    @M  啊，什么声音？
+  >>Start2:  
   	...  
-  Start10:  
+  >>Start10:  
   	...  
   	...  
 #Progress:  
@@ -101,37 +104,30 @@
   ...  
   Start9->Start10 
 #Options:
-  OptionSelect1:
+  >>OptionSelect1:
     A=2 | D=2 | S=3
     A>2 & D<2>
     S>3 & K=1
     Else
   ...   
-
+#NextPlay:
+  [PlayName1,PlayName2,PlayName3]
+#NextOptions:
+  A=3 | D=2 | S=8
+  S=1 & D>3 a=3
+  Else
 ```
 
-系统剧本配置:
+章节剧本配置:
 ```
-#Begin
-  Head
-#End
-  Tail
-#Progress:  
-  [Fade] Start0->Start1
-  [Block] Start1->[OptionSelect1]->[Start2,Start3] 
-  [Fade] Start2->Start4
-  [Fade] Start3->[OptionSelect2]->[Start6,Start7,Start8]
-  [Block] Start4->Start5  
-  ...  
-  Start9->Start10 
-#Options:
-  OptionSelect1:
-    A=2 | D=2 | S=3
-    A>2 & D<2>
-    S>3 & K=1
-    Else
-  OptionSelect2:
-    ...  
-  ...   
-
+#Info:
+  id
+  name
+  StartPlayName
+#NextChapter:
+  [Chapter1,Chapter2,Chapter3]
+#NextOptions:
+  A=3 | D=2 | S=8
+  S=1 & D>3 a=3
+  Else
 ```
