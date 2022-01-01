@@ -11,7 +11,7 @@ public record Play
 
     public static final Play NONE_PLAY = null;
 
-    public BodyStruck nextBodyStruck(String id, Map<String, Integer> data) {
+    public BodyStruck nextBodyStruck(String id, Map<String, String> data) {
         BodyStruck struck = bodyStruckMap.get(id);
         String dis = struck.optionStruck.struckNextOption(data);
         if (Objects.equals(dis, OptionStruck.NONE_ID)) {
@@ -43,7 +43,7 @@ public record Play
         //S>3 & K=1
         //Else
         //检查有哪一个分支符合，如果没有一条符合的话就返回-1，报错
-        public String struckNextOption(Map<String, Integer> data) {
+        public String struckNextOption(Map<String, String> data) {
             if (selectExpression == null) return NONE_ID;
 
             for (int i = 0; i != selectExpression.length; ++i) {
@@ -63,7 +63,7 @@ public record Play
         //A!=2
         //A>=2
         //A<=2
-        private boolean parseStruck1(String expression, Map<String, Integer> data) {
+        private boolean parseStruck1(String expression, Map<String, String> data) {
             String[] vs;
             Integer d1, d2;
             if (expression.contains("!=")) {
@@ -114,17 +114,19 @@ public record Play
 
         private static final Integer NONE_DATA = -1;
 
-        private Integer getReal(String v, Map<String, Integer> data) {
+        private Integer getReal(String v, Map<String, String> data) {
             char v10 = v.charAt(0);
             if (v10 >= '0' && v10 <= '9') {
                 return Integer.parseInt(v);
             } else {
-                return data.getOrDefault(v, -1);
+                String s=data.get(v);
+                if(s==null)return -1;
+                else return Integer.parseInt(s);
             }
         }
 
         // A & B & C | D & E | F
-        private boolean parseSelectExpression(String expression, Map<String, Integer> data) {
+        private boolean parseSelectExpression(String expression, Map<String, String> data) {
             String dest = expression.replaceAll("\\s*", "");
             String[] orSplit = dest.split("\\|");
             for (String s : orSplit) {
@@ -136,7 +138,7 @@ public record Play
         }
 
         //A & B & C
-        private boolean parseAndEx(String expression, Map<String, Integer> data) {
+        private boolean parseAndEx(String expression, Map<String, String> data) {
             String[] exArray = expression.split("&");
             for (String s : exArray) {
                 if (!parseStruck1(s, data)) {
@@ -154,7 +156,7 @@ public record Play
         Stack<BodyNodeH> stack = new Stack<>();
 
         try {
-            File file = ConfigCenter.loadFileInClasspath("demo/demo2.avg");
+            File file = ConfigCenter.loadFileInClasspath("play/story/chapter0/demo2.avg");
             Play p = loadPlay(file);
             System.out.println("Ok.");
         } catch (Exception e) {
@@ -452,12 +454,12 @@ public record Play
     public record Chapter
             (String id,
              String name,
-             String startName,
+             String startPlayId,
              Map<String, OptionStruck> playOptionMap) {
 
         public static final Chapter NONE_CHAPTER = null;
 
-        public String nextPlay(String id, Map<String, Integer> data) {
+        public String nextPlay(String id, Map<String, String> data) {
             OptionStruck struck = playOptionMap.get(id);
             if (struck == null) {
                 return OptionStruck.NONE_ID;
@@ -478,7 +480,7 @@ public record Play
 
         public static final GlobalConfig NONE_GLOBAL_CONFIG=null;
 
-        public String nextChapter(String id, Map<String, Integer> data) {
+        public String nextChapter(String id, Map<String, String> data) {
             OptionStruck struck = chapterOptionMap.get(id);
             if (struck == null) {
                 return OptionStruck.NONE_ID;

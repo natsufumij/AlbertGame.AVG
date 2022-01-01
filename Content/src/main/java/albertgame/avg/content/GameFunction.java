@@ -2,7 +2,6 @@ package albertgame.avg.content;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -136,7 +135,6 @@ public interface GameFunction {
 
         private void Open() {
             _d.wordLineShowProperty().set(true);
-            _d.nameShowProperty().set(true);
         }
 
         private void Clear() {
@@ -147,7 +145,6 @@ public interface GameFunction {
 
         private void Close() {
             _d.wordLineShowProperty().set(false);
-            _d.nameShowProperty().set(false);
         }
     }
 
@@ -165,7 +162,7 @@ public interface GameFunction {
                 case "In" -> In(data, arg.value);
                 case "Out" -> Out(data, arg.value);
                 case "Show" -> Show(data, header, arg.value, arg.extra[0]);
-                case "No.Show"->NoShow(data,header,arg.value);
+                case "No.Show" -> NoShow(data, header, arg.value);
                 case "Hide" -> Hide(data, header, arg.value);
                 case "Change.State" -> ChangeState(data, arg.value, arg.extra[0]);
             }
@@ -176,7 +173,7 @@ public interface GameFunction {
             if (d.getPlayedPersons().containsKey(pid)) return;
 
             Person.PersonData pd = d.getPersonDataMap().get(pid);
-            String[] states = pd.state();
+            String[] states = pd.state().toArray(new String[0]);
             if (states == null) return;
 
             Map<String, Image> img = new HashMap<>();
@@ -196,7 +193,7 @@ public interface GameFunction {
             d.getPlayedPersons().remove(pid);
         }
 
-        private void NoShow(GameData d, GameHeader h, String pos){
+        private void NoShow(GameData d, GameHeader h, String pos) {
             switch (pos) {
                 case "L" -> {
                     d.setLeftPerson(null);
@@ -249,11 +246,11 @@ public interface GameFunction {
 
         private void ChangeState(GameData d, String pos, String newState) {
             Person p;
-            final String FAILED="ChangeState Failed: Don't Change On A Null Person";
+            final String FAILED = "ChangeState Failed: Don't Change On A Null Person";
             switch (pos) {
                 case "L" -> {
                     p = d.getLeftPerson();
-                    if(p==null){
+                    if (p == null) {
                         System.out.println(FAILED);
                         return;
                     }
@@ -262,7 +259,7 @@ public interface GameFunction {
                 }
                 case "C" -> {
                     p = d.getCenterPerson();
-                    if(p==null){
+                    if (p == null) {
                         System.out.println(FAILED);
                         return;
                     }
@@ -271,7 +268,7 @@ public interface GameFunction {
                 }
                 case "R" -> {
                     p = d.getRightPerson();
-                    if(p==null){
+                    if (p == null) {
                         System.out.println(FAILED);
                         return;
                     }
@@ -290,27 +287,30 @@ public interface GameFunction {
         @Override
         public void fun(GameData data, GameHeader header, FunctionArg arg) {
             switch (arg.name) {
-                case "Save" -> Save(data, arg.name, Integer.parseInt(arg.value));
+                case "Save" -> Save(data, arg.name, arg.value);
                 case "Plus" -> Plus(data, arg.name, Integer.parseInt(arg.value));
                 case "Minus" -> Minus(data, arg.name, Integer.parseInt(arg.value));
             }
         }
 
-        private void Save(GameData d, String name, Integer v) {
+        private void Save(GameData d, String name, String v) {
             d.getData().put(name, v);
         }
 
         private void Plus(GameData d, String name, Integer v) {
-            Integer de = d.getData().get(name);
+            String de = d.getData().get(name);
             if (de != null) {
-                d.getData().put(name, de + v);
+                int dx = Integer.parseInt(de);
+                int dd=dx+v;
+                d.getData().put(name, (dx + v) + "");
             }
         }
 
         private void Minus(GameData d, String name, Integer v) {
-            Integer de = d.getData().get(name);
+            String de = d.getData().get(name);
             if (de != null) {
-                d.getData().put(name, de - v);
+                int dx = Integer.parseInt(de);
+                d.getData().put(name, (dx - v) + "");
             }
         }
     }
@@ -394,8 +394,8 @@ public interface GameFunction {
             data.setNowSelectId(arg.value);
             for (int i = 0; i != arg.extra.length; ++i) {
                 String s = arg.extra[i];
-                Text t=header.getSelectText()[i];
-                t.textProperty().set((i+1)+". "+s);
+                Text t = header.getSelectText()[i];
+                t.textProperty().set((i + 1) + ". " + s);
                 t.setVisible(true);
             }
             data.setGameState(GameData.GAME_STATE_SELECTING);

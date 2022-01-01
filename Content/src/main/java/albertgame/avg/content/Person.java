@@ -2,11 +2,12 @@ package albertgame.avg.content;
 
 import javafx.scene.image.Image;
 
+import java.util.List;
 import java.util.Map;
 
 public class Person {
 
-    public record PersonData(String id, String name, String defaultState, String[] state) {
+    public record PersonData(String id, String name, String defaultState, List<String> state) {
     }
 
     public static final Person NONE_PERSON = new Person();

@@ -6,25 +6,22 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class ManageCenter {
+public class GameCenter {
 
-    private static ManageCenter center;
+    private static GameCenter center;
 
-    public static ManageCenter getCenter() {
+    public static GameCenter getCenter() {
         if (center == null) {
-            synchronized (ManageCenter.class) {
-                center = new ManageCenter();
+            synchronized (GameCenter.class) {
+                center = new GameCenter();
                 center.init();
             }
         }
@@ -36,7 +33,7 @@ public class ManageCenter {
     public static final char MANAGE_GAME_SCENE = 1;
     public static final char MANAGE_STORE_SCENE = 2;
 
-    private ManageCenter() {
+    private GameCenter() {
     }
 
     private char manageState;
@@ -52,7 +49,10 @@ public class ManageCenter {
     //游戏功能
     private Map<String, GameFunction> functionMap;
 
+    public static int storeSelect;
+
     private void init() {
+        storeSelect=0;
         gameData = new GameData();
         header = new GameHeader(gameData);
         manageState = 0;
@@ -70,6 +70,108 @@ public class ManageCenter {
             gameData.nextPlayLine();
         }
     }
+
+    private void handleArg(GameFunction.FunctionArg arg){
+        GameFunction function=this.functionMap.get(arg.type());
+        function.fun(gameData,header,arg);
+    }
+
+    private void initGame() {
+
+        //导入基本配置
+        gameData.setGlobalConfig(ConfigCenter.loadGlobalConfig());
+        //添加人物信息
+        for (Play.GlobalConfig.PersonConfig pc : gameData.getGlobalConfig().personConfigs().values()) {
+            Person.PersonData pd = new Person.PersonData(pc.id(), pc.name(), pc.state().get(0), pc.state());
+            gameData.getPersonDataMap().put(pd.id(), pd);
+        }
+
+        //导入缓存
+        if (ConfigCenter.isCacheExist(GameCenter.storeSelect)) {
+            //存在存档
+            Properties p = ConfigCenter.loadCacheData(GameCenter.storeSelect);
+            for (Map.Entry<Object, Object> s : p.entrySet()) {
+                gameData.getData().put((String) s.getKey(), (String) s.getValue());
+            }
+
+            gameData.setProperties(ConfigCenter.loadCache(GameCenter.storeSelect));
+            restoreGame();
+        }
+    }
+
+    private void restoreGame() {
+        String chapter = gameData.getProperties().getProperty("chapter");
+        String play = gameData.getProperties().getProperty("play");
+        String struck = gameData.getProperties().getProperty("struck");
+        String scene = gameData.getProperties().getProperty("scene");
+        String bgm = gameData.getProperties().getProperty("bgm");
+        String name = gameData.getProperties().getProperty("name");
+        String word = gameData.getProperties().getProperty("word");
+        String wordType=gameData.getProperties().getProperty("wordtype");
+        String[] personIn = gameData.getProperties().getProperty("personin").split(",");
+        String leftP = gameData.getProperties().getProperty("leftp");
+        String centerP = gameData.getProperties().getProperty("centerp");
+        String rightP = gameData.getProperties().getProperty("rightp");
+        boolean wordpanelshow = Boolean.parseBoolean(gameData.getProperties().getProperty("wordpanelshow"));
+        boolean maskshow = Boolean.parseBoolean(gameData.getProperties().getProperty("maskshow"));
+
+        gameData.setNowChapter(ConfigCenter.loadChapter(chapter));
+        gameData.setNowPlay(ConfigCenter.loadPlayInClasspath(chapter, play));
+        gameData.setStruck(gameData.getNowPlay().bodyStruckMap().get(struck));
+        gameData.setLineIndex(Integer.parseInt(gameData.getProperties().getProperty("index")));
+
+        Image sceneI = ConfigCenter.loadScene(scene);
+        gameData.backgroundImageProperty().set(sceneI);
+        gameData.nameDisplayProperty().set(name);
+
+        List<GameFunction.FunctionArg> argList = new ArrayList<>();
+
+        GameFunction.FunctionArg arg = new GameFunction.FunctionArg(
+                "Audio", "Bgm.Play", bgm, GameFunction.NONE_EXTRA);
+        argList.add(arg);
+
+        for (String s : personIn) {
+            GameFunction.FunctionArg arg2 = new GameFunction.FunctionArg(
+                    "Person", "In", s, GameFunction.NONE_EXTRA);
+            argList.add(arg2);
+        }
+
+        if (leftP != null) {
+            GameFunction.FunctionArg arg3 = new GameFunction.FunctionArg(
+                    "Person", "Show", "L", new String[]{leftP});
+            argList.add(arg3);
+        }
+        if (centerP != null) {
+            GameFunction.FunctionArg arg3 = new GameFunction.FunctionArg(
+                    "Person", "Show", "C", new String[]{centerP});
+            argList.add(arg3);
+        }
+        if (rightP != null) {
+            GameFunction.FunctionArg arg3 = new GameFunction.FunctionArg(
+                    "Person", "Show", "R", new String[]{rightP});
+            argList.add(arg3);
+        }
+        gameData.wordLineShowProperty().set(wordpanelshow);
+        gameData.maskShowProperty().set(maskshow);
+        GameFunction.FunctionArg arg1=null;
+        if(wordType.startsWith("@")){
+            String dataId=wordType.substring(1);
+            arg1=new GameFunction.FunctionArg("Dialog","Word",dataId,new String[]{word});
+        }else if(wordType.equals("P")){
+            arg1=new GameFunction.FunctionArg("Dialog","Word",word,GameFunction.NONE_EXTRA);
+        }else if(wordType.equals("M")||wordType.equals("S")){
+            arg=new GameFunction.FunctionArg("Dialog","Word",wordType,new String[]{word});
+        }
+
+        if(arg1!=null){
+            argList.add(arg1);
+        }
+
+        for(GameFunction.FunctionArg arg2:argList){
+            handleArg(arg2);
+        }
+    }
+
 
     public void initChapter() {
 
@@ -148,49 +250,7 @@ public class ManageCenter {
         KeyFrame frame = new KeyFrame(Duration.millis(30), event -> {
             if (gameData.getGameState() != GameData.GAME_STATE_WAIT_NEXT) return;
 
-            if (index != dest) {
-                String[] nowCmd = struck.expressions().get(index).split("  ");
-                GameFunction.FunctionArg arg;
-                if (nowCmd.length == 3) {
-                    arg = new GameFunction.FunctionArg(
-                            nowCmd[0], nowCmd[1], nowCmd[2], GameFunction.NONE_EXTRA);
-                } else if (nowCmd.length == 2) {
-                    arg = new GameFunction.FunctionArg(
-                            nowCmd[0], nowCmd[1], "", GameFunction.NONE_EXTRA);
-                } else {
-                    String[] args = new String[nowCmd.length - 3];
-                    System.arraycopy(nowCmd, 3, args, 0, args.length);
-                    arg = new GameFunction.FunctionArg(
-                            nowCmd[0], nowCmd[1], nowCmd[2], args);
-                }
-                GameFunction function = functionMap.get(arg.type());
-                System.out.println("Function: " + arg.type() + "," + arg.name() + "," + arg.value());
-                function.fun(gameData, header, arg);
-                ++index;
-            } else {
-                //寻找下一个struck
-                if (struck.optionStruck() != Play.OptionStruck.NONE_OPTION) {
-                    Play.BodyStruck bodyStruck = play.nextBodyStruck(struck.id(), gameData.getData());
-                    if (bodyStruck != Play.BodyStruck.NONE_BODY) {
-                        this.struck = bodyStruck;
-                        index = 0;
-                        dest = this.struck.expressions().size();
-                    }
-                } else {
-                    //没有下一个struck了
-                    //判断play是否有下一个剧本
-//                    if(play.nextPlay()!= Play.OptionStruck.NONE_OPTION){
-//                        String pid= play.nextPlay(gameData.getData());
-//                        play=Play.loadPlay(ConfigCenter.loadFileInClasspath("demo/"+pid+".avg"));
-//                        struck=play.bodyStruckMap().get("begins");
-//                        index = 0;
-//                        dest = this.struck.expressions().size();
-//                    }else {
-//                        demoline.stop();
-//                        System.out.println("All Done.");
-//                    }
-                }
-            }
+            gameData.nextPlayLine();
         });
         demoline.getKeyFrames().add(frame);
 
@@ -198,8 +258,7 @@ public class ManageCenter {
             @Override
             protected Void call() throws Exception {
                 try {
-                    File file = ConfigCenter.loadFileInClasspath("demo/demo2.avg");
-                    ManageCenter.this.play=Play.loadPlay(file);
+                    initGame();
                     succeeded();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -217,6 +276,7 @@ public class ManageCenter {
 
         Platform.runLater(task);
     }
+
 
 
     public Parent getNowScene() {
@@ -245,8 +305,8 @@ public class ManageCenter {
                 ConfigCenter.WINDOW_HEIGHT);
         newScene.setOnKeyReleased(event -> {
             if (event.getCode() == KeyCode.ENTER &&
-                    ManageCenter.getCenter().gameData.getGameState() == GameData.GAME_STATE_WAIT_PRESS) {
-                ManageCenter.getCenter().gameData.setGameState(GameData.GAME_STATE_WAIT_NEXT);
+                    GameCenter.getCenter().gameData.getGameState() == GameData.GAME_STATE_WAIT_PRESS) {
+                GameCenter.getCenter().gameData.setGameState(GameData.GAME_STATE_WAIT_NEXT);
             }
         });
 

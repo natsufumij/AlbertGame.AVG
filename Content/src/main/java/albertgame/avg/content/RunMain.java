@@ -8,13 +8,13 @@ public class RunMain extends Application {
     @Override
     public void start(Stage primaryStage){
 
-        ManageCenter center=ManageCenter.getCenter();
+        GameCenter center= GameCenter.getCenter();
         center.setStage(primaryStage);
 
         primaryStage.setTitle(ConfigCenter.WINDOW_TITLE);
         primaryStage.getIcons().add(ConfigCenter.WINDOW_ICON);
 
-        center.setManageState(ManageCenter.MANAGE_GAME_SCENE);
+        center.setManageState(GameCenter.MANAGE_GAME_SCENE);
         primaryStage.show();
     }
 

@@ -5,10 +5,13 @@ import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.text.Font;
 
-import java.io.File;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Objects;
+import java.util.Properties;
 
 public class ConfigCenter {
 
@@ -55,6 +58,80 @@ public class ConfigCenter {
 
     public static File loadFileInClasspath(String path){
         return new File(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResource(path)).getFile());
+    }
+
+    private static final String CACHE_PATH=System.getProperty("user.home")+"/.Cache/AlbertGame.AVG/Store_";
+
+    public static boolean isCacheExist(int index){
+        String dest=CACHE_PATH+index+".properties";
+        File file=new File(dest);
+        return file.exists();
+    }
+
+    public static Properties loadCache(int index){
+        String dest=CACHE_PATH+index+".properties";
+        return loadP(dest);
+    }
+
+    private static Properties loadP(String dest){
+        File file=new File(dest);
+        Properties properties=new Properties();
+        if(file.exists()&&file.isFile()){
+            try {
+                properties.load(new FileInputStream(file));
+                return properties;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return properties;
+    }
+
+    public static Properties loadCacheData(int index){
+        String dest=CACHE_PATH+index+".data.properties";
+        return loadP(dest);
+    }
+
+    public static void saveCache(int index,Properties properties){
+        String dest=CACHE_PATH+index+".properties";
+        Calendar calendar=Calendar.getInstance();
+        properties.setProperty("year", String.valueOf(calendar.get(Calendar.YEAR)));
+        properties.setProperty("monty", String.valueOf(calendar.get(Calendar.MONTH)));
+        properties.setProperty("day", String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
+        properties.setProperty("hour", String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)));
+        properties.setProperty("minute", String.valueOf(calendar.get(Calendar.MINUTE)));
+        properties.setProperty("second", String.valueOf(calendar.get(Calendar.SECOND)));
+
+        saveC(dest,"游戏存档",properties);
+    }
+
+    private static void saveC(String dest,String comment,Properties properties){
+        File file=new File(dest);
+        try {
+            properties.store(new FileWriter(file),"存档");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveCacheData(int index,Properties properties){
+        String dest=CACHE_PATH+index+".data.properties";
+        saveC(dest,"游戏选择分支存档",properties);
+    }
+
+    public static Play loadPlayInClasspath(String chapterId,String name){
+        File file=loadFileInClasspath("play/story/"+chapterId+"/"+name+".avg");
+        return Play.loadPlay(file);
+    }
+
+    public static Play.Chapter loadChapter(String chapterId){
+        File file=loadFileInClasspath("play/story/"+chapterId+".avg");
+        return Play.loadChapter(file);
+    }
+
+    public static Play.GlobalConfig loadGlobalConfig(){
+        File file=loadFileInClasspath("play/story/global.avg");
+        return Play.loadGlobalConfig(file);
     }
 
     public static Image loadScene(String name) {

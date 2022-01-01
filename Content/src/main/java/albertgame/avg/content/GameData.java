@@ -3,8 +3,7 @@ package albertgame.avg.content;
 import javafx.beans.property.*;
 import javafx.scene.image.Image;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class GameData {
 
@@ -21,8 +20,6 @@ public class GameData {
     public static final char GAME_STATE_WORD_DISPLAYING = 3;
     public static final char GAME_STATE_ANIMATING = 4;
 
-    private SaveData saveData;
-
     private final ObjectProperty<Image> backgroundImage;
 
     private final ObjectProperty<Image> leftPersonImage;
@@ -33,9 +30,9 @@ public class GameData {
     private final StringProperty[] displayWords;
 
     private final BooleanProperty wordLineShow;
-    private final BooleanProperty nameShow;
+    private final BooleanProperty maskShow;
 
-    private final Map<String, Integer> data;
+    private final Map<String, String> data;
 
     private Person leftPerson;
     private Person centerPerson;
@@ -45,6 +42,10 @@ public class GameData {
 
     private final Map<String, Play.Chapter> chapterSet;
     private final Map<String, Play> playSet;
+
+    private Properties properties;
+
+    private Play.GlobalConfig globalConfig;
     private Play.Chapter nowChapter;
     private Play nowPlay;
     private Play.BodyStruck struck;
@@ -52,6 +53,8 @@ public class GameData {
 
     private char gameState;
     private String nowSelectId;
+
+    private boolean end = false;
 
     //是否自动
     private boolean auto;
@@ -72,19 +75,12 @@ public class GameData {
             displayWords[i] = text;
         }
         wordLineShow = new SimpleBooleanProperty(Boolean.TRUE);
-        nameShow = new SimpleBooleanProperty(Boolean.TRUE);
+        maskShow=new SimpleBooleanProperty(false);
         gameState = GAME_STATE_WAIT_PRESS;
         chapterSet = new HashMap<>();
         data = new HashMap<>();
         playSet = new HashMap<>();
         personDataMap = new HashMap<>();
-
-        testInit();
-    }
-
-    private void testInit() {
-        Person.PersonData personData = new Person.PersonData("bishojo", "美少女", "1", new String[]{"1"});
-        personDataMap.put("bishojo", personData);
     }
 
     public Map<String, Person> getPlayedPersons() {
@@ -92,6 +88,8 @@ public class GameData {
     }
 
     public void nextPlayLine() {
+        if (end) return;
+
         if (lineIndex == struck.expressions().size()) {
 
             //如果有下一个body块
@@ -100,28 +98,39 @@ public class GameData {
                 Play.BodyStruck nextStruck = nowPlay.nextBodyStruck(struck.id(), this.data);
                 resetStruck(nowChapter, nowPlay, nextStruck);
             } else {
-
                 //body块结束，并且没有下一块
                 //寻找下一个play
-//                String destId = nowPlay.nextPlay(this.data);
-//                Play play = playSet.get(destId);
-//                final String beginStruckName="begins";
+                String destId = nowChapter.nextPlay(nowPlay.id(), this.data);
 
-                //找到了play，寻找begins，作为第一个body块
-//                if (play != null) {
-//                    resetStruck(nowChapter,play,play.bodyStruckMap().get(beginStruckName));
-//                } else {
-//
-//                    //如果没有下一个play，则切换到下一章节，重设play，和body块
-//                    destId = nowChapter.nextChapter(this.data);
-//                    Chapter chapter = chapterSet.get(destId);
-//                    if (chapter != null) {
-//                        Play p=chapter.startPlay();
-//                        resetStruck(chapter,p,p.bodyStruckMap().get(beginStruckName));
-//                    }
-//                }
+                //如果destId不是NONE_ID，表示play存在
+                if (!Objects.equals(destId, Play.OptionStruck.NONE_ID)) {
+                    Play play = ConfigCenter.loadPlayInClasspath(nowChapter.id(), destId);
+                    final String beginStruckName = "begins";
+
+                    //找到了play，寻找begins，作为第一个body块
+                    resetStruck(nowChapter, play, play.bodyStruckMap().get(beginStruckName));
+                } else {
+                    //是NONE_ID，表示play不存在，则寻找下一个Chapter
+                    destId = globalConfig.nextChapter(nowChapter.id(), this.data);
+                    if (Objects.equals(destId, Play.OptionStruck.NONE_ID)) {
+                        //无下一个Chapter
+                        System.out.println("All Done.");
+                        end = true;
+                    } else {
+                        Play.Chapter chapter = ConfigCenter.loadChapter(destId);
+                        String startPlayId = chapter.startPlayId();
+                        Play play = ConfigCenter.loadPlayInClasspath(chapter.id(), startPlayId);
+                        nowChapter = chapter;
+                        resetStruck(nowChapter, play, play.bodyStruckMap().get("begins"));
+                    }
+                }
             }
         }
+    }
+
+
+    public Play.GlobalConfig getGlobalConfig() {
+        return globalConfig;
     }
 
     private void resetStruck(Play.Chapter c, Play p, Play.BodyStruck struck) {
@@ -129,14 +138,6 @@ public class GameData {
         this.nowPlay = p;
         this.struck = struck;
         lineIndex = 0;
-    }
-
-    public SaveData getSaveData() {
-        return saveData;
-    }
-
-    public void setSaveData(SaveData saveData) {
-        this.saveData = saveData;
     }
 
     public Image getBackgroundImage() {
@@ -231,12 +232,12 @@ public class GameData {
         this.auto = auto;
     }
 
-    public boolean isNameShow() {
-        return nameShow.get();
+    public boolean isMaskShow() {
+        return maskShow.get();
     }
 
-    public BooleanProperty nameShowProperty() {
-        return nameShow;
+    public BooleanProperty maskShowProperty() {
+        return maskShow;
     }
 
     public Map<String, Play.Chapter> getChapterSet() {
@@ -247,7 +248,7 @@ public class GameData {
         return playSet;
     }
 
-    public Map<String, Integer> getData() {
+    public Map<String, String> getData() {
         return data;
     }
 
@@ -261,5 +262,41 @@ public class GameData {
 
     public Map<String, Person.PersonData> getPersonDataMap() {
         return personDataMap;
+    }
+
+    public void setGlobalConfig(Play.GlobalConfig globalConfig) {
+        this.globalConfig = globalConfig;
+    }
+
+    public void setProperties(Properties properties) {
+        this.properties = properties;
+    }
+
+    public Properties getProperties() {
+        return properties;
+    }
+
+    public void setNowChapter(Play.Chapter nowChapter) {
+        this.nowChapter = nowChapter;
+    }
+
+    public void setNowPlay(Play nowPlay) {
+        this.nowPlay = nowPlay;
+    }
+
+    public void setStruck(Play.BodyStruck struck) {
+        this.struck = struck;
+    }
+
+    public void setLineIndex(int lineIndex) {
+        this.lineIndex = lineIndex;
+    }
+
+    public Play.Chapter getNowChapter() {
+        return nowChapter;
+    }
+
+    public Play getNowPlay() {
+        return nowPlay;
     }
 }
