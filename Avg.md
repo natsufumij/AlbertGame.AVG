@@ -72,6 +72,7 @@
 #Info
   id
   name
+  Play
 #Body
   >>Begin  
     #View  Scene  Name1
@@ -106,13 +107,6 @@
     A>2 & D<2>
     Else
   ...   
-#NextPlays
-  PlayName1,PlayName2,PlayName3
-#NextOptions
-  A=3 | D=2 | S=8
-  S=1 & D>3 a=3
-  Else
-```
 
 章节剧本配置
 ```
@@ -120,10 +114,45 @@
   id
   name
   StartPlayName
-#NextChapter
-  [Chapter1,Chapter2,Chapter3]
-#NextOptions
-  A=3 | D=2 | S=8
-  S=1 & D>3 a=3
-  Else
+  Chapter
+#Progress
+  play1->NextOption1->play2,play3,play4
+  play1->NextOption2->play2,play3,play4
+#Options
+  >>NextOption1
+    A=3 | D=2 | S=8
+    S=1 & D>3 a=3
+    Else
+  >>NextOption2
+    A=3 | D=2 | S=8
+    S=1 & D>3 a=3
+    Else
 ```
+
+
+总局配置  
+#Info
+  StartName
+  Global
+#Progress
+  Chapter0->NextOption1->Chapter1,Chapter2
+  Chapter1->NextOption2->Chapter3,Chapter4
+  Chapter2->NextOption3->Chapter3,Chapter4
+  Chapter3->NextOption4->Chapter4,Chapter5
+#Options
+  >>NextOption1
+    A=3 | D=2 | S=8
+    S=1 & D>3 a=3
+    Else
+  >>NextOption2
+    A=3 | D=2 | S=8
+    S=1 & D>3 a=3
+    Else
+#PersonData
+  >>PersonId
+    name
+    1,2,3,4,5,6
+  >>PersonId
+    name
+    1,2,3,4,6,7
+

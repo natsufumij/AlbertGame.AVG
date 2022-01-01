@@ -7,21 +7,16 @@ import java.util.*;
 public record Play
         (String id,
          String name,
-         Map<String, BodyStruck> bodyStruckMap,
-         OptionStruck nextPlay) {
+         Map<String, BodyStruck> bodyStruckMap) {
 
-    public String nextPlay(Map<String, Integer> data) {
-        if (nextPlay == OptionStruck.NONE_OPTION) return OptionStruck.NONE_ID;
-
-        return nextPlay.struckNextOption(data);
-    }
+    public static final Play NONE_PLAY = null;
 
     public BodyStruck nextBodyStruck(String id, Map<String, Integer> data) {
-        BodyStruck struck=bodyStruckMap.get(id);
-        String dis=struck.optionStruck.struckNextOption(data);
-        if(Objects.equals(dis, OptionStruck.NONE_ID)){
+        BodyStruck struck = bodyStruckMap.get(id);
+        String dis = struck.optionStruck.struckNextOption(data);
+        if (Objects.equals(dis, OptionStruck.NONE_ID)) {
             return BodyStruck.NONE_BODY;
-        }else {
+        } else {
             return bodyStruckMap.get(dis);
         }
     }
@@ -155,12 +150,12 @@ public record Play
 
     public static void main(String[] args) {
 
-        List<BodyNodeH> bodyNodeHS=new ArrayList<>();
-        Stack<BodyNodeH> stack=new Stack<>();
+        List<BodyNodeH> bodyNodeHS = new ArrayList<>();
+        Stack<BodyNodeH> stack = new Stack<>();
 
         try {
             File file = ConfigCenter.loadFileInClasspath("demo/demo2.avg");
-            Play p=loadPlay(file);
+            Play p = loadPlay(file);
             System.out.println("Ok.");
         } catch (Exception e) {
             e.printStackTrace();
@@ -176,9 +171,8 @@ public record Play
         List<BodyNodeH> children = new ArrayList<>();
     }
 
-    private static void parseFile(List<BodyNodeH> oneList,Stack<BodyNodeH> stack,String line) {
+    private static void parseFile(List<BodyNodeH> oneList, Stack<BodyNodeH> stack, String line) {
         if (line.isBlank()) return;
-        line = line.strip();
 
         if (line.startsWith("#")) {
             //#只在栈中存在一次
@@ -225,7 +219,7 @@ public record Play
             int ind = s.indexOf("]");
             String f = s.substring(1, ind);
             f = f.strip();
-            ArrayList<String[]> arrayList=new ArrayList<>();
+            ArrayList<String[]> arrayList = new ArrayList<>();
             arrayList.add(f.split(" {2}"));
             return arrayList;
         } else if (s.startsWith("@")) {
@@ -267,9 +261,9 @@ public record Play
         } else return Collections.emptyList();
     }
 
-    public static Play loadPlay(File file){
-        List<BodyNodeH> bodyNodeHS=new ArrayList<>();
-        Stack<BodyNodeH> stack=new Stack<>();
+    private static List<BodyNodeH> loadBodyNodeH(File file) {
+        List<BodyNodeH> bodyNodeHS = new ArrayList<>();
+        Stack<BodyNodeH> stack = new Stack<>();
 
         try {
             if (file.exists() && file.isFile()) {
@@ -280,31 +274,37 @@ public record Play
                 String line;
                 while ((line = r.readLine()) != null) {
                     line = line.strip();
-                    line=line.strip();
-                    if(!line.isBlank()){
-                        parseFile(bodyNodeHS,stack,line);
+                    if (!line.isBlank()) {
+                        parseFile(bodyNodeHS, stack, line);
                     }
                 }
-                parseFile(bodyNodeHS,stack,END_SIGN);
+                parseFile(bodyNodeHS, stack, END_SIGN);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return bodyNodeHS;
+    }
 
-        return loadPlay(bodyNodeHS);
+    public static Play loadPlay(File file) {
+        return loadPlay(loadBodyNodeH(file));
     }
 
     private static Play loadPlay(List<BodyNodeH> hs) {
-        Map<String, OptionStruck> op = new HashMap<>();
+        Map<String, OptionStruck> op =null;
         Map<String, BodyStruck> bodyStruckMap = new HashMap<>();
         Map<String, String[]> optionMap = new HashMap<>();
-        String[] nextPlayIds = null, nextOps = null;
         BodyNodeH bodyN = null;
-        BodyNodeH progressN=null;
+        BodyNodeH progressN = null;
         String id = "00", name = "00";
         for (BodyNodeH b : hs) {
             switch (b.name) {
                 case "Info":
+                    if (b.texts.size() < 1 ||
+                            !b.texts.get(b.texts.size() - 1).equals("Play")) {
+                        return Play.NONE_PLAY;
+                    }
+
                     id = b.texts.get(0);
                     name = b.texts.get(1);
                     break;
@@ -319,24 +319,11 @@ public record Play
                 case "Progress":
                     progressN = b;
                     break;
-                case "NextPlays":
-                    nextPlayIds = b.texts.get(0).split(",");
-                    break;
-                case "NextOptions":
-                    nextOps = b.texts.toArray(new String[0]);
-                    break;
             }
         }
 
         //生成OptionStruck
-        if(progressN!=null){
-            for (String s : progressN.texts) {
-                s = s.replaceAll(" ", "");
-                String[] sp = s.split("->");
-                OptionStruck optionStruck = new OptionStruck(sp[1], optionMap.get(sp[1]), sp[2].split(","));
-                op.put(sp[0], optionStruck);
-            }
-        }
+        op=loadOptionStruckM(progressN,optionMap);
 
         //生成Map<String, BodyStruck>
         assert bodyN != null;
@@ -350,24 +337,17 @@ public record Play
             bodyStruckMap.put(hid, struck);
         }
 
-        //生成OptionStruck NextPlay
-        OptionStruck nextOp;
-        if(nextOps==null){
-            nextOp=OptionStruck.NONE_OPTION;
-        }else {
-            nextOp=new OptionStruck("This",nextOps,nextPlayIds);
-        }
-        return new Play(id, name, bodyStruckMap, nextOp);
+        return new Play(id, name, bodyStruckMap);
     }
 
     //拼接成:Type  Name  Word  EXTRA[0]  EXTRA[1] ...
-    private static void refreshBodyStruck(BodyStruck struck){
-        List<String> destList=new ArrayList<>();
-        for(String s:struck.expressions){
-            List<String[]> dest=parseCmd(s);
-            for(String[] sr:dest){
-                StringBuilder ax= new StringBuilder("  ");
-                for(String sd:sr){
+    private static void refreshBodyStruck(BodyStruck struck) {
+        List<String> destList = new ArrayList<>();
+        for (String s : struck.expressions) {
+            List<String[]> dest = parseCmd(s);
+            for (String[] sr : dest) {
+                StringBuilder ax = new StringBuilder("  ");
+                for (String sd : sr) {
                     ax.append(sd).append("  ");
                 }
                 ax = new StringBuilder(ax.toString().strip());
@@ -376,5 +356,143 @@ public record Play
         }
         struck.expressions.clear();
         struck.expressions.addAll(destList);
+    }
+
+    public static Chapter loadChapter(File file) {
+        Chapter chapter;
+        String id = null, name = null, startName = null;
+
+        List<BodyNodeH> list = loadBodyNodeH(file);
+        BodyNodeH progressH = null;
+        Map<String, String[]> optionExMap = new HashMap<>();
+
+        for (BodyNodeH h : list) {
+            if (h.name.equals("Info")) {
+                if (h.texts.size() < 1 ||
+                        !h.texts.get(h.texts.size() - 1).equals("Chapter")) {
+                    return Chapter.NONE_CHAPTER;
+                }
+
+                id = h.texts.get(0);
+                name = h.texts.get(1);
+                startName = h.texts.get(2);
+            } else if (h.name.equals("Progress")) {
+                progressH = h;
+            } else if (h.name.equals("Options")) {
+                for(BodyNodeH b:h.children){
+                    optionExMap.put(b.name, b.texts.toArray(new String[0]));
+                }
+            }
+        }
+
+        if (id == null || name == null) {
+            return Chapter.NONE_CHAPTER;
+        }
+
+        Map<String, OptionStruck> optionStruckMap = loadOptionStruckM(progressH,optionExMap);
+
+        chapter = new Chapter(id, name, startName, optionStruckMap);
+        return chapter;
+    }
+
+    public static GlobalConfig loadGlobalConfig(File file){
+
+        List<BodyNodeH> bodyNodeHS=loadBodyNodeH(file);
+        Map<String,String[]> optionExpressionMap=new HashMap<>();
+        BodyNodeH progressH=null;
+        Map<String,GlobalConfig.PersonConfig> personConfigMap=new HashMap<>();
+        Map<String,OptionStruck> optionStruckMap;
+        String startName="";
+        for(BodyNodeH h:bodyNodeHS){
+            if(h.name.equals("Info")){
+                if(h.texts.size()!=2 || !h.texts.get(h.texts.size()-1).equals("Global")){
+                    return GlobalConfig.NONE_GLOBAL_CONFIG;
+                }else {
+                    startName=h.texts.get(0);
+                }
+            }else if(h.name.equals("Options")){
+                for(BodyNodeH b:h.children){
+                    optionExpressionMap.put(b.name, b.texts.toArray(new String[0]));
+                }
+            }else if(h.name.equals("Progress")){
+                progressH=h;
+            }else if(h.name.equals("PersonData")){
+                for(BodyNodeH b:h.children){
+                    String id=b.name;
+                    String name=b.texts.get(0);
+                    List<String> states=new ArrayList<>();
+                    String[] s=b.texts.get(1).split(",");
+                    Collections.addAll(states, s);
+                    GlobalConfig.PersonConfig personConfig=new GlobalConfig.PersonConfig(id,name,states);
+                    personConfigMap.put(id,personConfig);
+                }
+            }
+        }
+
+        optionStruckMap=loadOptionStruckM(progressH,optionExpressionMap);
+
+        return new GlobalConfig(startName,optionStruckMap,personConfigMap);
+    }
+
+    private static Map<String,OptionStruck> loadOptionStruckM(BodyNodeH progressH,Map<String,String[]> expressions){
+        Map<String,OptionStruck> struck=new HashMap<>();
+        if(progressH!=null){
+            for (String s : progressH.texts) {
+                String x = s.replaceAll(" {2}", "");
+                String[] xl = x.split("->");
+                String sourceId = xl[0];
+                String optionName = xl[1];
+                String[] select = xl[2].split(",");
+                struck.put(sourceId, new OptionStruck(optionName, select, expressions.get(optionName)));
+            }
+        }
+        return struck;
+    }
+
+    public record Chapter
+            (String id,
+             String name,
+             String startName,
+             Map<String, OptionStruck> playOptionMap) {
+
+        public static final Chapter NONE_CHAPTER = null;
+
+        public String nextPlay(String id, Map<String, Integer> data) {
+            OptionStruck struck = playOptionMap.get(id);
+            if (struck == null) {
+                return OptionStruck.NONE_ID;
+            } else {
+                String nextId = struck.struckNextOption(data);
+                if (Objects.equals(nextId, OptionStruck.NONE_ID)) {
+                    return OptionStruck.NONE_ID;
+                } else {
+                    return nextId;
+                }
+            }
+        }
+    }
+
+    public record GlobalConfig(String startChapter,
+                               Map<String, OptionStruck> chapterOptionMap,
+                               Map<String,PersonConfig> personConfigs) {
+
+        public static final GlobalConfig NONE_GLOBAL_CONFIG=null;
+
+        public String nextChapter(String id, Map<String, Integer> data) {
+            OptionStruck struck = chapterOptionMap.get(id);
+            if (struck == null) {
+                return OptionStruck.NONE_ID;
+            } else {
+                String nextId = struck.struckNextOption(data);
+                if (Objects.equals(nextId, OptionStruck.NONE_ID)) {
+                    return OptionStruck.NONE_ID;
+                } else {
+                    return nextId;
+                }
+            }
+        }
+
+        public record PersonConfig(String id, String name, List<String> state) {
+        }
     }
 }

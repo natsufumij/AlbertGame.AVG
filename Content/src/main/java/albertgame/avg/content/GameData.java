@@ -35,7 +35,7 @@ public class GameData {
     private final BooleanProperty wordLineShow;
     private final BooleanProperty nameShow;
 
-    private final Map<String,Integer> data;
+    private final Map<String, Integer> data;
 
     private Person leftPerson;
     private Person centerPerson;
@@ -43,9 +43,9 @@ public class GameData {
     private final Map<String, Person> playedPersons;
     private final Map<String, Person.PersonData> personDataMap;
 
-    private final Map<String, Chapter> chapterSet;
+    private final Map<String, Play.Chapter> chapterSet;
     private final Map<String, Play> playSet;
-    private Chapter nowChapter;
+    private Play.Chapter nowChapter;
     private Play nowPlay;
     private Play.BodyStruck struck;
     private int lineIndex;
@@ -75,16 +75,16 @@ public class GameData {
         nameShow = new SimpleBooleanProperty(Boolean.TRUE);
         gameState = GAME_STATE_WAIT_PRESS;
         chapterSet = new HashMap<>();
-        data=new HashMap<>();
+        data = new HashMap<>();
         playSet = new HashMap<>();
-        personDataMap=new HashMap<>();
+        personDataMap = new HashMap<>();
 
         testInit();
     }
 
     private void testInit() {
-        Person.PersonData personData=new Person.PersonData("bishojo","美少女","1",new String[]{"1"});
-        personDataMap.put("bishojo",personData);
+        Person.PersonData personData = new Person.PersonData("bishojo", "美少女", "1", new String[]{"1"});
+        personDataMap.put("bishojo", personData);
     }
 
     public Map<String, Person> getPlayedPersons() {
@@ -98,37 +98,37 @@ public class GameData {
             if (struck.optionStruck() != Play.OptionStruck.NONE_OPTION) {
                 //查找下一个body块
                 Play.BodyStruck nextStruck = nowPlay.nextBodyStruck(struck.id(), this.data);
-                resetStruck(nowChapter,nowPlay,nextStruck);
+                resetStruck(nowChapter, nowPlay, nextStruck);
             } else {
 
                 //body块结束，并且没有下一块
                 //寻找下一个play
-                String destId = nowPlay.nextPlay(this.data);
-                Play play = playSet.get(destId);
-                final String beginStruckName="begins";
+//                String destId = nowPlay.nextPlay(this.data);
+//                Play play = playSet.get(destId);
+//                final String beginStruckName="begins";
 
                 //找到了play，寻找begins，作为第一个body块
-                if (play != null) {
-                    resetStruck(nowChapter,play,play.bodyStruckMap().get(beginStruckName));
-                } else {
-
-                    //如果没有下一个play，则切换到下一章节，重设play，和body块
-                    destId = nowChapter.nextChapter(this.data);
-                    Chapter chapter = chapterSet.get(destId);
-                    if (chapter != null) {
-                        Play p=chapter.startPlay();
-                        resetStruck(chapter,p,p.bodyStruckMap().get(beginStruckName));
-                    }
-                }
+//                if (play != null) {
+//                    resetStruck(nowChapter,play,play.bodyStruckMap().get(beginStruckName));
+//                } else {
+//
+//                    //如果没有下一个play，则切换到下一章节，重设play，和body块
+//                    destId = nowChapter.nextChapter(this.data);
+//                    Chapter chapter = chapterSet.get(destId);
+//                    if (chapter != null) {
+//                        Play p=chapter.startPlay();
+//                        resetStruck(chapter,p,p.bodyStruckMap().get(beginStruckName));
+//                    }
+//                }
             }
         }
     }
 
-    private void resetStruck(Chapter c, Play p, Play.BodyStruck struck){
-        this.nowChapter=c;
-        this.nowPlay=p;
-        this.struck=struck;
-        lineIndex=0;
+    private void resetStruck(Play.Chapter c, Play p, Play.BodyStruck struck) {
+        this.nowChapter = c;
+        this.nowPlay = p;
+        this.struck = struck;
+        lineIndex = 0;
     }
 
     public SaveData getSaveData() {
@@ -239,7 +239,7 @@ public class GameData {
         return nameShow;
     }
 
-    public Map<String, Chapter> getChapterSet() {
+    public Map<String, Play.Chapter> getChapterSet() {
         return chapterSet;
     }
 
