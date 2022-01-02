@@ -38,7 +38,8 @@ public class StoreHeader extends Parent {
 
         group.setTranslateX(ConfigCenter.CACHE_RECT_TAP);
         group.setTranslateY(ConfigCenter.CACHE_RECT_TAP);
-
+        this.setTranslateX(ConfigCenter.CACHE_X);
+        this.setTranslateY(ConfigCenter.CACHE_Y);
         super.getChildren().add(group);
     }
 
@@ -46,13 +47,22 @@ public class StoreHeader extends Parent {
         Group group = new Group();
         Text text = new Text("空文档");
         text.setFont(ConfigCenter.NAME_FONT);
+        text.setFill(Color.AZURE);
         group.getChildren().add(text);
         text.setTranslateY(36);
 
         Rectangle rect = new Rectangle();
         rect.setWidth(ConfigCenter.CACHE_RECT_WIDTH);
         rect.setHeight(ConfigCenter.CACHE_RECT_HEIGHT);
-        rect.setFill(Color.color(0.3, 0.2, 0.4, 0.3));
+        final Color c1=Color.color(0.3,0.2,0.4,0.3);
+        final Color c2=Color.color(0.1,0.1,0.6,0.3);
+        rect.setFill(c1);
+        rect.setOnMouseEntered(event -> {
+            rect.setFill(c2);
+        });
+        rect.setOnMouseExited(event -> {
+            rect.setFill(c1);
+        });
 
         int rowIndex = index / ConfigCenter.CACHE_COLUMN;
         int columnIndex = index % ConfigCenter.CACHE_COLUMN;
@@ -92,7 +102,16 @@ public class StoreHeader extends Parent {
         Rectangle rect = new Rectangle();
         rect.setWidth(ConfigCenter.CACHE_RECT_WIDTH);
         rect.setHeight(ConfigCenter.CACHE_RECT_HEIGHT);
-        rect.setFill(Color.color(0.3, 0.2, 0.4, 0.3));
+        final Color c1=Color.color(0.3,0.2,0.4,0.3);
+        final Color c2=Color.color(0.1,0.1,0.6,0.3);
+        final Color c3=Color.color(0.3,0.4,0.2,0.3);
+        rect.setFill(c1);
+        rect.setOnMouseEntered(event -> {
+            rect.setFill(c2);
+        });
+        rect.setOnMouseExited(event -> {
+            rect.setFill(c1);
+        });
 
         group.getChildren().addAll(text1, text2, rect);
 
