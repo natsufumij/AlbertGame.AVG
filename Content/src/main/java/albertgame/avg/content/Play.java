@@ -218,9 +218,8 @@ public record Play
     //[Person  In  DataId]
     //,这是注释
     public static List<String[]> parseCmd(String s) {
-        if (s.startsWith("[")) {
-            int ind = s.indexOf("]");
-            String f = s.substring(1, ind);
+        if (s.startsWith("[")&&s.endsWith("]")) {
+            String f = s.substring(1, s.length()-1);
             f = f.strip();
             ArrayList<String[]> arrayList = new ArrayList<>();
             arrayList.add(f.split(" {2}"));

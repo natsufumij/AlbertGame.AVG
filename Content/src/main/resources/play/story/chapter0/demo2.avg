@@ -6,8 +6,6 @@
 
 #Body
     >>begins
-        [View  Scene  demo2]
-        [Audio  Bgm.Play  bgm1]
         [View  Lighting  3000]
         [Dialog  Open]
         序章的第2个剧本
@@ -23,8 +21,9 @@
 
     >>End
         结束，进入第一章章节
-        [Audio  Bgm.Stop]
+        [Dialog  Clear]
         [Dialog  Close]
+        [Audio  Bgm.Stop]
         [View  Darking  3000]
 
 #Progress

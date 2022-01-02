@@ -1,16 +1,14 @@
 #Info
     demo2
-    第一章的第2剧本
+    第一章的第3剧本
     begins
     Play
 
 #Body
     >>begins
-        [View  Scene  demo2]
-        [Audio  Bgm.Play  bgm1]
         [View  Lighting  3000]
         [Dialog  Open]
-        第一章的第2个剧本
+        第一章的第3个剧本
 
     >>Struck1
         第一章。第3个剧本第1块
@@ -23,6 +21,7 @@
 
     >>End
         结束
+        [Dialog  Clear]
         [Audio  Bgm.Stop]
         [Dialog  Close]
         [View  Darking  3000]
