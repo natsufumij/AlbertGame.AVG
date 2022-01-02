@@ -45,19 +45,20 @@ public class GameCenter {
     private GameData gameData;
     //游戏场景界面
     private GameHeader header;
+
     //游戏功能
     private Map<String, GameFunction> functionMap;
 
     public static int storeSelect;
 
     private void init() {
-        storeSelect=0;
+        storeSelect = 0;
+        manageState = 0;
         gameData = new GameData();
         header = new GameHeader(gameData);
-        manageState = 0;
         functionMap = new HashMap<>();
 //        initChapter();
-        testLines();
+//        testLines();
     }
 
     public void update() {
@@ -66,9 +67,9 @@ public class GameCenter {
         //TODO: 执行剧本的命令，更新剧本执行的相关数据
     }
 
-    private void handleArg(GameFunction.FunctionArg arg){
-        GameFunction function=this.functionMap.get(arg.type());
-        function.fun(gameData,header,arg);
+    private void handleArg(GameFunction.FunctionArg arg) {
+        GameFunction function = this.functionMap.get(arg.type());
+        function.fun(gameData, header, arg);
     }
 
     private void initGame() {
@@ -84,12 +85,12 @@ public class GameCenter {
         //导入缓存
         if (ConfigCenter.isCacheExist(GameCenter.storeSelect)) {
             //存在存档
-            Map<String,String> p = ConfigCenter.loadCacheData(GameCenter.storeSelect);
+            Map<String, String> p = ConfigCenter.loadCacheData(GameCenter.storeSelect);
 
             gameData.setProperties(ConfigCenter.loadCache(GameCenter.storeSelect));
             gameData.getData().putAll(p);
             restoreGame();
-        }else {
+        } else {
             gameData.loadFromGlobal();
             System.out.println("");
         }
@@ -103,7 +104,7 @@ public class GameCenter {
         String bgm = gameData.getProperties().getProperty("bgm");
         String name = gameData.getProperties().getProperty("name");
         String word = gameData.getProperties().getProperty("word");
-        String wordType=gameData.getProperties().getProperty("wordtype");
+        String wordType = gameData.getProperties().getProperty("wordtype");
         String[] personIn = gameData.getProperties().getProperty("personin").split(",");
         String leftP = gameData.getProperties().getProperty("leftp");
         String centerP = gameData.getProperties().getProperty("centerp");
@@ -149,26 +150,26 @@ public class GameCenter {
         }
         gameData.wordLineShowProperty().set(wordpanelshow);
         gameData.maskShowProperty().set(maskshow);
-        GameFunction.FunctionArg arg1=null;
-        if(wordType.startsWith("@")){
-            String dataId=wordType.substring(1);
-            arg1=new GameFunction.FunctionArg("Dialog","Word",dataId,new String[]{word});
-        }else if(wordType.equals("P")){
-            arg1=new GameFunction.FunctionArg("Dialog","Word",word,GameFunction.NONE_EXTRA);
-        }else if(wordType.equals("M")||wordType.equals("S")){
-            arg1=new GameFunction.FunctionArg("Dialog","Word",wordType,new String[]{word});
+        GameFunction.FunctionArg arg1 = null;
+        if (wordType.startsWith("@")) {
+            String dataId = wordType.substring(1);
+            arg1 = new GameFunction.FunctionArg("Dialog", "Word", dataId, new String[]{word});
+        } else if (wordType.equals("P")) {
+            arg1 = new GameFunction.FunctionArg("Dialog", "Word", word, GameFunction.NONE_EXTRA);
+        } else if (wordType.equals("M") || wordType.equals("S")) {
+            arg1 = new GameFunction.FunctionArg("Dialog", "Word", wordType, new String[]{word});
         }
 
-        if(arg1!=null){
+        if (arg1 != null) {
             argList.add(arg1);
         }
 
-        for(GameFunction.FunctionArg arg2:argList){
+        for (GameFunction.FunctionArg arg2 : argList) {
             handleArg(arg2);
         }
     }
 
-    public void loadFromGlobalConfig(){
+    public void loadFromGlobalConfig() {
 
     }
 
@@ -247,10 +248,10 @@ public class GameCenter {
             if (gameData.getGameState()
                     == GameData.GAME_STATE_WAIT_NEXT &&
                     !gameData.isStruckEnd()) {
-                GameFunction.FunctionArg arg=gameData.getArgAndSetNext();
+                GameFunction.FunctionArg arg = gameData.getArgAndSetNext();
                 handleArg(arg);
-            }else if(gameData.getGameState()==GameData.GAME_STATE_WAIT_NEXT
-                    &&gameData.isStruckEnd()){
+            } else if (gameData.getGameState() == GameData.GAME_STATE_WAIT_NEXT
+                    && gameData.isStruckEnd()) {
                 gameData.nextPlayLine();
             }
         });
@@ -276,10 +277,6 @@ public class GameCenter {
         Platform.runLater(task);
     }
 
-    private void handleCmd() {
-
-    }
-
     public Parent getNowScene() {
         return nowScene;
     }
@@ -291,12 +288,13 @@ public class GameCenter {
     public void setManageState(char manageState) {
         if (this.manageState == manageState) return;
 
-        //TODO: 等待完善开始界面与存档界面
         switch (manageState) {
-            case 0:
-            case 2:
+            case MANAGE_START_SCENE:
                 return;
-            case 1:
+            case MANAGE_STORE_SCENE:
+                nowScene = new StoreHeader();
+                break;
+            case MANAGE_GAME_SCENE:
                 nowScene = header;
                 break;
         }

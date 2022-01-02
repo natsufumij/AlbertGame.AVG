@@ -158,7 +158,7 @@
 
 缓存
 year,month,day,hour,minute,second
-chapter,play,struck,index
+chapter,play,struck,index,chaptername,playname
 scene,bgm,name,word,wordtype[M,S,P,@DataId]
 leftp,centerp,rightp,personin,
 wordpanelshow,maskshow

@@ -14,7 +14,7 @@ public class RunMain extends Application {
         primaryStage.setTitle(ConfigCenter.WINDOW_TITLE);
         primaryStage.getIcons().add(ConfigCenter.WINDOW_ICON);
 
-        center.setManageState(GameCenter.MANAGE_GAME_SCENE);
+        center.setManageState(GameCenter.MANAGE_STORE_SCENE);
         primaryStage.show();
     }
 

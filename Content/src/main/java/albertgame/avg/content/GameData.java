@@ -145,6 +145,8 @@ public class GameData {
         properties.setProperty("play",p.id());
         properties.setProperty("struck",struck.id());
         properties.setProperty("index","0");
+        properties.setProperty("chaptername",c.name());
+        properties.setProperty("playname",p.name());
         struckEnd =false;
     }
 
