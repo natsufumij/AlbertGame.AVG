@@ -1,57 +1,38 @@
 #Info
-Demo2
-第二个测试用剧本
+    demo2
+    序章的第2剧本
+    begins
+    Play
 
 #Body
+    >>begins
+        [View  Scene  demo2]
+        [Audio  Bgm.Play  bgm1]
+        [View  Lighting  3000]
+        [Dialog  Open]
+        序章的第2个剧本
 
->>begins
-[Dialog  Close]
-[View  Scene  demo2]
-[Audio  Bgm.Play  bgm1]
-[View  Lighting  3000]
-[Dialog  Open]
+    >>Struck1
+        序章。第2个剧本第1块
 
->>Struck1
-@M  博野在昨天已经高中毕业了，十分普通的成绩能进入市里的二流大学，和大部分的中等生不太一样，他并不期待大学的生活，从根本上来说，也能否读大学都不一定，他不太想去念书，而家人也不太愿意为了他花二流大学的高额的学费，因为他是家里的第二个儿子，而父母的爱，大部分都花在了优秀又全能的兄长的人生。
-原本室准备找视线恰好能够到达车站的座位，但是却被几个淘气的小孩子绕着跑，不得不换了位子，坐在了靠后的一位女生的旁边。当博野眯起眼睛仔细注视着女生的脸，才发现眼前的女生的模样有些印象。
-@M  不行，不行
-但是博野也仍旧没有多少在意，直到注意到旁边有一个轻轻的声音。
-[Dialog  Close]
-[View  Darking  3000]
+    >>Struck3
+        序章。第2个剧本第3块
 
->>Struck2
-[Audio  Sound.Play  audio1]
-[Person  In  bishojo]
-[Person  Show  L  bishojo]
-@bishojo  那个，博野同学，你有带餐巾纸吗？
-博野看到旁边的女生涨红了脸，从嘴巴里面挤出来这几个字。
-@M  看起来很累呢，你最好还是好好休息一下吧，不过不是在这里……大家都已经下车了，目的地已经到了，现在准备一些自带的食物，我们要去山腰处的空地里面野餐了，你最好快速收拾一下就出来，再晚的话，可能我们就等不了你了
-[Dialog  Close]
-[View  Darking  3000]
+    >>Struck2
+        序章。第2个剧本第2块
 
->>Struck3
-[Audio  Bgm.Play  bgm1]
-@bishojo  这是村庄里面重要的食物来源之一，不要轻易地去靠近
-街上并没有水泥路，但是有很大的一条由小石头堆成的路途。街道上倒是没有什么野草，倒是街道的两边的野草长得很疯，甚至都有膝盖一般高了。
-是否要去触碰呢？
-[Select  Go  Pound  一定要去触碰  不行，不能去触碰]
-[Audio  Bgm.Stop]
+    >>End
+        结束，进入第一章章节
+        [Audio  Bgm.Stop]
+        [Dialog  Close]
+        [View  Darking  3000]
 
 #Progress
-begins->Option1->Struck3
-Struck3->Option2->Struck1,Struck2
+    begins->Option1.1->Struck1
+    Struck1->Option1.1->Struck2
+    Struck2->Option1.1->Struck3
+    Struck3->Option1.1->End
 
 #Options
-
->>Option1
-Else
-
->>Option2
-Pound=2
-Pound=1
-
-#NextPlays
-demo3
-
-#NextOptions
-Else
+    >>Option1.1
+        Else

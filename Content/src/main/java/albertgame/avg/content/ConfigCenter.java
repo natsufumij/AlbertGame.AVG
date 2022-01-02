@@ -8,10 +8,7 @@ import javafx.scene.text.Font;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
 public class ConfigCenter {
 
@@ -87,16 +84,22 @@ public class ConfigCenter {
         return properties;
     }
 
-    public static Properties loadCacheData(int index){
+    public static Map<String,String> loadCacheData(int index){
         String dest=CACHE_PATH+index+".data.properties";
-        return loadP(dest);
+        Map<String,String> map=new HashMap<>();
+        Properties p= loadP(dest);
+        for (Map.Entry<Object, Object> s : p.entrySet()) {
+            map.put((String) s.getKey(), (String) s.getValue());
+        }
+        return map;
     }
+
 
     public static void saveCache(int index,Properties properties){
         String dest=CACHE_PATH+index+".properties";
         Calendar calendar=Calendar.getInstance();
         properties.setProperty("year", String.valueOf(calendar.get(Calendar.YEAR)));
-        properties.setProperty("monty", String.valueOf(calendar.get(Calendar.MONTH)));
+        properties.setProperty("month", String.valueOf(calendar.get(Calendar.MONTH)));
         properties.setProperty("day", String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
         properties.setProperty("hour", String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)));
         properties.setProperty("minute", String.valueOf(calendar.get(Calendar.MINUTE)));
@@ -104,6 +107,7 @@ public class ConfigCenter {
 
         saveC(dest,"游戏存档",properties);
     }
+
 
     private static void saveC(String dest,String comment,Properties properties){
         File file=new File(dest);
@@ -114,9 +118,14 @@ public class ConfigCenter {
         }
     }
 
-    public static void saveCacheData(int index,Properties properties){
+    public static void saveCacheData(int index,Map<String,String> map){
+        Properties p= new Properties();
+        for (Map.Entry<String, String> s : map.entrySet()) {
+            p.put(s.getKey(), s.getValue());
+        }
+
         String dest=CACHE_PATH+index+".data.properties";
-        saveC(dest,"游戏选择分支存档",properties);
+        saveC(dest,"游戏选择分支存档",p);
     }
 
     public static Play loadPlayInClasspath(String chapterId,String name){

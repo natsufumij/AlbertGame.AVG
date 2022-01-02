@@ -7,6 +7,7 @@ import java.util.*;
 public record Play
         (String id,
          String name,
+         String startStruck,
          Map<String, BodyStruck> bodyStruckMap) {
 
     public static final Play NONE_PLAY = null;
@@ -298,7 +299,7 @@ public record Play
         Map<String, String[]> optionMap = new HashMap<>();
         BodyNodeH bodyN = null;
         BodyNodeH progressN = null;
-        String id = "00", name = "00";
+        String id = "00", name = "00",startStruck = "00";
         for (BodyNodeH b : hs) {
             switch (b.name) {
                 case "Info":
@@ -309,6 +310,7 @@ public record Play
 
                     id = b.texts.get(0);
                     name = b.texts.get(1);
+                    startStruck = b.texts.get(2);
                     break;
                 case "Body":
                     bodyN = b;
@@ -339,7 +341,7 @@ public record Play
             bodyStruckMap.put(hid, struck);
         }
 
-        return new Play(id, name, bodyStruckMap);
+        return new Play(id, name,startStruck, bodyStruckMap);
     }
 
     //拼接成:Type  Name  Word  EXTRA[0]  EXTRA[1] ...
@@ -445,7 +447,7 @@ public record Play
                 String sourceId = xl[0];
                 String optionName = xl[1];
                 String[] select = xl[2].split(",");
-                struck.put(sourceId, new OptionStruck(optionName, select, expressions.get(optionName)));
+                struck.put(sourceId, new OptionStruck(optionName, expressions.get(optionName),select));
             }
         }
         return struck;

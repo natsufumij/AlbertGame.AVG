@@ -57,7 +57,7 @@
 - 选项
     - Select  Go  #SelectId  #[Option1,Option2,Option3]  选择问题保存Id
   `
-  Select Go  Question.ID.A  [我不选择,你选择吧,选你个头!]  则保存在选择记录里,ID.A为0-2，并且在属存储里有个同名的属性值
+  Select Go  Question.ID.A  我不选择,你选择吧,选你个头!  则保存在选择记录里,ID.A为0-2，并且在属存储里有个同名的属性值
   `
 
 - 界面
@@ -156,3 +156,9 @@
     name
     1,2,3,4,6,7
 
+缓存
+year,month,day,hour,minute,second
+chapter,play,struck,index
+scene,bgm,name,word,wordtype[M,S,P,@DataId]
+leftp,centerp,rightp,personin,
+wordpanelshow,maskshow

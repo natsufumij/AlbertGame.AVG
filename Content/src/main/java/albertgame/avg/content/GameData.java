@@ -32,7 +32,7 @@ public class GameData {
     private final BooleanProperty wordLineShow;
     private final BooleanProperty maskShow;
 
-    private final Map<String, String> data;
+    private Map<String, String> data;
 
     private Person leftPerson;
     private Person centerPerson;
@@ -54,7 +54,7 @@ public class GameData {
     private char gameState;
     private String nowSelectId;
 
-    private boolean end = false;
+    private boolean struckEnd = false;
 
     //是否自动
     private boolean auto;
@@ -76,9 +76,16 @@ public class GameData {
         }
         wordLineShow = new SimpleBooleanProperty(Boolean.TRUE);
         maskShow=new SimpleBooleanProperty(false);
+        maskShow.addListener((e,o,n)->{
+            properties.put("maskshow",String.valueOf(n));
+        });
+        wordLineShow.addListener((e,o,n)->{
+            properties.put("wordpanelshow",String.valueOf(n));
+        });
         gameState = GAME_STATE_WAIT_PRESS;
         chapterSet = new HashMap<>();
         data = new HashMap<>();
+        properties=new Properties();
         playSet = new HashMap<>();
         personDataMap = new HashMap<>();
     }
@@ -88,9 +95,7 @@ public class GameData {
     }
 
     public void nextPlayLine() {
-        if (end) return;
-
-        if (lineIndex == struck.expressions().size()) {
+        if (struckEnd) {
 
             //如果有下一个body块
             if (struck.optionStruck() != Play.OptionStruck.NONE_OPTION) {
@@ -105,8 +110,7 @@ public class GameData {
                 //如果destId不是NONE_ID，表示play存在
                 if (!Objects.equals(destId, Play.OptionStruck.NONE_ID)) {
                     Play play = ConfigCenter.loadPlayInClasspath(nowChapter.id(), destId);
-                    final String beginStruckName = "begins";
-
+                    final String beginStruckName = play.startStruck();
                     //找到了play，寻找begins，作为第一个body块
                     resetStruck(nowChapter, play, play.bodyStruckMap().get(beginStruckName));
                 } else {
@@ -115,7 +119,6 @@ public class GameData {
                     if (Objects.equals(destId, Play.OptionStruck.NONE_ID)) {
                         //无下一个Chapter
                         System.out.println("All Done.");
-                        end = true;
                     } else {
                         Play.Chapter chapter = ConfigCenter.loadChapter(destId);
                         String startPlayId = chapter.startPlayId();
@@ -138,6 +141,11 @@ public class GameData {
         this.nowPlay = p;
         this.struck = struck;
         lineIndex = 0;
+        properties.setProperty("chapter",c.id());
+        properties.setProperty("play",p.id());
+        properties.setProperty("struck",struck.id());
+        properties.setProperty("index","0");
+        struckEnd =false;
     }
 
     public Image getBackgroundImage() {
@@ -298,5 +306,39 @@ public class GameData {
 
     public Play getNowPlay() {
         return nowPlay;
+    }
+
+    public boolean isStruckEnd() {
+        return struckEnd;
+    }
+
+    public GameFunction.FunctionArg getArgAndSetNext(){
+        if(struckEnd)return GameFunction.FunctionArg.NONE_ARG;
+
+        String[] nowCmd=struck.expressions().get(lineIndex).split("  ");
+
+        ++lineIndex;
+        if(lineIndex==struck.expressions().size()){
+            struckEnd=true;
+        }
+
+        if(nowCmd.length==3){
+            return new GameFunction.FunctionArg(
+                    nowCmd[0],nowCmd[1],nowCmd[2],GameFunction.NONE_EXTRA);
+        }else if(nowCmd.length==2){
+            return new GameFunction.FunctionArg(
+                    nowCmd[0],nowCmd[1],"",GameFunction.NONE_EXTRA);
+        }else if(nowCmd.length>3){
+            String[] args=new String[nowCmd.length-3];
+            System.arraycopy(nowCmd,3,args,0,args.length);
+            return new GameFunction.FunctionArg(nowCmd[0],nowCmd[1],nowCmd[2],args);
+        }else return GameFunction.FunctionArg.NONE_ARG;
+    }
+
+    public void loadFromGlobal(){
+        setNowChapter(ConfigCenter.loadChapter(globalConfig.startChapter()));
+        setNowPlay(ConfigCenter.loadPlayInClasspath(nowChapter.id(),nowChapter.startPlayId()));
+        setStruck(getNowPlay().bodyStruckMap().get(nowPlay.startStruck()));
+        setLineIndex(0);
     }
 }

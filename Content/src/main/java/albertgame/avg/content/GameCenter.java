@@ -11,7 +11,6 @@ import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.File;
 import java.util.*;
 
 public class GameCenter {
@@ -62,13 +61,9 @@ public class GameCenter {
     }
 
     public void update() {
-
         //如果正在等待下一条命令，
         //则读取剧本中下一条命令，并执行
         //TODO: 执行剧本的命令，更新剧本执行的相关数据
-        if (gameData.getGameState() == GameData.GAME_STATE_WAIT_NEXT) {
-            gameData.nextPlayLine();
-        }
     }
 
     private void handleArg(GameFunction.FunctionArg arg){
@@ -89,13 +84,14 @@ public class GameCenter {
         //导入缓存
         if (ConfigCenter.isCacheExist(GameCenter.storeSelect)) {
             //存在存档
-            Properties p = ConfigCenter.loadCacheData(GameCenter.storeSelect);
-            for (Map.Entry<Object, Object> s : p.entrySet()) {
-                gameData.getData().put((String) s.getKey(), (String) s.getValue());
-            }
+            Map<String,String> p = ConfigCenter.loadCacheData(GameCenter.storeSelect);
 
             gameData.setProperties(ConfigCenter.loadCache(GameCenter.storeSelect));
+            gameData.getData().putAll(p);
             restoreGame();
+        }else {
+            gameData.loadFromGlobal();
+            System.out.println("");
         }
     }
 
@@ -160,7 +156,7 @@ public class GameCenter {
         }else if(wordType.equals("P")){
             arg1=new GameFunction.FunctionArg("Dialog","Word",word,GameFunction.NONE_EXTRA);
         }else if(wordType.equals("M")||wordType.equals("S")){
-            arg=new GameFunction.FunctionArg("Dialog","Word",wordType,new String[]{word});
+            arg1=new GameFunction.FunctionArg("Dialog","Word",wordType,new String[]{word});
         }
 
         if(arg1!=null){
@@ -170,6 +166,10 @@ public class GameCenter {
         for(GameFunction.FunctionArg arg2:argList){
             handleArg(arg2);
         }
+    }
+
+    public void loadFromGlobalConfig(){
+
     }
 
 
@@ -231,10 +231,6 @@ public class GameCenter {
     }
 
     private Timeline demoline;
-    private Play play;
-    private Play.BodyStruck struck;
-    int index = 0;
-    int dest;
 
     private void testLines() {
 
@@ -248,9 +244,15 @@ public class GameCenter {
         demoline = new Timeline();
         demoline.setCycleCount(Timeline.INDEFINITE);
         KeyFrame frame = new KeyFrame(Duration.millis(30), event -> {
-            if (gameData.getGameState() != GameData.GAME_STATE_WAIT_NEXT) return;
-
-            gameData.nextPlayLine();
+            if (gameData.getGameState()
+                    == GameData.GAME_STATE_WAIT_NEXT &&
+                    !gameData.isStruckEnd()) {
+                GameFunction.FunctionArg arg=gameData.getArgAndSetNext();
+                handleArg(arg);
+            }else if(gameData.getGameState()==GameData.GAME_STATE_WAIT_NEXT
+                    &&gameData.isStruckEnd()){
+                gameData.nextPlayLine();
+            }
         });
         demoline.getKeyFrames().add(frame);
 
@@ -268,16 +270,15 @@ public class GameCenter {
         };
 
         task.setOnSucceeded(event -> {
-            struck=play.bodyStruckMap().get("begins");
-            dest=struck.expressions().size();
-            index=0;
             demoline.play();
         });
 
         Platform.runLater(task);
     }
 
+    private void handleCmd() {
 
+    }
 
     public Parent getNowScene() {
         return nowScene;

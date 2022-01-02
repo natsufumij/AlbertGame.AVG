@@ -21,6 +21,7 @@ public interface GameFunction {
     String[] NONE_EXTRA = null;
 
     record FunctionArg(String type, String name, String value, String[] extra) {
+        public static final FunctionArg NONE_ARG=null;
     }
 
     void fun(GameData data, GameHeader header, FunctionArg arg);
@@ -47,11 +48,14 @@ public interface GameFunction {
                 case "Word":
                     if (arg.extra != NONE_EXTRA) {
                         if (arg.value.equals("S")) {
+                            type="S";
                             SetName("???");
                         } else if (arg.value.equals("M")) {
+                            type="M";
                             SetName("我");
                         } else {
                             String pid = arg.value;
+                            type="@"+pid;
                             Person p = _d.getPlayedPersons().get(pid);
                             if (p != null) {
                                 SetName(p.getName());
@@ -61,6 +65,7 @@ public interface GameFunction {
                         Word(arg.extra[0]);
                     } else {
                         SetName("");
+                        type="P";
                         Clear();
                         Word(arg.value);
                     }
@@ -80,6 +85,7 @@ public interface GameFunction {
         Timeline line;
         String destWords;
         int index = 0, dest;
+        String type;
 
         /**
          * 将需要显示的文字暂存，修改状态为Displaying，并开启一个定时任务将文字贴到WordPanel上，
@@ -112,6 +118,12 @@ public interface GameFunction {
                         } else {
                             this._d.setGameState(GameData.GAME_STATE_WAIT_NEXT);
                         }
+                        StringBuilder builder=new StringBuilder();
+                        for(StringProperty s:this._d.getDisplayWords()){
+                            builder.append(s.get());
+                        }
+                        this._d.getProperties().put("word",builder.toString());
+                        this._d.getProperties().put("wordtype",type);
                         line.stop();
                     } else {
                         //继续贴字
@@ -184,6 +196,16 @@ public interface GameFunction {
 
             Person p = new Person(pd.id(), pd.name(), pd.defaultState(), img);
             d.getPlayedPersons().put(p.getId(), p);
+            refreshPersonIn(d);
+        }
+
+        private void refreshPersonIn(GameData d){
+            StringBuilder builder=new StringBuilder();
+            builder.append(",");
+            d.getPlayedPersons().keySet().forEach(id->builder.append(id).append(","));
+            builder.deleteCharAt(0);
+            builder.deleteCharAt(builder.length()-1);
+            d.getProperties().put("personin",builder.toString());
         }
 
         private void Out(GameData d, String pid) {
@@ -191,6 +213,7 @@ public interface GameFunction {
             if (!d.getPlayedPersons().containsKey(pid)) return;
 
             d.getPlayedPersons().remove(pid);
+            refreshPersonIn(d);
         }
 
         private void NoShow(GameData d, GameHeader h, String pos) {
@@ -199,16 +222,19 @@ public interface GameFunction {
                     d.setLeftPerson(null);
                     d.leftPersonImageProperty().set(null);
                     h.getLeftPerson().setVisible(true);
+                    d.getProperties().put("leftp","");
                 }
                 case "C" -> {
                     d.setCenterPerson(null);
                     d.centerPersonImageProperty().set(null);
                     h.getCenterPerson().setVisible(true);
+                    d.getProperties().put("centerp","");
                 }
                 case "R" -> {
                     d.setRightPerson(null);
                     d.rightPersonImageProperty().set(null);
                     h.getRightPerson().setVisible(true);
+                    d.getProperties().put("rightp","");
                 }
             }
         }
@@ -222,16 +248,19 @@ public interface GameFunction {
                     d.setLeftPerson(p);
                     d.leftPersonImageProperty().set(p.getNowStateImage());
                     h.getLeftPerson().setVisible(true);
+                    d.getProperties().put("leftp",p.getId());
                 }
                 case "C" -> {
                     d.setCenterPerson(p);
                     d.centerPersonImageProperty().set(p.getNowStateImage());
                     h.getCenterPerson().setVisible(true);
+                    d.getProperties().put("centerp",p.getId());
                 }
                 case "R" -> {
                     d.setRightPerson(p);
                     d.rightPersonImageProperty().set(p.getNowStateImage());
                     h.getRightPerson().setVisible(true);
+                    d.getProperties().put("rightp",p.getId());
                 }
             }
         }

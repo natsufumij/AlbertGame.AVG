@@ -1,6 +1,8 @@
 package albertgame.avg.content;
 
+import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.effect.Bloom;
@@ -14,9 +16,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class GameHeader extends Parent {
 
@@ -99,12 +99,12 @@ public class GameHeader extends Parent {
             rectangle.setTranslateX(ConfigCenter.SELECT_X - 10);
             rectangle.setTranslateY(ty - 27.0);
             rectangle.setOnMouseClicked(event -> {
-                System.out.println("You Select " + (Integer) rectangle.getUserData());
+                System.out.println("You Select " + rectangle.getUserData());
                 for (int j = 0; j != selectText.length; ++j) {
                     Text desist = selectText[j];
                     desist.visibleProperty().set(false);
                 }
-                data.getData().put(data.getNowSelectId(), (String) rectangle.getUserData());
+                data.getData().put(data.getNowSelectId(), String.valueOf(rectangle.getUserData()));
                 data.setGameState(GameData.GAME_STATE_WAIT_NEXT);
             });
 
@@ -131,7 +131,7 @@ public class GameHeader extends Parent {
                     Text desist = selectText[j];
                     desist.visibleProperty().set(false);
                 }
-                data.getData().put(data.getNowSelectId(), (String) rectangle.getUserData());
+                data.getData().put(data.getNowSelectId(), String.valueOf(rectangle.getUserData()));
                 data.setGameState(GameData.GAME_STATE_WAIT_NEXT);
             });
 
@@ -310,7 +310,21 @@ public class GameHeader extends Parent {
 
         @Override
         public void handle(MouseEvent event) {
-            //TODO: 调出存档界面
+            Task<Void> task=new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    int index=GameCenter.storeSelect;
+                    GameData data=GameCenter.getCenter().getGameData();
+                    Properties p=data.getProperties();
+                    Map<String,String> da=data.getData();
+                    ConfigCenter.saveCache(index,p);
+                    ConfigCenter.saveCacheData(index,da);
+                    super.succeeded();
+                    return null;
+                }
+            };
+            task.setOnSucceeded(event1 -> System.out.println("保存成功"));
+            Platform.runLater(task);
         }
     }
 
