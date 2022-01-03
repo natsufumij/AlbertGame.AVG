@@ -11,7 +11,8 @@ javafx {
     modules = ['javafx.controls', 'javafx.media']
 }
 
-mainClassName = 'albertgame.avg.content.RunMain'
+//mainClassName = 'albertgame.avg.content.RunMain'
+mainClassName = 'albertgame.avg.content.n2.MainEntry'
 
 repositories {
     mavenCentral()

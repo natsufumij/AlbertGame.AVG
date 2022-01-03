@@ -56,11 +56,11 @@ public class ConfigCenter {
     public static final int CACHE_ROW = 4;
     public static final int CACHE_RECT_WIDTH = 240;
     public static final int CACHE_RECT_HEIGHT = 50;
-    public static final int CACHE_RECT_TAP=10;
-    public static final int CACHE_ALL_WIDTH=CACHE_RECT_WIDTH*CACHE_COLUMN+CACHE_RECT_TAP*(CACHE_COLUMN+1);
-    public static final int CACHE_ALL_HEIGHT=CACHE_RECT_HEIGHT*CACHE_ROW+CACHE_RECT_TAP*(CACHE_ROW+1);
-    public static final int CACHE_X=WINDOW_WIDTH/2-CACHE_ALL_WIDTH/2;
-    public static final int CACHE_Y=WINDOW_HEIGHT/2-CACHE_ALL_HEIGHT/2;
+    public static final int CACHE_RECT_TAP = 10;
+    public static final int CACHE_ALL_WIDTH = CACHE_RECT_WIDTH * CACHE_COLUMN + CACHE_RECT_TAP * (CACHE_COLUMN + 1);
+    public static final int CACHE_ALL_HEIGHT = CACHE_RECT_HEIGHT * CACHE_ROW + CACHE_RECT_TAP * (CACHE_ROW + 1);
+    public static final int CACHE_X = WINDOW_WIDTH / 2 - CACHE_ALL_WIDTH / 2;
+    public static final int CACHE_Y = WINDOW_HEIGHT / 2 - CACHE_ALL_HEIGHT / 2;
 
 
     public static final String WINDOW_TITLE = "AlbertGame.AVG";

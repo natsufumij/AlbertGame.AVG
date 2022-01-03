@@ -57,14 +57,6 @@ public class GameCenter {
         gameData = new GameData();
         header = new GameHeader(gameData);
         functionMap = new HashMap<>();
-//        initChapter();
-//        testLines();
-    }
-
-    public void update() {
-        //如果正在等待下一条命令，
-        //则读取剧本中下一条命令，并执行
-        //TODO: 执行剧本的命令，更新剧本执行的相关数据
     }
 
     private void handleArg(GameFunction.FunctionArg arg) {
