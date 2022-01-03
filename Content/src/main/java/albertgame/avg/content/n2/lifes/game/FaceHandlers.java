@@ -5,10 +5,18 @@ import albertgame.avg.content.Person;
 import albertgame.avg.content.n2.FaceData;
 import albertgame.avg.content.n2.FaceHandler;
 import albertgame.avg.content.n2.FaceHead;
+import albertgame.avg.content.n2.MainEntry;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import java.util.HashMap;
@@ -30,29 +38,28 @@ public interface FaceHandlers {
         public void handle(FaceData data, FaceHead head, Arg arg) {
             switch (arg.name()) {
                 case "Word":
-                    if (arg.data().length==2) {
+                    if (arg.data().length == 2) {
                         if (arg.data()[0].equals("S")) {
-                            type="S";
-                            _setName(data,"???");
+                            type = "S";
+                            _setName(data, "???");
                         } else if (arg.data()[0].equals("M")) {
-                            type="M";
-                            _setName(data,"我");
+                            type = "M";
+                            _setName(data, "我");
                         } else {
                             String pid = arg.data()[0];
-                            type="@"+pid;
-                            Person p = ((Map<String, Person>)
-                                    (data.getObj("playedPersons"))).get(pid);
+                            type = "@" + pid;
+                            Person p = GameFaceLife.playedPersons.get(pid);
                             if (p != null) {
-                                _setName(data,p.getName());
+                                _setName(data, p.getName());
                             }
                         }
                         Clear(data);
-                        Word(data,arg.data()[1]);
+                        Word(data, arg.data()[1]);
                     } else {
-                        _setName(data,"");
-                        type="P";
+                        _setName(data, "");
+                        type = "P";
                         Clear(data);
-                        Word(data,arg.data()[0]);
+                        Word(data, arg.data()[0]);
                     }
                     break;
                 case "Open":
@@ -74,9 +81,9 @@ public interface FaceHandlers {
 
         private void Word(FaceData d, String text) {
 
-            index=0;
-            destWords=text;
-            dest=destWords.length();
+            index = 0;
+            destWords = text;
+            dest = destWords.length();
 
             if (line == null) {
                 line = new Timeline();
@@ -150,22 +157,29 @@ public interface FaceHandlers {
     //  - Person  No.Show  #Position(L/C/R)  去掉显示的人物位置
     //  - Person  Hide  #Position(L/R) 隐藏左边、右边
     //  - Person  Change.State  #Position(L/R)  #newState 改变左边、右边人物的状态
-    class PersonHandle implements FaceHandler{
+    class PersonHandle implements FaceHandler {
 
         @Override
         public void handle(FaceData data, FaceHead head, Arg arg) {
-
+            switch (arg.name()) {
+                case "In" -> In(data, arg.data()[0]);
+                case "Out" -> Out(data, arg.data()[0]);
+                case "Show" -> Show(data, head, arg.data()[0], arg.data()[1]);
+                case "No.Show" -> NoShow(data, head, arg.data()[0]);
+                case "Hide" -> Hide(data, head, arg.data()[0]);
+                case "Change.State" -> ChangeState(data, head, arg.data()[0], arg.data()[1]);
+            }
         }
+
         //导入一个人物到
         private void In(FaceData d, String pid) {
-            Map<String,Person> playedPersons= (Map<String, Person>) d.getObj("playedPersons");
+            Map<String, Person> playedPersons = GameFaceLife.playedPersons;
             if (playedPersons.containsKey(pid)) return;
 
-            Map<String, Person.PersonData> personDataMap=
-                    (Map<String, Person.PersonData>) d.getObj("personDataMap");
+            Map<String, Person.PersonData> personDataMap = GameFaceLife.personDataMap;
             Person.PersonData pd = personDataMap.get(pid);
             String[] states = pd.state().toArray(new String[0]);
-            if (states == null) return;
+            if (states.length == 0) return;
 
             Map<String, Image> img = new HashMap<>();
             for (String s : states) {
@@ -177,118 +191,392 @@ public interface FaceHandlers {
             playedPersons.put(p.getId(), p);
             refreshPersonIn(d);
         }
-        private void refreshPersonIn(FaceData d){
-            StringBuilder builder=new StringBuilder();
+
+        private void refreshPersonIn(FaceData d) {
+            StringBuilder builder = new StringBuilder();
             builder.append(",");
-            Map<String,Person> playedPersons= (Map<String, Person>) d.getObj("playedPersons");
-            playedPersons.keySet().forEach(id->builder.append(id).append(","));
+            Map<String, Person> playedPersons = GameFaceLife.playedPersons;
+            playedPersons.keySet().forEach(id -> builder.append(id).append(","));
             builder.deleteCharAt(0);
-            builder.deleteCharAt(builder.length()-1);
-            d.property("cache").put("personin",builder.toString());
+            builder.deleteCharAt(builder.length() - 1);
+            d.property("cache").put("personin", builder.toString());
         }
 
         private void Out(FaceData d, String pid) {
-            Map<String,Person> playedPersons= (Map<String, Person>) d.getObj("playedPersons");
+            Map<String, Person> playedPersons = GameFaceLife.playedPersons;
 
             if (!playedPersons.containsKey(pid)) return;
 
             playedPersons.remove(pid);
             refreshPersonIn(d);
         }
+
         private void NoShow(FaceData d, FaceHead h, String pos) {
             switch (pos) {
                 case "L" -> {
                     d.strPro("leftPerson").set("");
-                    ((ImageView)h.fetch("leftPerson")).setImage(null);
-                    d.property("cache").put("leftp","");
+                    ((ImageView) h.fetch("leftPerson")).setImage(null);
+                    d.property("cache").put("leftp", "");
                 }
                 case "C" -> {
                     d.strPro("centerPerson").set("");
-                    ((ImageView)h.fetch("centerPerson")).setImage(null);
-                    d.property("cache").put("centerp","");
+                    ((ImageView) h.fetch("centerPerson")).setImage(null);
+                    d.property("cache").put("centerp", "");
                 }
                 case "R" -> {
                     d.strPro("rightPerson").set("");
-                    ((ImageView)h.fetch("rightPerson")).setImage(null);
-                    d.property("cache").put("rightp","");
+                    ((ImageView) h.fetch("rightPerson")).setImage(null);
+                    d.property("cache").put("rightp", "");
                 }
             }
         }
 
-        private void Show(FaceData d, FaceHead h,  String pos, String pid) {
-            Map<String,Person> playedPersons= (Map<String, Person>) d.getObj("playedPersons");
+        private void Show(FaceData d, FaceHead h, String pos, String pid) {
+            Map<String, Person> playedPersons = GameFaceLife.playedPersons;
             Person p = playedPersons.get(pid);
             if (p == null) return;
 
             switch (pos) {
                 case "L" -> {
                     d.strPro("leftPerson").set(p.getId());
-                    ImageView v= (ImageView) h.fetch("leftPerson");
+                    ImageView v = (ImageView) h.fetch("leftPerson");
                     v.setImage(p.getNowStateImage());
                     v.setVisible(true);
-                    d.property("cache").put("leftp",p.getId());
+                    d.property("cache").put("leftp", p.getId());
                 }
                 case "C" -> {
                     d.strPro("centerPerson").set(p.getId());
-                    ImageView v= (ImageView) h.fetch("centerPerson");
+                    ImageView v = (ImageView) h.fetch("centerPerson");
                     v.setImage(p.getNowStateImage());
                     v.setVisible(true);
-                    d.property("cache").put("centerp",p.getId());
+                    d.property("cache").put("centerp", p.getId());
                 }
                 case "R" -> {
                     d.strPro("rightPerson").set(p.getId());
-                    ImageView v= (ImageView) h.fetch("rightPerson");
+                    ImageView v = (ImageView) h.fetch("rightPerson");
                     v.setImage(p.getNowStateImage());
                     v.setVisible(true);
-                    d.property("cache").put("rightp",p.getId());
+                    d.property("cache").put("rightp", p.getId());
                 }
             }
         }
 
         private void Hide(FaceData d, FaceHead h, String pos) {
-            String v="L";
+            String v = "L";
             switch (pos) {
-                case "L" -> v="leftPerson";
-                case "C" -> v="centerPerson";
-                case "R" -> v="rightPerson";
+                case "L" -> v = "leftPerson";
+                case "C" -> v = "centerPerson";
+                case "R" -> v = "rightPerson";
             }
-            ImageView view=(ImageView) h.fetch(v);
+            ImageView view = (ImageView) h.fetch(v);
             view.setVisible(false);
         }
-        private void ChangeState(FaceData d, FaceHead head,String pos, String newState) {
+
+        private void ChangeState(FaceData d, FaceHead head, String pos, String newState) {
             Person p;
             final String FAILED = "ChangeState Failed: Don't Change On A Null Person";
             switch (pos) {
                 case "L" -> {
-                    p = (Person) d.getObj("leftPerson");
+                    p = GameFaceLife.leftPerson;
                     if (p == null) {
                         System.out.println(FAILED);
                         return;
                     }
                     p.changeStateTo(newState);
-                    ((ImageView)head.fetch("leftPerson")).setImage(p.getNowStateImage());
+                    ((ImageView) head.fetch("leftPerson")).setImage(p.getNowStateImage());
                 }
                 case "C" -> {
-                    p = (Person) d.getObj("centerPerson");
+                    p = GameFaceLife.centerPerson;
                     if (p == null) {
                         System.out.println(FAILED);
                         return;
                     }
                     p.changeStateTo(newState);
-                    ((ImageView)head.fetch("centerPerson")).setImage(p.getNowStateImage());
+                    ((ImageView) head.fetch("centerPerson")).setImage(p.getNowStateImage());
                 }
                 case "R" -> {
-                    p = (Person) d.getObj("rightPerson");
+                    p = GameFaceLife.rightPerson;
                     if (p == null) {
                         System.out.println(FAILED);
                         return;
                     }
                     p.changeStateTo(newState);
-                    ((ImageView)head.fetch("rightPerson")).setImage(p.getNowStateImage());
+                    ((ImageView) head.fetch("rightPerson")).setImage(p.getNowStateImage());
                 }
             }
         }
     }
 
-    //TODO: 还有很多功能需要搬运
+    //  - Storage  Save#Name  #Value 保存为某个值
+    //  - Storage  Plus#Name  #Value 增加一个值
+    //  - Storage  Minus#Name  #Value 减少一个值
+    class StoreHandler implements FaceHandler {
+
+        @Override
+        public void handle(FaceData data, FaceHead head, Arg arg) {
+            switch (arg.name()) {
+                case "Save" -> Save(data, arg.name(), arg.data()[0]);
+                case "Plus" -> Plus(data, arg.name(), Integer.parseInt(arg.data()[0]));
+                case "Minus" -> Minus(data, arg.name(), Integer.parseInt(arg.data()[0]));
+            }
+        }
+
+        private void Save(FaceData data, String name, String v) {
+            data.property("selects").put(name, v);
+        }
+
+        private void Plus(FaceData data, String name, Integer v) {
+            String de = (String) data.property("selects").get(name);
+            if (de != null) {
+                int dx = Integer.parseInt(de);
+                int dd = dx + v;
+                data.property("selects").put(name, dd + "");
+            }
+        }
+
+        private void Minus(FaceData data, String name, Integer v) {
+            String de = (String) data.property("selects").get(name);
+            if (de != null) {
+                int dx = Integer.parseInt(de);
+                data.property("selects").put(name, (dx - v) + "");
+            }
+        }
+    }
+
+    //  - Audio  Bgm.Play  #BgmName
+    //  - Audio  Bgm.Pause
+    //  - Audio  Bgm.Resume
+    //  - Audio  Bgm.Stop
+    //
+    //  - Audio  Sound.Play #SoundName
+    class AudioHandler implements FaceHandler {
+
+        @Override
+        public void handle(FaceData data, FaceHead head, Arg arg) {
+            switch (arg.name()) {
+                case "Bgm.Play" -> BgmPlay(arg.data()[0]);
+                case "Bgm.Pause" -> BgmPause();
+                case "Bgm.Resume" -> BgmResume();
+                case "Bgm.Stop" -> BgmStop();
+                case "Sound.Play" -> AudioPlay(arg.data()[0]);
+            }
+        }
+
+        private void BgmPlay(String name) {
+            MediaView mediaView = MainEntry.Controller().getMediaView();
+            MediaPlayer mediaPlayer;
+            if (mediaView.getMediaPlayer() != null) {
+                mediaPlayer = mediaView.getMediaPlayer();
+                mediaPlayer.stop();
+            }
+            Media media = ConfigCenter.loadBgm(name);
+            mediaPlayer = new MediaPlayer(media);
+            mediaView.setMediaPlayer(mediaPlayer);
+            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+            mediaPlayer.play();
+        }
+
+        private void BgmPause() {
+            MediaView mediaView = MainEntry.Controller().getMediaView();
+            MediaPlayer mediaPlayer;
+            if (mediaView.getMediaPlayer() != null) {
+                mediaPlayer = mediaView.getMediaPlayer();
+                Duration lastTime = mediaPlayer.getCurrentTime();
+                mediaView.setUserData(lastTime);
+                mediaPlayer.stop();
+            }
+        }
+
+        private void BgmResume() {
+            MediaView mediaView = MainEntry.Controller().getMediaView();
+            MediaPlayer mediaPlayer;
+            if (mediaView.getMediaPlayer() != null) {
+                mediaPlayer = mediaView.getMediaPlayer();
+                Duration lastTime = (Duration) mediaView.getUserData();
+                mediaPlayer.seek(lastTime);
+                mediaPlayer.play();
+            }
+        }
+
+        private void BgmStop() {
+            MediaView mediaView = MainEntry.Controller().getMediaView();
+            MediaPlayer mediaPlayer;
+            if (mediaView.getMediaPlayer() != null) {
+                mediaPlayer = mediaView.getMediaPlayer();
+                mediaPlayer.stop();
+            }
+            mediaView.setMediaPlayer(null);
+        }
+
+        private void AudioPlay(String name) {
+            AudioClip clip = ConfigCenter.loadAudio(name);
+            clip.play();
+        }
+    }
+
+    //  - Select  Go  #SelectId  Option1  Option2  Option3  选择问题保存Id
+    class SelectHandler implements FaceHandler {
+
+        @Override
+        public void handle(FaceData data, FaceHead head, Arg arg) {
+            data.strPro("nowSelectId").set(arg.data()[0]);
+            for (int i = 1; i != arg.data().length; ++i) {
+                String s = arg.data()[i];
+                int dest=i-1;
+                String dex=GameFaceLife.findSelectAt(dest);
+                data.strPro(dex).set(s);
+                data.boolPro(dex).set(Boolean.TRUE);
+            }
+            data.intPro("gameState").set(GameFaceLife.GAME_STATE_SELECTING);
+        }
+    }
+
+    //- 界面
+    //  - View  Scene  #Name 更换场景图片
+    //  - View  Shake  #L/C/R 抖动人物
+    //  - View  Darking  #3000(ms)  渐黑
+    //  - View  Lighting  #3000(s)  渐亮
+    class ViewHandler implements FaceHandler {
+
+        @Override
+        public void handle(FaceData data, FaceHead head, Arg arg) {
+            switch (arg.name()) {
+                case "Scene" -> Scene(head,arg.data()[0]);
+                case "Shake" -> Shake(data,head,arg.data()[0]);
+                case "Darking" -> Darking(data,head,Integer.parseInt(arg.data()[0]));
+                case "Lighting" -> Lighting(data,head,Integer.parseInt(arg.data()[0]));
+            }
+        }
+
+        private void Scene(FaceHead head, String newSceneName) {
+            Image scene = ConfigCenter.loadScene(newSceneName);
+            ImageView img = (ImageView) head.fetch("scene");
+            img.setImage(scene);
+        }
+
+        int leftCount;
+        ImageView view;
+        Timeline shakeline;
+        double rb, lb;
+        double px;
+        boolean right;
+
+        private void Shake(FaceData data,FaceHead head,String pos) {
+
+            switch (pos) {
+                case "L":
+                    view = (ImageView) head.fetch("leftPerson");
+                    break;
+                case "C":
+                    view =(ImageView) head.fetch("centerPerson");
+                    break;
+                case "R":
+                    view = (ImageView) head.fetch("rightPerson");
+                    break;
+                default:
+                    return;
+            }
+
+            px = view.getTranslateX();
+            rb = px + view.getFitWidth() / 20;
+            lb = px - view.getFitWidth() / 20;
+            right = true;
+            shakeline = new Timeline();
+            shakeline.setCycleCount(Timeline.INDEFINITE);
+            leftCount = 0;
+            KeyFrame frame = new KeyFrame(Duration.millis(10), event -> {
+                double nowX = view.getTranslateX();
+                //最后返回原位的动作
+                if (leftCount == 3) {
+                    if (nowX < px) {
+                        nowX += 2.5;
+                    } else {
+                        //全部动作结束
+                        shakeline.stop();
+                        nowX = px;
+                    }
+                } else {
+                    //来回移动的动作
+                    if (right) {
+                        if (nowX >= rb) {
+                            right = false;
+                        } else {
+                            nowX += 2.5;
+                        }
+                    } else {
+                        if (nowX <= lb) {
+                            //碰到左边的壁了
+                            right = true;
+                            ++leftCount;
+                        } else {
+                            nowX -= 2.5;
+                        }
+                    }
+                }
+                view.setTranslateX(nowX);
+            });
+
+            shakeline.getKeyFrames().add(frame);
+            shakeline.setOnFinished(event -> {
+                data.intPro("gameState").set(GameFaceLife.GAME_STATE_WAIT_NEXT);
+                data.boolPro("globalMask").set(false);
+                data.animate(false);
+            });
+
+            data.animate(true);
+            data.boolPro("globalMask").set(true);
+            shakeline.play();
+        }
+        int dest;
+        int count;
+
+        private void Darking(FaceData data,FaceHead head,Integer seconds) {
+            dest = seconds / 50;
+            count = 0;
+            Timeline timeline = new Timeline();
+
+            final Rectangle mask= (Rectangle) head.fetch("globalMask");
+            mask.setFill(Color.color(0,0,0,0.0));
+            data.boolPro("maskShow").set(true);
+
+            KeyFrame frame = new KeyFrame(Duration.millis(50), event -> {
+                ++count;
+                mask.setFill(Color.color(0, 0, 0, (count / (double) dest)));
+            });
+            timeline.getKeyFrames().add(frame);
+            timeline.setCycleCount(dest);
+            timeline.setOnFinished(event -> {
+                data.intPro("gameState").set(GameFaceLife.GAME_STATE_WAIT_NEXT);
+                data.animate(false);
+            });
+
+            data.animate(true);
+            timeline.play();
+        }
+
+        private void Lighting(FaceData data,FaceHead head,Integer seconds) {
+            dest = seconds / 50;
+            count = 0;
+            Timeline timeline = new Timeline();
+
+            final Rectangle mask= (Rectangle) head.fetch("globalMask");
+            mask.setFill(Color.color(0,0,0,1.0));
+            data.boolPro("maskShow").set(true);
+
+            KeyFrame frame = new KeyFrame(Duration.millis(50), event -> {
+                ++count;
+                mask.setFill(Color.color(0, 0, 0, (1 - (double) count / (double) dest)));
+            });
+            timeline.getKeyFrames().add(frame);
+            timeline.setCycleCount(dest);
+            timeline.setOnFinished(event -> {
+                data.intPro("gameState").set(GameFaceLife.GAME_STATE_WAIT_NEXT);
+                data.animate(false);
+                data.boolPro("maskShow").set(false);
+            });
+
+            data.animate(true);
+            timeline.play();
+        }
+    }
 }

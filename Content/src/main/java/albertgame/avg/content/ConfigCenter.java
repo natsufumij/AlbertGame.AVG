@@ -98,6 +98,11 @@ public class ConfigCenter {
         return properties;
     }
 
+    public static Properties loadSelects(int index){
+        String dest = CACHE_PATH + index + ".data.properties";
+        return loadP(dest);
+    }
+
     public static Map<String, String> loadCacheData(int index) {
         String dest = CACHE_PATH + index + ".data.properties";
         Map<String, String> map = new HashMap<>();

@@ -8,6 +8,7 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.effect.Bloom;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -76,40 +77,60 @@ public class GameFaceLife implements FaceLife {
         }
     }
 
+    public static final Map<String, Person> playedPersons = new HashMap<>();
+    public static final Map<String, Person.PersonData> personDataMap = new HashMap<>();
+    public static Person leftPerson, centerPerson, rightPerson;
+    public static Play.GlobalConfig globalConfig;
+    public static Play.Chapter chapter;
+    public static Play play;
+    public static Play.BodyStruck bodyStruck;
+
+    public static void clearStaticCache() {
+        playedPersons.clear();
+        personDataMap.clear();
+    }
 
     @Override
     public GameController.KeyInput handlerKeys() {
         EventHandler<KeyEvent> p = event -> {
         };
         EventHandler<KeyEvent> r = event -> {
-            System.out.println("release...");
-            FaceHandler.Arg arg=new FaceHandler.Arg("Dialog","Word",new String[]{"M","你好啊啊啊"});
-            MainEntry.Controller().handleArguments(arg);
+            if (_d.intPro("gameState").get() == GAME_STATE_WAIT_PRESS) {
+                _d.intPro("gameState").set(GAME_STATE_WAIT_NEXT);
+            }
         };
         return new GameController.KeyInput(p, r);
     }
 
+    FaceData _d;
 
     @Override
     public void init(FaceData d, FaceHead h, Map<String, FaceHandler> p) {
+        _d = d;
+        p.put("Dialog", new FaceHandlers.DialogHandler());
+        p.put("View", new FaceHandlers.ViewHandler());
+        p.put("Person", new FaceHandlers.PersonHandle());
+        p.put("Audio", new FaceHandlers.AudioHandler());
+        p.put("Store", new FaceHandlers.StoreHandler());
+        p.put("Select", new FaceHandlers.SelectHandler());
+
+        clearStaticCache();
         initData(d);
         initHead(d, h);
-        initBind(d,h);
-        initGame(d,h);
-        p.put("Dialog",new FaceHandlers.DialogHandler());
+        initBind(d, h);
+        initGame(d, h);
+        debugPropertyView(d);
     }
 
-    private void initGame(FaceData data,FaceHead head){
-        Play.GlobalConfig globalConfig=ConfigCenter.loadGlobalConfig();
-        data.setObj("globalConfig",globalConfig);
-        Map<String, Person.PersonData> personDataMap= (Map<String, Person.PersonData>) data.getObj("personDataMap");
+    private void initGame(FaceData data, FaceHead head) {
+        GameFaceLife.globalConfig = ConfigCenter.loadGlobalConfig();
         //添加人物信息
         for (Play.GlobalConfig.PersonConfig pc : globalConfig.personConfigs().values()) {
             Person.PersonData pd = new Person.PersonData(pc.id(), pc.name(), pc.state().get(0), pc.state());
-            personDataMap.put(pd.id(), pd);
+            GameFaceLife.personDataMap.put(pd.id(), pd);
         }
 
-        int index=Integer.parseInt(
+        int index = Integer.parseInt(
                 MainEntry.Controller().getData().get("index"));
         //导入缓存
         if (ConfigCenter.isCacheExist(index)) {
@@ -118,33 +139,34 @@ public class GameFaceLife implements FaceLife {
 
             data.property("selects").putAll(p);
             data.property("cache").putAll(ConfigCenter.loadCache(index));
-            restoreGame(data,head);
+            restoreGame(data, head);
         } else {
-            loadFromGlobal();
-            System.out.println("");
+            loadFromGlobal(data);
+            System.out.println("导入...");
         }
     }
 
-    private void loadFromGlobal() {
-
+    private void loadFromGlobal(FaceData data) {
+        Play.GlobalConfig config = GameFaceLife.globalConfig;
+        GameFaceLife.chapter = ConfigCenter.loadChapter(config.startChapter());
+        GameFaceLife.play = ConfigCenter.loadPlayInClasspath(
+                config.startChapter(), GameFaceLife.chapter.startPlayId());
+        GameFaceLife.bodyStruck = GameFaceLife.play.bodyStruckMap().get(GameFaceLife.play.startStruck());
+        data.intPro("nowIndex").set(0);
     }
 
-    private void restoreGame(FaceData data,FaceHead head) {
+    private void restoreGame(FaceData data, FaceHead head) {
 
-
-        Properties p=ConfigCenter.loadCache(
+        Properties p = ConfigCenter.loadCache(
                 Integer.parseInt(MainEntry.Controller().getData().get("index")));
-        Properties properties=data.property("cache");
+        Properties properties = data.property("cache");
         properties.putAll(p);
-        
+
         String chapter = properties.getProperty("chapter");
         String play = properties.getProperty("play");
         String struck = properties.getProperty("struck");
         String scene = properties.getProperty("scene");
         String bgm = properties.getProperty("bgm");
-        String name = properties.getProperty("name");
-        String word = properties.getProperty("word");
-        String wordType = properties.getProperty("wordtype");
         String[] personIn = properties.getProperty("personin").split(",");
         String leftP = properties.getProperty("leftp");
         String centerP = properties.getProperty("centerp");
@@ -152,31 +174,147 @@ public class GameFaceLife implements FaceLife {
         boolean wordpanelshow = Boolean.parseBoolean(properties.getProperty("wordpanelshow"));
         boolean maskshow = Boolean.parseBoolean(properties.getProperty("maskshow"));
 
-        Play.Chapter c=ConfigCenter.loadChapter(chapter);
-        Play play1=ConfigCenter.loadPlayInClasspath(chapter,play);
-        Play.BodyStruck bodyStruck=play1.bodyStruckMap().get(struck);
+        GameFaceLife.chapter = ConfigCenter.loadChapter(chapter);
+        GameFaceLife.play = ConfigCenter.loadPlayInClasspath(chapter, play);
+        GameFaceLife.bodyStruck = GameFaceLife.play.bodyStruckMap().get(struck);
+
         int index=Integer.parseInt(properties.getProperty("index"));
-        data.setObj("nowChapter",c);
-        data.setObj("nowPlay",play1);
-        data.setObj("nowStruck",bodyStruck);
         data.intPro("nowIndex").set(index);
 
         Image sceneI = ConfigCenter.loadScene(scene);
-        ((ImageView)head.fetch("scene")).setImage(sceneI);
-        data.strPro("nameDisplay").set(name);
+        ((ImageView) head.fetch("scene")).setImage(sceneI);
+        if(!maskshow){
+            //初始状态为黑的状态，如果遮罩没有，则代表全亮的，否则则为初始状态
+            Rectangle n= (Rectangle) head.fetch("globalMask");
+            n.setFill(Color.color(0,0,0,0.0));
+        }
+        data.boolPro("maskShow").set(maskshow);
 
-        List<FaceHandler.Arg> list=new ArrayList<>();
-        //TODO: 导入数据的任务仍需继续完成
+        List<FaceHandler.Arg> list = new ArrayList<>();
+        FaceHandler.Arg bgmArg=new FaceHandler.Arg(
+                "Audio","Bgm.Play",new String[]{bgm});
+        list.add(bgmArg);
+
+        for(String s:personIn){
+            if(s.isBlank()) continue;
+
+            FaceHandler.Arg arg=new FaceHandler.Arg("Person","In",new String[]{s});
+            list.add(arg);
+        }
+
+        if(leftP!=null&&!leftP.isBlank()){
+            FaceHandler.Arg arg=new FaceHandler.Arg("Person","Show",new String[]{"L",leftP});
+            list.add(arg);
+        }
+        if(centerP!=null&&!centerP.isBlank()){
+            FaceHandler.Arg arg=new FaceHandler.Arg("Person","Show",new String[]{"C",centerP});
+            list.add(arg);
+        }
+        if(rightP!=null&&!rightP.isBlank()){
+            FaceHandler.Arg arg=new FaceHandler.Arg("Person","Show",new String[]{"R",rightP});
+            list.add(arg);
+        }
+
+        data.boolPro("wordPanelShow").set(wordpanelshow);
+
+        for(FaceHandler.Arg ar:list){
+            MainEntry.Controller().handleArguments(ar);
+        }
     }
 
     @Override
     public void update(FaceData d, FaceHead h) {
+        if (d.intPro("gameState").get() == GAME_STATE_WAIT_NEXT) {
+            if (!d.boolPro("struckEnd").get()) {
+                FaceHandler.Arg arg = getArgAndSetNext(d);
+                MainEntry.Controller().handleArguments(arg);
+            } else {
+                nextPlayLine(d);
+            }
+        }
+    }
 
+    private Map<String, String> helpData(FaceData data) {
+        Map<String, String> d = new HashMap<>();
+        for (Map.Entry<Object, Object> en : data.property("selects").entrySet()) {
+            d.put((String) en.getKey(), (String.valueOf(en.getValue())));
+        }
+        return d;
+    }
+
+    private void nextPlayLine(FaceData data) {
+        if (data.boolPro("struckEnd").get()) {
+            Play.BodyStruck struck = GameFaceLife.bodyStruck;
+            Map<String, String> da = helpData(data);
+            //如果有下一个body块
+            if (struck.optionStruck() != Play.OptionStruck.NONE_OPTION) {
+                //查找下一个body块
+                Play.BodyStruck nextStruck = GameFaceLife.play.nextBodyStruck(struck.id(), da);
+                resetStruck(data, GameFaceLife.chapter, GameFaceLife.play, nextStruck);
+            } else {
+                //body块结束，并且没有下一块
+                //寻找下一个play
+                String destId = GameFaceLife.chapter.nextPlay(GameFaceLife.play.id(), da);
+
+                //如果destId不是NONE_ID，表示play存在
+                if (!Objects.equals(destId, Play.OptionStruck.NONE_ID)) {
+                    Play play = ConfigCenter.loadPlayInClasspath(GameFaceLife.chapter.id(), destId);
+                    final String beginStruckName = play.startStruck();
+                    //找到了play，寻找begins，作为第一个body块
+                    resetStruck(data, GameFaceLife.chapter, play, play.bodyStruckMap().get(beginStruckName));
+                } else {
+                    //是NONE_ID，表示play不存在，则寻找下一个Chapter
+                    destId = globalConfig.nextChapter(GameFaceLife.chapter.id(), da);
+                    if (Objects.equals(destId, Play.OptionStruck.NONE_ID)) {
+                        //无下一个Chapter
+                        System.out.println("All Done.");
+                    } else {
+                        Play.Chapter chapter = ConfigCenter.loadChapter(destId);
+                        String startPlayId = chapter.startPlayId();
+                        Play play = ConfigCenter.loadPlayInClasspath(chapter.id(), startPlayId);
+                        GameFaceLife.chapter = chapter;
+                        resetStruck(data, GameFaceLife.chapter, play, play.bodyStruckMap().get("begins"));
+                    }
+                }
+            }
+        }
+    }
+
+    private void resetStruck(FaceData d, Play.Chapter c, Play p, Play.BodyStruck struck) {
+        GameFaceLife.chapter = c;
+        GameFaceLife.play = p;
+        GameFaceLife.bodyStruck = struck;
+        d.intPro("nowIndex").set(0);
+        d.property("cache").setProperty("chapter", c.id());
+        d.property("cache").setProperty("play", p.id());
+        d.property("cache").setProperty("struck", struck.id());
+        d.property("cache").setProperty("index", "0");
+        d.property("cache").setProperty("chaptername", c.name());
+        d.property("cache").setProperty("playname", p.name());
+        d.boolPro("struckEnd").set(false);
+    }
+
+    private FaceHandler.Arg getArgAndSetNext(FaceData data) {
+        if (data.boolPro("struckEnd").get()) {
+            return FaceHandler.Arg.NONE_ARG;
+        }
+
+        int lineIndex = data.intPro("nowIndex").get();
+        String[] nowCmd = GameFaceLife.bodyStruck.expressions().get(lineIndex).split(" {2}");
+
+        ++lineIndex;
+        data.intPro("nowIndex").set(lineIndex);
+        if (lineIndex == GameFaceLife.bodyStruck.expressions().size()) {
+            data.boolPro("struckEnd").set(true);
+        }
+
+        String[] a = new String[nowCmd.length - 2];
+        System.arraycopy(nowCmd, 2, a, 0, a.length);
+        return new FaceHandler.Arg(nowCmd[0], nowCmd[1], a);
     }
 
     @Override
     public void pause(FaceData d, FaceHead h) {
-
     }
 
     @Override
@@ -200,17 +338,8 @@ public class GameFaceLife implements FaceLife {
         data.boolPro("struckEnd");
         data.boolPro("auto");
 
-        data.setObj("personDataMap",new HashMap<String, Person.PersonData>());
-        data.setObj("playedPersons",new HashMap<String,Person>());
-        data.setObj("globalConfig",ConfigCenter.loadGlobalConfig());
-
-        //导入数据方法
-//        data.objectPro("nowChapter");
-//        data.objectPro("nowPlay");
-//        data.objectPro("nowStruck");
-
         data.intPro("nowIndex");
-        data.intPro("gameState");
+        data.intPro("gameState").set(1);
 
         data.strPro("nowSelectId");
         data.strPro("nameDisplay");
@@ -237,14 +366,14 @@ public class GameFaceLife implements FaceLife {
             "SKI P", "AUTO", "SAVE", "LOAD", "BACK"
     };
 
-    ImageView leftPerson;
-    ImageView centerPerson;
-    ImageView rightPerson;
+    ImageView leftPersonImage;
+    ImageView centerPersonImage;
+    ImageView rightPersonImage;
 
     Rectangle globalMask;
 
     final Text[] buttonList = new Text[buttonNames.length];
-    final Text[] words=new Text[ConfigCenter.WORD_MAX_SIZE];
+    final Text[] words = new Text[ConfigCenter.WORD_MAX_SIZE];
     final Text[] selectText = new Text[ConfigCenter.SELECT_MAX_SIZE];
     final Rectangle[] selectMasks = new Rectangle[ConfigCenter.SELECT_MAX_SIZE];
 
@@ -263,10 +392,10 @@ public class GameFaceLife implements FaceLife {
 
     private void initGlobalMask(FaceHead head) {
         globalMask = new Rectangle(ConfigCenter.WINDOW_WIDTH, ConfigCenter.WINDOW_HEIGHT);
-        globalMask.setFill(Color.color(0, 0, 0, 0));
+        globalMask.setFill(Color.color(0, 0, 0, 1.0));
         globalMask.setTranslateX(0);
         globalMask.setTranslateY(0);
-        globalMask.setVisible(false);
+        globalMask.setVisible(true);
 
         head.attach(globalMask);
         head.mark("globalMask", FaceHead.THIS_FACE, globalMask);
@@ -276,7 +405,7 @@ public class GameFaceLife implements FaceLife {
         ImageView background = new ImageView(ConfigCenter.loadScene("back_demo1"));
         background.setFitWidth(ConfigCenter.WINDOW_WIDTH);
         background.setFitHeight(ConfigCenter.WINDOW_HEIGHT);
-//        background.imageProperty().set(null);
+        background.imageProperty().set(null);
         head.attach(background);
         head.mark("scene", FaceHead.THIS_FACE, background);
     }
@@ -286,34 +415,34 @@ public class GameFaceLife implements FaceLife {
         Image otoko = ConfigCenter.loadPersonState("otoko", "1");
         Image bishojo = ConfigCenter.loadPersonState("bishojo", "1");
 
-        leftPerson = new ImageView(ona);
-        leftPerson.setFitWidth(ConfigCenter.PERSON_WIDTH);
-        leftPerson.setFitHeight(ConfigCenter.PERSON_HEIGHT);
-        leftPerson.imageProperty().set(null);
+        leftPersonImage = new ImageView(ona);
+        leftPersonImage.setFitWidth(ConfigCenter.PERSON_WIDTH);
+        leftPersonImage.setFitHeight(ConfigCenter.PERSON_HEIGHT);
+        leftPersonImage.imageProperty().set(null);
 
-        centerPerson = new ImageView(bishojo);
-        centerPerson.setFitWidth(ConfigCenter.PERSON_WIDTH);
-        centerPerson.setFitHeight(ConfigCenter.PERSON_HEIGHT);
-        centerPerson.setTranslateX(ConfigCenter.PERSON_WIDTH);
-//        centerPerson.imageProperty().set(null);
+        centerPersonImage = new ImageView(bishojo);
+        centerPersonImage.setFitWidth(ConfigCenter.PERSON_WIDTH);
+        centerPersonImage.setFitHeight(ConfigCenter.PERSON_HEIGHT);
+        centerPersonImage.setTranslateX(ConfigCenter.PERSON_WIDTH);
+        centerPersonImage.imageProperty().set(null);
 
-        rightPerson = new ImageView(otoko);
-        rightPerson.setFitWidth(ConfigCenter.PERSON_WIDTH);
-        rightPerson.setFitHeight(ConfigCenter.PERSON_HEIGHT);
-        rightPerson.setTranslateX(ConfigCenter.PERSON_WIDTH * 2);
-//        rightPerson.imageProperty().set(null);
+        rightPersonImage = new ImageView(otoko);
+        rightPersonImage.setFitWidth(ConfigCenter.PERSON_WIDTH);
+        rightPersonImage.setFitHeight(ConfigCenter.PERSON_HEIGHT);
+        rightPersonImage.setTranslateX(ConfigCenter.PERSON_WIDTH * 2);
+        rightPersonImage.imageProperty().set(null);
 
-        head.attach(leftPerson);
-        head.attach(centerPerson);
-        head.attach(rightPerson);
+        head.attach(leftPersonImage);
+        head.attach(centerPersonImage);
+        head.attach(rightPersonImage);
 
-        head.mark("leftPerson", FaceHead.THIS_FACE, leftPerson);
-        head.mark("centerPerson", FaceHead.THIS_FACE, centerPerson);
-        head.mark("rightPerson", FaceHead.THIS_FACE, rightPerson);
+        head.mark("leftPerson", FaceHead.THIS_FACE, leftPersonImage);
+        head.mark("centerPerson", FaceHead.THIS_FACE, centerPersonImage);
+        head.mark("rightPerson", FaceHead.THIS_FACE, rightPersonImage);
     }
 
     private void initNameAndWordPanel(FaceHead head) {
-        name = new Text("这就是我");
+        name = new Text("");
         name.setFont(ConfigCenter.NAME_FONT);
         name.setFill(Color.WHEAT);
         name.setTranslateX(ConfigCenter.NAME_DISPLAY_X);
@@ -334,7 +463,7 @@ public class GameFaceLife implements FaceLife {
         for (int i = 0; i != ConfigCenter.WORD_MAX_SIZE; ++i) {
             int row = i / ConfigCenter.WORD_LINE_COLUMN;
             int column = i % ConfigCenter.WORD_LINE_COLUMN;
-            Text t = new Text("我");
+            Text t = new Text("");
             t.setEffect(new DropShadow(1, 1, 1, Color.BLACK));
             t.setStroke(Color.WHITE);
             t.setFont(ConfigCenter.WORD_FONT);
@@ -346,7 +475,7 @@ public class GameFaceLife implements FaceLife {
                     (row + 1) * f.getSize() +
                     (row - 1) * ConfigCenter.WORD_LINE_TAP);
             t.visibleProperty().bindBidirectional(wordPaneFrame.visibleProperty());
-            words[i]=t;
+            words[i] = t;
             head.attach(t);
         }
     }
@@ -376,13 +505,13 @@ public class GameFaceLife implements FaceLife {
                     Text desist = selectText[j];
                     desist.visibleProperty().set(false);
                 }
-                data.property("selects").put(data.strPro("nowSelectId"),
-                        String.valueOf(rectangle.getUserData()));
+                data.property("selects").put(data.strPro("nowSelectId").get(),
+                        rectangle.getUserData());
                 data.intPro("gameState").set(GAME_STATE_WAIT_NEXT);
             });
 
             Text t = new Text("");
-            t.setUserData(rectangle);
+            t.setId(i+"");
             t.setFont(ConfigCenter.SELECT_FONT);
             t.setTranslateY(ty);
             t.setTranslateX(ConfigCenter.SELECT_X);
@@ -392,6 +521,7 @@ public class GameFaceLife implements FaceLife {
             t.visibleProperty().bindBidirectional(rectangle.visibleProperty());
             head.attach(t);
             head.attach(rectangle);
+            head.mark(findSelectAt(i),FaceHead.THIS_FACE,t);
         }
     }
 
@@ -414,6 +544,7 @@ public class GameFaceLife implements FaceLife {
             button.setLayoutY(ConfigCenter.TOOL_DISPLAY_Y);
             button.setFont(ConfigCenter.WORD_FONT);
             button.setStroke(Color.WHITE);
+            button.visibleProperty().bindBidirectional(wordPaneFrame.visibleProperty());
             prefX -= 55;
 
             head.attach(button);
@@ -424,27 +555,52 @@ public class GameFaceLife implements FaceLife {
         //maskShow Bind
         data.boolPro("maskShow").bindBidirectional(globalMask.visibleProperty());
 
-        //SelectShow Bind
-        BooleanProperty selectShow = data.boolPro("selectShow");
-        for (int i = 0; i != selectText.length; ++i) {
-            selectShow.bindBidirectional(selectText[i].visibleProperty());
-        }
         //Select Text Bind
-        for(int i=0;i!=selectText.length;++i){
+        for (int i = 0; i != selectText.length; ++i) {
             data.strPro(findSelectAt(i)).
                     bindBidirectional(selectText[i].textProperty());
+            data.boolPro(findSelectAt(i))
+                    .bindBidirectional(selectText[i].visibleProperty());
+            data.boolPro(findSelectAt(i))
+                            .set(false);
+            data.boolPro(findSelectAt(i)).addListener((v,o,n)->{
+                System.out.println("BoolProperty "+v+" Change From "+o+" to "+n+" .");
+            });
         }
 
         //WordPanelShow Bind
         BooleanProperty wordPanelShow = data.boolPro("wordPanelShow");
         wordPanelShow.bindBidirectional(wordPaneFrame.visibleProperty());
+        wordPanelShow.set(false);
+
         //Name Text Bind
         data.strPro("nameDisplay").bindBidirectional(name.textProperty());
         //Word Text Bind
-        for(int i=0;i!=words.length;++i){
-            int cx=i/ConfigCenter.WORD_LINE_COLUMN;
-            int cy=i%ConfigCenter.WORD_LINE_COLUMN;
-            data.strPro(findWordAt(cx,cy)).bindBidirectional(words[i].textProperty());
+        for (int i = 0; i != words.length; ++i) {
+            int cx = i / ConfigCenter.WORD_LINE_COLUMN;
+            int cy = i % ConfigCenter.WORD_LINE_COLUMN;
+            data.strPro(findWordAt(cx, cy)).bindBidirectional(words[i].textProperty());
+        }
+    }
+
+    private void debugPropertyView(FaceData data){
+        data.intPro("gameState").addListener((v,o,n)->{
+            System.out.println("gameState Change From "+o+" to "+n);
+        });
+        for(int i=0;i!=selectText.length;++i){
+            Text t=selectText[i];
+            t.visibleProperty().addListener((v,o,n)->{
+                System.out.println("Select Visible "+t.getId()+" Change From "+o+" to "+n);
+            });
+            t.textProperty().addListener((v,o,n)->{
+                System.out.println("Select Text "+t.getId()+" Change From "+o+" to"+n);
+            });
+        }
+        for(int i=0;i!=selectMasks.length;++i){
+            Rectangle t=selectMasks[i];
+            t.visibleProperty().addListener((v,o,n)->{
+                System.out.println("Select Mask Visible "+t.getId()+" Change From "+o+" to "+n);
+            });
         }
     }
 

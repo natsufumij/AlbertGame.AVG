@@ -1,5 +1,6 @@
 package albertgame.avg.content.n2;
 
+import albertgame.avg.content.ConfigCenter;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.*;
@@ -31,7 +32,6 @@ public class GameController {
         Map<String, BooleanProperty> booleanPropertyMap;
         Map<String, IntegerProperty> integerPropertyMap;
         Map<String, Properties> propertiesMap;
-        Map<String, Object> objectMap;
 
         public FaceDataIm() {
             animating = false;
@@ -39,45 +39,45 @@ public class GameController {
             booleanPropertyMap = new HashMap<>();
             integerPropertyMap = new HashMap<>();
             propertiesMap = new HashMap<>();
-            objectMap=new HashMap<>();
+
+            int index=Integer.parseInt(
+                    MainEntry.Controller().getData().get("index"));
+            Properties p= ConfigCenter.loadCache(index);
+            Properties p2=ConfigCenter.loadSelects(index);
+            propertiesMap.put("cache",p);
+            propertiesMap.put("selects",p2);
         }
 
         @Override
         public StringProperty strPro(String id) {
             if (stringPropertyMap.containsKey(id)) return stringPropertyMap.get(id);
-
-            return stringPropertyMap.put(id, new SimpleStringProperty(""));
+            StringProperty stringProperty = new SimpleStringProperty("");
+            stringPropertyMap.put(id, stringProperty);
+            return stringProperty;
         }
 
         @Override
         public BooleanProperty boolPro(String id) {
             if (booleanPropertyMap.containsKey(id)) return booleanPropertyMap.get(id);
-
-            return booleanPropertyMap.put(id, new SimpleBooleanProperty(false));
+            BooleanProperty booleanProperty = new SimpleBooleanProperty(false);
+            booleanPropertyMap.put(id, booleanProperty);
+            return booleanProperty;
         }
 
         @Override
         public IntegerProperty intPro(String id) {
             if (integerPropertyMap.containsKey(id)) return integerPropertyMap.get(id);
-
-            return integerPropertyMap.put(id, new SimpleIntegerProperty(0));
-        }
-
-        @Override
-        public void setObj(String id, Object o) {
-            objectMap.put(id,o);
-        }
-
-        @Override
-        public Object getObj(String id) {
-            return objectMap.get(id);
+            IntegerProperty integerProperty = new SimpleIntegerProperty(0);
+            integerPropertyMap.put(id, integerProperty);
+            return integerProperty;
         }
 
         @Override
         public Properties property(String id) {
             if (propertiesMap.containsKey(id)) return propertiesMap.get(id);
-
-            return propertiesMap.put(id, new Properties());
+            Properties p = new Properties();
+            propertiesMap.put(id, p);
+            return p;
         }
 
         @Override
@@ -162,14 +162,15 @@ public class GameController {
     private Map<String, FaceHandler> handlerMap;
     private KeyInput keyInput;
 
-    double _w,_h;
+    double _w, _h;
     FaceLife _life;
     Stage _stage;
+
     private GameController(double width, double height, Stage stage, FaceLife initialFace) {
-        _w=width;
-        _h=height;
-        _life=initialFace;
-        _stage=stage;
+        _w = width;
+        _h = height;
+        _life = initialFace;
+        _stage = stage;
         _allGroup = new Group();
 
         Group _mediaGroup = new Group();
@@ -177,14 +178,14 @@ public class GameController {
         _allGroup.getChildren().add(_mediaGroup);
 
         data = new HashMap<>();
-        data.put("index","0");
+        data.put("index", "0");
         packs = new Stack<>();
 
         _scene = new Scene(_allGroup, width, height);
         stage.setScene(_scene);
     }
 
-    public void initController(){
+    public void initController() {
         pushFace(_life);
         initControlLine();
         initKeys();
@@ -204,7 +205,6 @@ public class GameController {
         if (_headNode != null) {
             _allGroup.getChildren().remove(_headNode);
         }
-        life.init(c.data, c.head, c.handlerMap);
 
         this.faceLife = c.life;
         faceData = c.data;
@@ -214,6 +214,7 @@ public class GameController {
 
         _headNode = c.head;
         _allGroup.getChildren().add(_headNode);
+        life.init(c.data, c.head, c.handlerMap);
         packs.push(c);
     }
 
@@ -238,7 +239,7 @@ public class GameController {
         } else return false;
     }
 
-    public void replaceFace(FaceLife life){
+    public void replaceFace(FaceLife life) {
         popFace();
         pushFace(life);
     }
