@@ -137,6 +137,11 @@ public class ConfigCenter {
         }
     }
 
+    public static void saveSelects(int index,Properties properties){
+        String dest = CACHE_PATH + index + ".data.properties";
+        saveC(dest, "游戏选择分支存档", properties);
+    }
+
     public static void saveCacheData(int index, Map<String, String> map) {
         Properties p = new Properties();
         for (Map.Entry<String, String> s : map.entrySet()) {

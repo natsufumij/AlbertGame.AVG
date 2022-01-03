@@ -8,7 +8,6 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.effect.Bloom;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -45,13 +44,16 @@ public class GameFaceLife implements FaceLife {
         }
     }
 
-    static class SaveEventHandler implements EventHandler<MouseEvent> {
+    class SaveEventHandler implements EventHandler<MouseEvent> {
 
         @Override
         public void handle(MouseEvent event) {
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
+                    int ind= Integer.parseInt(MainEntry.Controller().getData().get("index"));
+                    ConfigCenter.saveCache(ind,_d.property("cache"));
+                    ConfigCenter.saveSelects(ind,_d.property("selects"));
                     super.succeeded();
                     return null;
                 }
@@ -65,7 +67,7 @@ public class GameFaceLife implements FaceLife {
 
         @Override
         public void handle(MouseEvent event) {
-            //TODO: 调出存档界面
+
         }
     }
 
@@ -152,6 +154,7 @@ public class GameFaceLife implements FaceLife {
         GameFaceLife.play = ConfigCenter.loadPlayInClasspath(
                 config.startChapter(), GameFaceLife.chapter.startPlayId());
         GameFaceLife.bodyStruck = GameFaceLife.play.bodyStruckMap().get(GameFaceLife.play.startStruck());
+        resetStruck(data,GameFaceLife.chapter,GameFaceLife.play,GameFaceLife.bodyStruck);
         data.intPro("nowIndex").set(0);
     }
 
@@ -171,53 +174,63 @@ public class GameFaceLife implements FaceLife {
         String leftP = properties.getProperty("leftp");
         String centerP = properties.getProperty("centerp");
         String rightP = properties.getProperty("rightp");
+        String leftS = properties.getProperty("leftstate");
+        String centerS = properties.getProperty("centerstate");
+        String rightS = properties.getProperty("rightstate");
         boolean wordpanelshow = Boolean.parseBoolean(properties.getProperty("wordpanelshow"));
         boolean maskshow = Boolean.parseBoolean(properties.getProperty("maskshow"));
 
         GameFaceLife.chapter = ConfigCenter.loadChapter(chapter);
         GameFaceLife.play = ConfigCenter.loadPlayInClasspath(chapter, play);
         GameFaceLife.bodyStruck = GameFaceLife.play.bodyStruckMap().get(struck);
+        resetStruck(data,GameFaceLife.chapter,GameFaceLife.play,GameFaceLife.bodyStruck);
 
-        int index=Integer.parseInt(properties.getProperty("index"));
+        int index = Integer.parseInt(properties.getProperty("index"));
         data.intPro("nowIndex").set(index);
 
         Image sceneI = ConfigCenter.loadScene(scene);
         ((ImageView) head.fetch("scene")).setImage(sceneI);
-        if(!maskshow){
+        if (!maskshow) {
             //初始状态为黑的状态，如果遮罩没有，则代表全亮的，否则则为初始状态
-            Rectangle n= (Rectangle) head.fetch("globalMask");
-            n.setFill(Color.color(0,0,0,0.0));
+            Rectangle n = (Rectangle) head.fetch("globalMask");
+            n.setFill(Color.color(0, 0, 0, 0.0));
         }
         data.boolPro("maskShow").set(maskshow);
 
         List<FaceHandler.Arg> list = new ArrayList<>();
-        FaceHandler.Arg bgmArg=new FaceHandler.Arg(
-                "Audio","Bgm.Play",new String[]{bgm});
+        FaceHandler.Arg bgmArg = new FaceHandler.Arg(
+                "Audio", "Bgm.Play", new String[]{bgm});
         list.add(bgmArg);
 
-        for(String s:personIn){
-            if(s.isBlank()) continue;
+        for (String s : personIn) {
+            if (s.isBlank()) continue;
 
-            FaceHandler.Arg arg=new FaceHandler.Arg("Person","In",new String[]{s});
+            FaceHandler.Arg arg = new FaceHandler.Arg("Person", "In", new String[]{s});
             list.add(arg);
         }
 
-        if(leftP!=null&&!leftP.isBlank()){
-            FaceHandler.Arg arg=new FaceHandler.Arg("Person","Show",new String[]{"L",leftP});
+        if (leftP != null && !leftP.isBlank()) {
+            FaceHandler.Arg arg = new FaceHandler.Arg("Person", "Show", new String[]{"L", leftP});
+            FaceHandler.Arg arg2 = new FaceHandler.Arg("Person", "Change.State", new String[]{"L", leftS});
             list.add(arg);
+            list.add(arg2);
         }
-        if(centerP!=null&&!centerP.isBlank()){
-            FaceHandler.Arg arg=new FaceHandler.Arg("Person","Show",new String[]{"C",centerP});
+        if (centerP != null && !centerP.isBlank()) {
+            FaceHandler.Arg arg = new FaceHandler.Arg("Person", "Show", new String[]{"C", centerP});
+            FaceHandler.Arg arg2 = new FaceHandler.Arg("Person", "Change.State", new String[]{"C", centerS});
             list.add(arg);
+            list.add(arg2);
         }
-        if(rightP!=null&&!rightP.isBlank()){
-            FaceHandler.Arg arg=new FaceHandler.Arg("Person","Show",new String[]{"R",rightP});
+        if (rightP != null && !rightP.isBlank()) {
+            FaceHandler.Arg arg = new FaceHandler.Arg("Person", "Show", new String[]{"R", rightP});
+            FaceHandler.Arg arg2 = new FaceHandler.Arg("Person", "Change.State", new String[]{"R", rightS});
             list.add(arg);
+            list.add(arg2);
         }
 
         data.boolPro("wordPanelShow").set(wordpanelshow);
 
-        for(FaceHandler.Arg ar:list){
+        for (FaceHandler.Arg ar : list) {
             MainEntry.Controller().handleArguments(ar);
         }
     }
@@ -511,7 +524,7 @@ public class GameFaceLife implements FaceLife {
             });
 
             Text t = new Text("");
-            t.setId(i+"");
+            t.setId(i + "");
             t.setFont(ConfigCenter.SELECT_FONT);
             t.setTranslateY(ty);
             t.setTranslateX(ConfigCenter.SELECT_X);
@@ -521,7 +534,7 @@ public class GameFaceLife implements FaceLife {
             t.visibleProperty().bindBidirectional(rectangle.visibleProperty());
             head.attach(t);
             head.attach(rectangle);
-            head.mark(findSelectAt(i),FaceHead.THIS_FACE,t);
+            head.mark(findSelectAt(i), FaceHead.THIS_FACE, t);
         }
     }
 
@@ -562,9 +575,9 @@ public class GameFaceLife implements FaceLife {
             data.boolPro(findSelectAt(i))
                     .bindBidirectional(selectText[i].visibleProperty());
             data.boolPro(findSelectAt(i))
-                            .set(false);
-            data.boolPro(findSelectAt(i)).addListener((v,o,n)->{
-                System.out.println("BoolProperty "+v+" Change From "+o+" to "+n+" .");
+                    .set(false);
+            data.boolPro(findSelectAt(i)).addListener((v, o, n) -> {
+                System.out.println("BoolProperty " + v + " Change From " + o + " to " + n + " .");
             });
         }
 
@@ -583,23 +596,23 @@ public class GameFaceLife implements FaceLife {
         }
     }
 
-    private void debugPropertyView(FaceData data){
-        data.intPro("gameState").addListener((v,o,n)->{
-            System.out.println("gameState Change From "+o+" to "+n);
+    private void debugPropertyView(FaceData data) {
+        data.intPro("gameState").addListener((v, o, n) -> {
+            System.out.println("gameState Change From " + o + " to " + n);
         });
-        for(int i=0;i!=selectText.length;++i){
-            Text t=selectText[i];
-            t.visibleProperty().addListener((v,o,n)->{
-                System.out.println("Select Visible "+t.getId()+" Change From "+o+" to "+n);
+        for (int i = 0; i != selectText.length; ++i) {
+            Text t = selectText[i];
+            t.visibleProperty().addListener((v, o, n) -> {
+                System.out.println("Select Visible " + t.getId() + " Change From " + o + " to " + n);
             });
-            t.textProperty().addListener((v,o,n)->{
-                System.out.println("Select Text "+t.getId()+" Change From "+o+" to"+n);
+            t.textProperty().addListener((v, o, n) -> {
+                System.out.println("Select Text " + t.getId() + " Change From " + o + " to" + n);
             });
         }
-        for(int i=0;i!=selectMasks.length;++i){
-            Rectangle t=selectMasks[i];
-            t.visibleProperty().addListener((v,o,n)->{
-                System.out.println("Select Mask Visible "+t.getId()+" Change From "+o+" to "+n);
+        for (int i = 0; i != selectMasks.length; ++i) {
+            Rectangle t = selectMasks[i];
+            t.visibleProperty().addListener((v, o, n) -> {
+                System.out.println("Select Mask Visible " + t.getId() + " Change From " + o + " to " + n);
             });
         }
     }

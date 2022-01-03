@@ -21,7 +21,7 @@ public class MainEntry extends Application {
 
         _controller =GameController.gameController(
                 ConfigCenter.WINDOW_WIDTH,ConfigCenter.WINDOW_HEIGHT,
-                primaryStage,new GameFaceLife());
+                primaryStage,new StoreLife());
         _controller.initController();
 
         primaryStage.show();

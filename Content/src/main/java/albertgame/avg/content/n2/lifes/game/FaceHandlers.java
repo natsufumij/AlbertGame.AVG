@@ -8,7 +8,6 @@ import albertgame.avg.content.n2.FaceHead;
 import albertgame.avg.content.n2.MainEntry;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.AudioClip;
@@ -283,6 +282,7 @@ public interface FaceHandlers {
                         return;
                     }
                     p.changeStateTo(newState);
+                    d.property("cache").put("leftstate",p.getNowState());
                     ((ImageView) head.fetch("leftPerson")).setImage(p.getNowStateImage());
                 }
                 case "C" -> {
@@ -292,6 +292,7 @@ public interface FaceHandlers {
                         return;
                     }
                     p.changeStateTo(newState);
+                    d.property("cache").put("centerstate",p.getNowState());
                     ((ImageView) head.fetch("centerPerson")).setImage(p.getNowStateImage());
                 }
                 case "R" -> {
@@ -301,6 +302,7 @@ public interface FaceHandlers {
                         return;
                     }
                     p.changeStateTo(newState);
+                    d.property("cache").put("rightstate",p.getNowState());
                     ((ImageView) head.fetch("rightPerson")).setImage(p.getNowStateImage());
                 }
             }
@@ -354,21 +356,22 @@ public interface FaceHandlers {
         @Override
         public void handle(FaceData data, FaceHead head, Arg arg) {
             switch (arg.name()) {
-                case "Bgm.Play" -> BgmPlay(arg.data()[0]);
+                case "Bgm.Play" -> BgmPlay(data,arg.data()[0]);
                 case "Bgm.Pause" -> BgmPause();
                 case "Bgm.Resume" -> BgmResume();
-                case "Bgm.Stop" -> BgmStop();
+                case "Bgm.Stop" -> BgmStop(data);
                 case "Sound.Play" -> AudioPlay(arg.data()[0]);
             }
         }
 
-        private void BgmPlay(String name) {
+        private void BgmPlay(FaceData data,String name) {
             MediaView mediaView = MainEntry.Controller().getMediaView();
             MediaPlayer mediaPlayer;
             if (mediaView.getMediaPlayer() != null) {
                 mediaPlayer = mediaView.getMediaPlayer();
                 mediaPlayer.stop();
             }
+            data.property("cache").put("bgm",name);
             Media media = ConfigCenter.loadBgm(name);
             mediaPlayer = new MediaPlayer(media);
             mediaView.setMediaPlayer(mediaPlayer);
@@ -398,7 +401,8 @@ public interface FaceHandlers {
             }
         }
 
-        private void BgmStop() {
+        private void BgmStop(FaceData data) {
+            data.property("cache").put("bgm","");
             MediaView mediaView = MainEntry.Controller().getMediaView();
             MediaPlayer mediaPlayer;
             if (mediaView.getMediaPlayer() != null) {
@@ -441,22 +445,23 @@ public interface FaceHandlers {
         @Override
         public void handle(FaceData data, FaceHead head, Arg arg) {
             switch (arg.name()) {
-                case "Scene" -> Scene(head,arg.data()[0]);
+                case "Scene" -> Scene(data,head,arg.data()[0]);
                 case "Shake" -> Shake(data,head,arg.data()[0]);
                 case "Darking" -> Darking(data,head,Integer.parseInt(arg.data()[0]));
                 case "Lighting" -> Lighting(data,head,Integer.parseInt(arg.data()[0]));
             }
         }
 
-        private void Scene(FaceHead head, String newSceneName) {
+        private void Scene(FaceData data,FaceHead head, String newSceneName) {
             Image scene = ConfigCenter.loadScene(newSceneName);
             ImageView img = (ImageView) head.fetch("scene");
             img.setImage(scene);
+            data.property("cache").put("scene",newSceneName);
         }
 
         int leftCount;
         ImageView view;
-        Timeline shakeline;
+        Timeline shakeLine;
         double rb, lb;
         double px;
         boolean right;
@@ -481,8 +486,8 @@ public interface FaceHandlers {
             rb = px + view.getFitWidth() / 20;
             lb = px - view.getFitWidth() / 20;
             right = true;
-            shakeline = new Timeline();
-            shakeline.setCycleCount(Timeline.INDEFINITE);
+            shakeLine = new Timeline();
+            shakeLine.setCycleCount(Timeline.INDEFINITE);
             leftCount = 0;
             KeyFrame frame = new KeyFrame(Duration.millis(10), event -> {
                 double nowX = view.getTranslateX();
@@ -492,7 +497,7 @@ public interface FaceHandlers {
                         nowX += 2.5;
                     } else {
                         //全部动作结束
-                        shakeline.stop();
+                        shakeLine.stop();
                         nowX = px;
                     }
                 } else {
@@ -516,16 +521,17 @@ public interface FaceHandlers {
                 view.setTranslateX(nowX);
             });
 
-            shakeline.getKeyFrames().add(frame);
-            shakeline.setOnFinished(event -> {
+            shakeLine.getKeyFrames().add(frame);
+            shakeLine.setOnFinished(event -> {
+                data.boolPro("maskShow").set(false);
                 data.intPro("gameState").set(GameFaceLife.GAME_STATE_WAIT_NEXT);
-                data.boolPro("globalMask").set(false);
+                data.property("cache").put("maskShow","false");
                 data.animate(false);
             });
 
             data.animate(true);
             data.boolPro("globalMask").set(true);
-            shakeline.play();
+            shakeLine.play();
         }
         int dest;
         int count;
@@ -548,6 +554,7 @@ public interface FaceHandlers {
             timeline.setOnFinished(event -> {
                 data.intPro("gameState").set(GameFaceLife.GAME_STATE_WAIT_NEXT);
                 data.animate(false);
+                data.property("cache").put("maskShow","true");
             });
 
             data.animate(true);
