@@ -95,11 +95,43 @@ public class GameFaceLife implements FaceLife {
         initData(d);
         initHead(d, h);
         initBind(d,h);
-        restoreGame(d,h);
+        initGame(d,h);
         p.put("Dialog",new FaceHandlers.DialogHandler());
     }
 
+    private void initGame(FaceData data,FaceHead head){
+        Play.GlobalConfig globalConfig=ConfigCenter.loadGlobalConfig();
+        data.setObj("globalConfig",globalConfig);
+        Map<String, Person.PersonData> personDataMap= (Map<String, Person.PersonData>) data.getObj("personDataMap");
+        //添加人物信息
+        for (Play.GlobalConfig.PersonConfig pc : globalConfig.personConfigs().values()) {
+            Person.PersonData pd = new Person.PersonData(pc.id(), pc.name(), pc.state().get(0), pc.state());
+            personDataMap.put(pd.id(), pd);
+        }
+
+        int index=Integer.parseInt(
+                MainEntry.Controller().getData().get("index"));
+        //导入缓存
+        if (ConfigCenter.isCacheExist(index)) {
+            //存在存档
+            Map<String, String> p = ConfigCenter.loadCacheData(index);
+
+            data.property("selects").putAll(p);
+            data.property("cache").putAll(ConfigCenter.loadCache(index));
+            restoreGame(data,head);
+        } else {
+            loadFromGlobal();
+            System.out.println("");
+        }
+    }
+
+    private void loadFromGlobal() {
+
+    }
+
     private void restoreGame(FaceData data,FaceHead head) {
+
+
         Properties p=ConfigCenter.loadCache(
                 Integer.parseInt(MainEntry.Controller().getData().get("index")));
         Properties properties=data.property("cache");
@@ -168,7 +200,7 @@ public class GameFaceLife implements FaceLife {
         data.boolPro("struckEnd");
         data.boolPro("auto");
 
-        data.setObj("personData",new HashMap<String, Person.PersonData>());
+        data.setObj("personDataMap",new HashMap<String, Person.PersonData>());
         data.setObj("playedPersons",new HashMap<String,Person>());
         data.setObj("globalConfig",ConfigCenter.loadGlobalConfig());
 

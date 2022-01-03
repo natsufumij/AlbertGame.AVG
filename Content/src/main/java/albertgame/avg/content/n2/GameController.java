@@ -162,7 +162,14 @@ public class GameController {
     private Map<String, FaceHandler> handlerMap;
     private KeyInput keyInput;
 
+    double _w,_h;
+    FaceLife _life;
+    Stage _stage;
     private GameController(double width, double height, Stage stage, FaceLife initialFace) {
+        _w=width;
+        _h=height;
+        _life=initialFace;
+        _stage=stage;
         _allGroup = new Group();
 
         Group _mediaGroup = new Group();
@@ -175,8 +182,10 @@ public class GameController {
 
         _scene = new Scene(_allGroup, width, height);
         stage.setScene(_scene);
-        pushFace(initialFace);
+    }
 
+    public void initController(){
+        pushFace(_life);
         initControlLine();
         initKeys();
     }
