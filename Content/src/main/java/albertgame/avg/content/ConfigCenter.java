@@ -3,15 +3,86 @@ package albertgame.avg.content;
 import javafx.scene.image.Image;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 import java.io.*;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class ConfigCenter {
+
+    private static final Map<String, Font> fontMap = new HashMap<>();
+    private static final Map<String, Image> imageMap = new HashMap<>();
+    private static final Map<String, Color> colorMap = new HashMap<>();
+    private static final Map<String, Media> bgmMap = new HashMap<>();
+
+    static {
+        Map<String, Double> systemFontSizeConfig = new HashMap<>();
+        systemFontSizeConfig.put("Name", 22.0);
+        systemFontSizeConfig.put("Word", 18.0);
+        systemFontSizeConfig.put("Select", 24.0);
+        systemFontSizeConfig.put("CacheDate", 14.0);
+
+        Play.SystemConfig config = Play.loadSystemConfig(loadFileInClasspath("config/system.avg"));
+        assert config != null;
+        colorMap.putAll(config.colorMap());
+        loadFont(config.fontMap(), systemFontSizeConfig);
+        loadImage(config.imageMap());
+        loadBgm(config.bgmMap());
+    }
+
+    public static Color getSystemColor(String id) {
+        return colorMap.get(id);
+    }
+
+    public static Image getSystemImage(String id) {
+        return imageMap.get(id);
+    }
+
+    public static Font getSystemFont(String id) {
+        return fontMap.get(id);
+    }
+
+    public static Media getSystemBgm(String id) {
+        return bgmMap.get(id);
+    }
+
+    private static void loadFont(Map<String, String> fontM, Map<String, Double> systemFontSizeConfig) {
+        for (Map.Entry<String, String> e : fontM.entrySet()) {
+            String k = e.getKey();
+            String v = e.getValue();
+            Double size = systemFontSizeConfig.get(k);
+            if (v.startsWith("@")) {
+                String n = v.substring(1);
+                fontMap.put(k, Font.loadFont(ConfigCenter.class.getClassLoader().
+                        getResourceAsStream("config/fonts/" + n + ".ttf"), size));
+            } else {
+                fontMap.put(k, Font.font(v, size));
+            }
+        }
+    }
+
+    private static void loadImage(Map<String, Play.ImageC> imageMapMap) {
+        for (Map.Entry<String, Play.ImageC> e : imageMapMap.entrySet()) {
+            String k = e.getKey();
+            String v = e.getValue().path();
+            String format = e.getValue().format();
+            imageMap.put(k, loadImageSystem("config/images/" + v, format));
+        }
+    }
+
+    private static void loadBgm(Map<String, String> bgmMapMap) {
+        for (Map.Entry<String, String> e : bgmMapMap.entrySet()) {
+            String k = e.getKey();
+            String v = e.getValue();
+            bgmMap.put(k, new Media(Objects.requireNonNull(
+                    ConfigCenter.class.getClassLoader().getResource("config/bgms/" + v + ".mp3")).toExternalForm()));
+        }
+    }
 
     public static final int WINDOW_HEIGHT = 600;
     public static final int WINDOW_WIDTH = 1000;
@@ -22,6 +93,9 @@ public class ConfigCenter {
     public static final int WORD_LINE_COLUMN = 30;
     public static final int WORD_LINE_ROW = 3;
     public static final int WORD_MAX_SIZE = WORD_LINE_COLUMN * WORD_LINE_ROW;
+
+    public static final double WORD_FONT_SIZE = 18.0;
+    public static final double NAME_FONT_SIZE = 22.0;
 
     public static final Font WORD_FONT = new Font(18.0);
     public static final Font NAME_FONT = new Font(22.0);
@@ -65,8 +139,6 @@ public class ConfigCenter {
 
     public static final String WINDOW_TITLE = "AlbertGame.AVG";
 
-    public static final Image WINDOW_ICON = loadImage("config/icon", "jpeg");
-
     public static File loadFileInClasspath(String path) {
         return new File(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResource(path)).getFile());
     }
@@ -79,6 +151,31 @@ public class ConfigCenter {
         return file.exists();
     }
 
+    public static boolean clearCache(int index) {
+        String dest = CACHE_PATH + index + ".properties";
+        File file = new File(dest);
+        Path path = Path.of(file.toURI());
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static boolean clearCacheData(int index) {
+        String dest = CACHE_PATH + index + ".data.properties";
+        File file = new File(dest);
+        Path path = Path.of(file.toURI());
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
     public static Properties loadCache(int index) {
         String dest = CACHE_PATH + index + ".properties";
         return loadP(dest);
@@ -88,8 +185,8 @@ public class ConfigCenter {
         File file = new File(dest);
         Properties properties = new Properties();
         if (file.exists() && file.isFile()) {
-            try {
-                properties.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+            try (FileInputStream stream = new FileInputStream(file)) {
+                properties.load(new InputStreamReader(stream, StandardCharsets.UTF_8));
                 return properties;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -98,7 +195,7 @@ public class ConfigCenter {
         return properties;
     }
 
-    public static Properties loadSelects(int index){
+    public static Properties loadSelects(int index) {
         String dest = CACHE_PATH + index + ".data.properties";
         return loadP(dest);
     }
@@ -130,60 +227,92 @@ public class ConfigCenter {
 
     private static void saveC(String dest, String comment, Properties properties) {
         File file = new File(dest);
-        try {
-            properties.store(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8), "存档");
+        try (FileOutputStream stream = new FileOutputStream(file)) {
+            properties.store(new OutputStreamWriter(stream, StandardCharsets.UTF_8), "存档");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void saveSelects(int index,Properties properties){
+    public static void saveSelects(int index, Properties properties) {
         String dest = CACHE_PATH + index + ".data.properties";
         saveC(dest, "游戏选择分支存档", properties);
     }
 
     public static void saveCacheData(int index, Map<String, String> map) {
         Properties p = new Properties();
-        for (Map.Entry<String, String> s : map.entrySet()) {
-            p.put(s.getKey(), s.getValue());
-        }
+        p.putAll(map);
 
         String dest = CACHE_PATH + index + ".data.properties";
         saveC(dest, "游戏选择分支存档", p);
     }
 
-    public static Play loadPlayInClasspath(String chapterId, String name) {
-        File file = loadFileInClasspath("play/story/" + chapterId + "/" + name + ".avg");
+    static final String PLAY_PATH = "../Play/";
+
+    private static File loadFileInPath(String path) {
+        return new File(PLAY_PATH + path);
+    }
+
+    public static Play loadPlay(String chapterId, String name) {
+        File file = loadFileInPath("story/" + chapterId + "/" + name + ".avg");
         return Play.loadPlay(file);
     }
 
     public static Play.Chapter loadChapter(String chapterId) {
-        File file = loadFileInClasspath("play/story/" + chapterId + ".avg");
+        File file = loadFileInPath("story/" + chapterId + ".avg");
         return Play.loadChapter(file);
     }
 
     public static Play.GlobalConfig loadGlobalConfig() {
-        File file = loadFileInClasspath("play/story/global.avg");
+        File file = loadFileInPath("story/global.avg");
         return Play.loadGlobalConfig(file);
     }
 
     public static Image loadScene(String name) {
-        return loadImage("play/scene/" + name, "jpg");
+        return loadImage("scene/" + name, "jpg");
     }
 
     public static Image loadPersonState(String id, String state) {
-        return loadImage("play/person/" + id + "_" + state, "png");
+        return loadImage("person/" + id + "_" + state, "png");
     }
 
-    public static Image loadImage(String path, String format) {
+    public static Image loadImageSystem(String path, String format) {
         return new Image(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResourceAsStream(path + "." + format)));
     }
 
+    public static Image loadImage(String path, String format) {
+        return loadImageFromPath(path, format);
+//        return new Image(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResourceAsStream(path + "." + format)));
+    }
+
+    private static Image loadImageFromPath(String path, String format) {
+        try {
+            return new Image(loadFileInPath(PLAY_PATH + path + "." + format).toURI().toURL().toExternalForm());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static Media loadBgm(String name) {
-        return new Media(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResource("play/bgm/" + name + ".mp3")).toExternalForm());
+        File file = loadFileInPath(PLAY_PATH + "bgm/" + name + ".mp3");
+        try {
+            return new Media(file.toURI().toURL().toExternalForm());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null;
+//        return new Media(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResource("play/bgm/" + name + ".mp3")).toExternalForm());
     }
 
     public static AudioClip loadAudio(String name) {
-        return new AudioClip(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResource("play/audio/" + name + ".wav")).toExternalForm());
+        File file = loadFileInPath(PLAY_PATH + "audio/" + name + ".wav");
+        try {
+            return new AudioClip(file.toURI().toURL().toExternalForm());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null;
+//        return new AudioClip(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResource("play/audio/" + name + ".wav")).toExternalForm());
     }
 }

@@ -1,5 +1,9 @@
 package albertgame.avg.content;
 
+import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -293,7 +297,7 @@ public record Play
     }
 
     private static Play loadPlay(List<BodyNodeH> hs) {
-        Map<String, OptionStruck> op =null;
+        Map<String, OptionStruck> op;
         Map<String, BodyStruck> bodyStruckMap = new HashMap<>();
         Map<String, String[]> optionMap = new HashMap<>();
         BodyNodeH bodyN = null;
@@ -370,21 +374,25 @@ public record Play
         Map<String, String[]> optionExMap = new HashMap<>();
 
         for (BodyNodeH h : list) {
-            if (h.name.equals("Info")) {
-                if (h.texts.size() < 1 ||
-                        !h.texts.get(h.texts.size() - 1).equals("Chapter")) {
-                    return Chapter.NONE_CHAPTER;
-                }
+            switch (h.name) {
+                case "Info":
+                    if (h.texts.size() < 1 ||
+                            !h.texts.get(h.texts.size() - 1).equals("Chapter")) {
+                        return Chapter.NONE_CHAPTER;
+                    }
 
-                id = h.texts.get(0);
-                name = h.texts.get(1);
-                startName = h.texts.get(2);
-            } else if (h.name.equals("Progress")) {
-                progressH = h;
-            } else if (h.name.equals("Options")) {
-                for(BodyNodeH b:h.children){
-                    optionExMap.put(b.name, b.texts.toArray(new String[0]));
-                }
+                    id = h.texts.get(0);
+                    name = h.texts.get(1);
+                    startName = h.texts.get(2);
+                    break;
+                case "Progress":
+                    progressH = h;
+                    break;
+                case "Options":
+                    for (BodyNodeH b : h.children) {
+                        optionExMap.put(b.name, b.texts.toArray(new String[0]));
+                    }
+                    break;
             }
         }
 
@@ -407,34 +415,94 @@ public record Play
         Map<String,OptionStruck> optionStruckMap;
         String startName="";
         for(BodyNodeH h:bodyNodeHS){
-            if(h.name.equals("Info")){
-                if(h.texts.size()!=2 || !h.texts.get(h.texts.size()-1).equals("Global")){
-                    return GlobalConfig.NONE_GLOBAL_CONFIG;
-                }else {
-                    startName=h.texts.get(0);
-                }
-            }else if(h.name.equals("Options")){
-                for(BodyNodeH b:h.children){
-                    optionExpressionMap.put(b.name, b.texts.toArray(new String[0]));
-                }
-            }else if(h.name.equals("Progress")){
-                progressH=h;
-            }else if(h.name.equals("PersonData")){
-                for(BodyNodeH b:h.children){
-                    String id=b.name;
-                    String name=b.texts.get(0);
-                    List<String> states=new ArrayList<>();
-                    String[] s=b.texts.get(1).split(",");
-                    Collections.addAll(states, s);
-                    GlobalConfig.PersonConfig personConfig=new GlobalConfig.PersonConfig(id,name,states);
-                    personConfigMap.put(id,personConfig);
-                }
+            switch (h.name) {
+                case "Info":
+                    if (h.texts.size() != 2 || !h.texts.get(h.texts.size() - 1).equals("Global")) {
+                        return GlobalConfig.NONE_GLOBAL_CONFIG;
+                    } else {
+                        startName = h.texts.get(0);
+                    }
+                    break;
+                case "Options":
+                    for (BodyNodeH b : h.children) {
+                        optionExpressionMap.put(b.name, b.texts.toArray(new String[0]));
+                    }
+                    break;
+                case "Progress":
+                    progressH = h;
+                    break;
+                case "PersonData":
+                    for (BodyNodeH b : h.children) {
+                        String id = b.name;
+                        String name = b.texts.get(0);
+                        List<String> states = new ArrayList<>();
+                        String[] s = b.texts.get(1).split(",");
+                        Collections.addAll(states, s);
+                        GlobalConfig.PersonConfig personConfig = new GlobalConfig.PersonConfig(id, name, states);
+                        personConfigMap.put(id, personConfig);
+                    }
+                    break;
             }
         }
 
         optionStruckMap=loadOptionStruckM(progressH,optionExpressionMap);
 
         return new GlobalConfig(startName,optionStruckMap,personConfigMap);
+    }
+
+    public static SystemConfig loadSystemConfig(File file){
+        List<BodyNodeH> bodyNodeHS=loadBodyNodeH(file);
+        Map<String,String> fontMap=new HashMap<>();
+        Map<String,Color> colorMap=new HashMap<>();
+        Map<String,ImageC> imageMap=new HashMap<>();
+        Map<String,String> bgmMap=new HashMap<>();
+        for(BodyNodeH b:bodyNodeHS){
+            switch (b.name) {
+                case "Info":
+                    if (!b.texts.get(0).equals("System")) {
+                        System.out.println("系统配置导入失败");
+                        return null;
+                    }
+                    break;
+                case "Fonts":
+                    for (String s : b.texts) {
+                        String[] sx = s.split(" {2}");
+                        String name = sx[0];
+                        String fontName = sx[1];
+                        fontMap.put(name, fontName);
+                    }
+                    break;
+                case "Colors":
+                    for (String s : b.texts) {
+                        String[] sx = s.split(" {2}");
+                        String name = sx[0];
+                        String[] colors = sx[1].split(",");
+                        double r = Double.parseDouble(colors[0]);
+                        double g = Double.parseDouble(colors[1]);
+                        double bl = Double.parseDouble(colors[2]);
+                        double o = Double.parseDouble(colors[3]);
+                        colorMap.put(name, Color.color(r, g, bl, o));
+                    }
+                    break;
+                case "Images":
+                    for (String s : b.texts) {
+                        String[] sx = s.split(" {2}");
+                        String name = sx[0];
+                        String path = sx[1];
+                        String format = sx[2];
+                        imageMap.put(name, new ImageC(path, format));
+                    }
+                    break;
+                case "Bgms":
+                    for (String s : b.texts) {
+                        String[] sx = s.split(" {2}");
+                        bgmMap.put(sx[0], sx[1]);
+                    }
+                    break;
+            }
+        }
+
+        return new SystemConfig(fontMap,colorMap,imageMap,bgmMap);
     }
 
     private static Map<String,OptionStruck> loadOptionStruckM(BodyNodeH progressH,Map<String,String[]> expressions){
@@ -498,4 +566,11 @@ public record Play
         public record PersonConfig(String id, String name, List<String> state) {
         }
     }
+
+    public record SystemConfig(Map<String,String> fontMap, Map<String,Color> colorMap,
+                               Map<String,ImageC> imageMap,Map<String,String> bgmMap){
+
+    }
+
+    public record ImageC(String path,String format){}
 }

@@ -129,6 +129,28 @@
     Else
 ```
 
+系统配置
+#Info
+  System
+#Fonts
+  Name  NameFont
+  Word  WordFont
+  Select  SelectFont
+#Colors
+  #SystemFontName
+  #@FontPathName
+  Name  0.2,0.3,0.4,0.4
+  Word  0.2,0.3,0.4,0.5
+  Select0  0.2,0.3,0.4,0.1
+  Select1  0.8,0.3,0.4,0.1
+#Images
+  Icon  IconImage
+  default  DefaultImage
+  start  StartBack
+  store  StoreBack
+#Bgms
+  Start  bgm1
+  Store  bgm2
 
 总局配置  
 #Info
@@ -159,6 +181,7 @@
 缓存
 year,month,day,hour,minute,second
 chapter,play,struck,index,chaptername,playname
-scene,bgm,name,word,wordtype[M,S,P,@DataId]
+scene,bgm,
+leftstate,centerstate,rightstate,
 leftp,centerp,rightp,personin,
 wordpanelshow,maskshow
