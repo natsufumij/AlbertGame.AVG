@@ -247,72 +247,46 @@ public class ConfigCenter {
         saveC(dest, "游戏选择分支存档", p);
     }
 
-    static final String PLAY_PATH = "../Play/";
-
-    private static File loadFileInPath(String path) {
-        return new File(PLAY_PATH + path);
-    }
+    static final String PLAY_PATH = "play/";
 
     public static Play loadPlay(String chapterId, String name) {
-        File file = loadFileInPath("story/" + chapterId + "/" + name + ".avg");
+        File file = loadFileInClasspath(PLAY_PATH + "story/" + chapterId + "/" + name + ".avg");
         return Play.loadPlay(file);
     }
 
     public static Play.Chapter loadChapter(String chapterId) {
-        File file = loadFileInPath("story/" + chapterId + ".avg");
+        File file = loadFileInClasspath(PLAY_PATH + "story/" + chapterId + ".avg");
         return Play.loadChapter(file);
     }
 
     public static Play.GlobalConfig loadGlobalConfig() {
-        File file = loadFileInPath("story/global.avg");
+        File file = loadFileInClasspath(PLAY_PATH + "story/global.avg");
         return Play.loadGlobalConfig(file);
     }
 
     public static Image loadScene(String name) {
-        return loadImage("scene/" + name, "jpg");
+        return loadImage(PLAY_PATH + "scene/" + name, "jpg");
     }
 
     public static Image loadPersonState(String id, String state) {
-        return loadImage("person/" + id + "_" + state, "png");
+        return loadImage(PLAY_PATH + "person/" + id + "_" + state, "png");
     }
 
-    public static Image loadImageSystem(String path, String format) {
+    private static Image loadImageSystem(String path, String format) {
         return new Image(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResourceAsStream(path + "." + format)));
     }
 
-    public static Image loadImage(String path, String format) {
-        return loadImageFromPath(path, format);
-//        return new Image(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResourceAsStream(path + "." + format)));
-    }
-
-    private static Image loadImageFromPath(String path, String format) {
-        try {
-            return new Image(loadFileInPath(PLAY_PATH + path + "." + format).toURI().toURL().toExternalForm());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        return null;
+    private static Image loadImage(String path, String format) {
+        return new Image(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResourceAsStream(path + "." + format)));
     }
 
     public static Media loadBgm(String name) {
-        File file = loadFileInPath(PLAY_PATH + "bgm/" + name + ".mp3");
-        try {
-            return new Media(file.toURI().toURL().toExternalForm());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        return null;
-//        return new Media(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResource("play/bgm/" + name + ".mp3")).toExternalForm());
+        return new Media(Objects.requireNonNull(ConfigCenter.class.getClassLoader().
+                getResource(PLAY_PATH + "bgm/" + name + ".mp3")).toExternalForm());
     }
 
     public static AudioClip loadAudio(String name) {
-        File file = loadFileInPath(PLAY_PATH + "audio/" + name + ".wav");
-        try {
-            return new AudioClip(file.toURI().toURL().toExternalForm());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        return null;
-//        return new AudioClip(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResource("play/audio/" + name + ".wav")).toExternalForm());
+        return new AudioClip(Objects.requireNonNull(ConfigCenter.class.getClassLoader().
+                getResource(PLAY_PATH + "audio/" + name + ".wav")).toExternalForm());
     }
 }

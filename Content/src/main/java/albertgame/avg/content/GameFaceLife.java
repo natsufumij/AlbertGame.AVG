@@ -2,6 +2,7 @@ package albertgame.avg.content;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.scene.effect.Bloom;
@@ -38,6 +39,11 @@ public class GameFaceLife implements FaceLife {
 
         @Override
         public void handle(MouseEvent event) {
+            IntegerProperty in=_d.intPro("gameState");
+            if(in.get()==GAME_STATE_WAIT_PRESS){
+                in.set(GAME_STATE_WAIT_NEXT);
+            }
+
             System.out.println("Auto");
             boolean b = _d.boolPro("auto").get();
             _d.boolPro("auto").set(!b);
@@ -169,7 +175,13 @@ public class GameFaceLife implements FaceLife {
         String struck = properties.getProperty("struck");
         String scene = properties.getProperty("scene");
         String bgm = properties.getProperty("bgm");
-        String[] personIn = properties.getProperty("personin").split(",");
+
+        String[] personIn ;
+        if(properties.contains("personin")){
+            personIn=properties.getProperty("personin").split(",");
+        }else {
+            personIn=new String[0];
+        }
         String leftP = properties.getProperty("leftp");
         String centerP = properties.getProperty("centerp");
         String rightP = properties.getProperty("rightp");
@@ -272,7 +284,9 @@ public class GameFaceLife implements FaceLife {
             if (struck.optionStruck() != Play.OptionStruck.NONE_OPTION) {
                 //查找下一个body块
                 Play.BodyStruck nextStruck = GameFaceLife.play.nextBodyStruck(struck.id(), da);
-                resetStruck(data, GameFaceLife.chapter, GameFaceLife.play, nextStruck);
+                if(nextStruck!= Play.BodyStruck.NONE_BODY){
+                    resetStruck(data, GameFaceLife.chapter, GameFaceLife.play, nextStruck);
+                }
             } else {
                 //body块结束，并且没有下一块
                 //寻找下一个play
@@ -495,7 +509,6 @@ public class GameFaceLife implements FaceLife {
             int column = i % ConfigCenter.WORD_LINE_COLUMN;
             Text t = new Text("");
             t.setEffect(new DropShadow(1, 1, 1, Color.BLACK));
-            t.setStroke(Color.WHITE);
             t.setFont(ConfigCenter.getSystemFont("Word"));
             t.setFill(ConfigCenter.getSystemColor("Word"));
             f = t.getFont();
@@ -553,7 +566,7 @@ public class GameFaceLife implements FaceLife {
     }
 
     private void initTool(FaceHead head) {
-        List<EventHandler<MouseEvent>> eventHandlers = new ArrayList<>(Arrays.asList(
+       final List<EventHandler<MouseEvent>> eventHandlers = new ArrayList<>(Arrays.asList(
                 new SkipEventHandler(),
                 new AutoEventHandler(),
                 new SaveEventHandler(),
@@ -564,14 +577,30 @@ public class GameFaceLife implements FaceLife {
         double prefX = ConfigCenter.TOOL_DISPLAY_X_R - 55;
         for (int i = buttonList.length - 1; i != -1; --i) {
             Text button = new Text(buttonNames[i]);
-            button.setOnMouseClicked(eventHandlers.get(i));
             button.setOnMouseEntered(event -> button.setEffect(new Bloom(0.1)));
             button.setOnMouseExited(event -> button.setEffect(null));
             button.setLayoutX(prefX);
             button.setLayoutY(ConfigCenter.TOOL_DISPLAY_Y);
-            button.setFont(ConfigCenter.WORD_FONT);
-            button.setStroke(Color.WHITE);
+            button.setFill(ConfigCenter.getSystemColor("Button0"));
+            button.setFont(ConfigCenter.getSystemFont("Word"));
             button.visibleProperty().bindBidirectional(wordPaneFrame.visibleProperty());
+            if(i==1){
+                button.setUserData(true);
+                EventHandler<MouseEvent> e=(m)->{
+                    //表示初始状态
+                    if((Boolean)button.getUserData()){
+                        button.setText("SLOW");
+                        button.setUserData(false);
+                    }else {
+                        button.setText("AUTO");
+                        button.setUserData(true);
+                    }
+                    eventHandlers.get(1).handle(m);
+                };
+                button.setOnMouseClicked(e);
+            }else {
+                button.setOnMouseClicked(eventHandlers.get(i));
+            }
             prefX -= 55;
 
             head.attach(button);

@@ -86,11 +86,11 @@ public class StoreLife implements FaceLife {
         }
 
         if (isStart) {
-            Button.setTranslateX(200.0);
+            Button.setTranslateX(140.0);
             Button.setTranslateY(300.0);
         } else {
-            Button.setTranslateX(200.0);
-            Button.setTranslateY(340.0);
+            Button.setTranslateX(260.0);
+            Button.setTranslateY(300.0);
         }
 
         return Button;
