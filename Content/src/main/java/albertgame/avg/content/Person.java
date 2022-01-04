@@ -7,7 +7,32 @@ import java.util.Map;
 
 public class Person {
 
-    public record PersonData(String id, String name, String defaultState, List<String> state) {
+    public static class PersonData{
+        String id,name,defaultState;
+        List<String> state;
+
+        public PersonData(String id, String name, String defaultState, List<String> state) {
+            this.id = id;
+            this.name = name;
+            this.defaultState = defaultState;
+            this.state = state;
+        }
+
+        public String id() {
+            return id;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public String defaultState() {
+            return defaultState;
+        }
+
+        public List<String> state() {
+            return state;
+        }
     }
 
     public static final Person NONE_PERSON = new Person();

@@ -1,21 +1,43 @@
 package albertgame.avg.content;
 
-import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public record Play
-        (String id,
-         String name,
-         String startStruck,
-         Map<String, BodyStruck> bodyStruckMap) {
+public class Play {
+
+    String id,name,startStruck;
+    Map<String,BodyStruck> bodyStruckMap;
+
+    public Play(String id, String name, String startStruck, Map<String, BodyStruck> bodyStruckMap) {
+        this.id = id;
+        this.name = name;
+        this.startStruck = startStruck;
+        this.bodyStruckMap = bodyStruckMap;
+    }
+
+    public String id() {
+        return id;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public String startStruck() {
+        return startStruck;
+    }
+
+    public Map<String, BodyStruck> bodyStruckMap() {
+        return bodyStruckMap;
+    }
 
     public static final Play NONE_PLAY = null;
-
     public BodyStruck nextBodyStruck(String id, Map<String, String> data) {
         BodyStruck struck = bodyStruckMap.get(id);
         String dis = struck.optionStruck.struckNextOption(data);
@@ -26,22 +48,59 @@ public record Play
         }
     }
 
-    public record BodyStruck
-            (String id,
-             List<String> expressions,
-             OptionStruck optionStruck) {
 
+    public static class BodyStruck{
         public static final BodyStruck NONE_BODY = null;
+
+        String id;
+        List<String> expressions;
+        OptionStruck optionStruck;
+
+        public BodyStruck(String id, List<String> expressions, OptionStruck optionStruck) {
+            this.id = id;
+            this.expressions = expressions;
+            this.optionStruck = optionStruck;
+        }
+
+        public String id() {
+            return id;
+        }
+
+        public List<String> expressions() {
+            return expressions;
+        }
+
+        public OptionStruck optionStruck() {
+            return optionStruck;
+        }
     }
 
-    public record OptionStruck
-            (String id,
-             String[] selectExpression,
-             String[] destIds) {
+    public static class OptionStruck{
+        String id;
+        String[] selectExpression,destIds;
 
         public static final String NONE_ID = "00";
 
         public static final OptionStruck NONE_OPTION = new OptionStruck(NONE_ID, null, null);
+
+
+        public OptionStruck(String id, String[] selectExpression, String[] destIds) {
+            this.id = id;
+            this.selectExpression = selectExpression;
+            this.destIds = destIds;
+        }
+
+        public String id() {
+            return id;
+        }
+
+        public String[] selectExpression() {
+            return selectExpression;
+        }
+
+        public String[] destIds() {
+            return destIds;
+        }
 
         //A=2 | D=2 | S=3
         //A>2 & D<2>
@@ -152,22 +211,6 @@ public record Play
             }
             return true;
         }
-
-    }
-
-    public static void main(String[] args) {
-
-        List<BodyNodeH> bodyNodeHS = new ArrayList<>();
-        Stack<BodyNodeH> stack = new Stack<>();
-
-        try {
-            File file = ConfigCenter.loadFileInClasspath("play/story/chapter0/demo2.avg");
-            Play p = loadPlay(file);
-            System.out.println("Ok.");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     private static final String END_SIGN = "<<<end>>>";
@@ -520,13 +563,35 @@ public record Play
         return struck;
     }
 
-    public record Chapter
-            (String id,
-             String name,
-             String startPlayId,
-             Map<String, OptionStruck> playOptionMap) {
 
+
+    public static class Chapter{
+        String id,name,startPlayId;
+        Map<String,OptionStruck> playOptionMap;
         public static final Chapter NONE_CHAPTER = null;
+
+        public Chapter(String id, String name, String startPlayId, Map<String, OptionStruck> playOptionMap) {
+            this.id = id;
+            this.name = name;
+            this.startPlayId = startPlayId;
+            this.playOptionMap = playOptionMap;
+        }
+
+        public String id() {
+            return id;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public String startPlayId() {
+            return startPlayId;
+        }
+
+        public Map<String, OptionStruck> playOptionMap() {
+            return playOptionMap;
+        }
 
         public String nextPlay(String id, Map<String, String> data) {
             OptionStruck struck = playOptionMap.get(id);
@@ -543,9 +608,28 @@ public record Play
         }
     }
 
-    public record GlobalConfig(String startChapter,
-                               Map<String, OptionStruck> chapterOptionMap,
-                               Map<String,PersonConfig> personConfigs) {
+    public static class GlobalConfig{
+        String startChapter;
+        Map<String,OptionStruck> chapterOptionMap;
+        Map<String,PersonConfig> personConfigs;
+
+        public GlobalConfig(String startChapter, Map<String, OptionStruck> chapterOptionMap, Map<String, PersonConfig> personConfigs) {
+            this.startChapter = startChapter;
+            this.chapterOptionMap = chapterOptionMap;
+            this.personConfigs = personConfigs;
+        }
+
+        public String startChapter() {
+            return startChapter;
+        }
+
+        public Map<String, OptionStruck> chapterOptionMap() {
+            return chapterOptionMap;
+        }
+
+        public Map<String, PersonConfig> personConfigs() {
+            return personConfigs;
+        }
 
         public static final GlobalConfig NONE_GLOBAL_CONFIG=null;
 
@@ -563,14 +647,74 @@ public record Play
             }
         }
 
-        public record PersonConfig(String id, String name, List<String> state) {
+
+
+        public static class PersonConfig{
+            String id,name;
+            List<String> state;
+
+            public PersonConfig(String id, String name, List<String> state) {
+                this.id = id;
+                this.name = name;
+                this.state = state;
+            }
+
+            public String id() {
+                return id;
+            }
+
+            public String name() {
+                return name;
+            }
+
+            public List<String> state() {
+                return state;
+            }
         }
     }
 
-    public record SystemConfig(Map<String,String> fontMap, Map<String,Color> colorMap,
-                               Map<String,ImageC> imageMap,Map<String,String> bgmMap){
+    public static class SystemConfig{
+        Map<String,String> fontMap;
+        Map<String, Color> colorMap;
+        Map<String,ImageC> imageMap;
+        Map<String,String> bgmMap;
 
+        public SystemConfig(Map<String, String> fontMap, Map<String, Color> colorMap, Map<String, ImageC> imageMap, Map<String, String> bgmMap) {
+            this.fontMap = fontMap;
+            this.colorMap = colorMap;
+            this.imageMap = imageMap;
+            this.bgmMap = bgmMap;
+        }
+
+        public Map<String, String> fontMap() {
+            return fontMap;
+        }
+
+        public Map<String, Color> colorMap() {
+            return colorMap;
+        }
+
+        public Map<String, ImageC> imageMap() {
+            return imageMap;
+        }
+
+        public Map<String, String> bgmMap() {
+            return bgmMap;
+        }
     }
 
-    public record ImageC(String path,String format){}
+    public static class ImageC{
+        String path,format;
+
+        public ImageC(String path, String format) {
+            this.path = path;
+            this.format = format;
+        }
+        public String path(){
+            return path;
+        }
+        public String format(){
+            return format;
+        }
+    }
 }

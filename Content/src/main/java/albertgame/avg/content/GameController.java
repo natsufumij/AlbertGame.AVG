@@ -20,8 +20,21 @@ import java.util.Stack;
 
 public class GameController {
 
-    public record KeyInput(EventHandler<KeyEvent> press,
-                           EventHandler<KeyEvent> release) {
+    public static class KeyInput{
+        EventHandler<KeyEvent> press,release;
+
+        public KeyInput(EventHandler<KeyEvent> press, EventHandler<KeyEvent> release) {
+            this.press = press;
+            this.release = release;
+        }
+
+        public EventHandler<KeyEvent> press() {
+            return press;
+        }
+
+        public EventHandler<KeyEvent> release() {
+            return release;
+        }
     }
 
     private static class FaceDataIm implements FaceData {

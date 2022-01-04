@@ -1,6 +1,7 @@
 plugins {
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.10'
+    id 'org.beryx.jlink' version '2.12.0'
 }
 
 group 'albertgame.avg'
@@ -11,7 +12,7 @@ javafx {
     modules = ['javafx.controls', 'javafx.media']
 }
 
-mainClassName = 'albertgame.avg.content.MainEntry'
+mainClassName = "$moduleName/albertgame.avg.content.MainEntry"
 
 repositories {
     mavenCentral()
@@ -22,4 +23,12 @@ dependencies {
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
+}
+
+
+jlink {
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    launcher {
+        name = 'albertgame.avg.content'
+    }
 }

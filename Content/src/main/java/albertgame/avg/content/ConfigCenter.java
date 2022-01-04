@@ -11,7 +11,10 @@ import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 public class ConfigCenter {
 
@@ -27,7 +30,7 @@ public class ConfigCenter {
         systemFontSizeConfig.put("Select", 24.0);
         systemFontSizeConfig.put("CacheDate", 14.0);
 
-        Play.SystemConfig config = Play.loadSystemConfig(loadFileInClasspath("config/system.avg"));
+        Play.SystemConfig config = Play.loadSystemConfig(loadFile("config", "system", "avg"));
         assert config != null;
         colorMap.putAll(config.colorMap());
         loadFont(config.fontMap(), systemFontSizeConfig);
@@ -58,8 +61,7 @@ public class ConfigCenter {
             Double size = systemFontSizeConfig.get(k);
             if (v.startsWith("@")) {
                 String n = v.substring(1);
-                fontMap.put(k, Font.loadFont(ConfigCenter.class.getClassLoader().
-                        getResourceAsStream("config/fonts/" + n + ".ttf"), size));
+                fontMap.put(k, loadSystemFont(n, size));
             } else {
                 fontMap.put(k, Font.font(v, size));
             }
@@ -71,7 +73,7 @@ public class ConfigCenter {
             String k = e.getKey();
             String v = e.getValue().path();
             String format = e.getValue().format();
-            imageMap.put(k, loadImageSystem("config/images/" + v, format));
+            imageMap.put(k, loadImageSystem(v, format));
         }
     }
 
@@ -79,8 +81,7 @@ public class ConfigCenter {
         for (Map.Entry<String, String> e : bgmMapMap.entrySet()) {
             String k = e.getKey();
             String v = e.getValue();
-            bgmMap.put(k, new Media(Objects.requireNonNull(
-                    ConfigCenter.class.getClassLoader().getResource("config/bgms/" + v + ".mp3")).toExternalForm()));
+            bgmMap.put(k, loadSystemBgm(v));
         }
     }
 
@@ -138,10 +139,6 @@ public class ConfigCenter {
 
 
     public static final String WINDOW_TITLE = "AlbertGame.AVG";
-
-    public static File loadFileInClasspath(String path) {
-        return new File(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResource(path)).getFile());
-    }
 
     private static final String CACHE_PATH = System.getProperty("user.home") + "/.Cache/AlbertGame.AVG/Store_";
 
@@ -224,7 +221,6 @@ public class ConfigCenter {
         saveC(dest, "游戏存档", properties);
     }
 
-
     private static void saveC(String dest, String comment, Properties properties) {
         File file = new File(dest);
         try (FileOutputStream stream = new FileOutputStream(file)) {
@@ -239,54 +235,64 @@ public class ConfigCenter {
         saveC(dest, "游戏选择分支存档", properties);
     }
 
-    public static void saveCacheData(int index, Map<String, String> map) {
-        Properties p = new Properties();
-        p.putAll(map);
-
-        String dest = CACHE_PATH + index + ".data.properties";
-        saveC(dest, "游戏选择分支存档", p);
-    }
-
-    static final String PLAY_PATH = "play/";
-
     public static Play loadPlay(String chapterId, String name) {
-        File file = loadFileInClasspath(PLAY_PATH + "story/" + chapterId + "/" + name + ".avg");
+        File file = loadFile("play/story", chapterId + "/" + name, "avg");
         return Play.loadPlay(file);
     }
 
     public static Play.Chapter loadChapter(String chapterId) {
-        File file = loadFileInClasspath(PLAY_PATH + "story/" + chapterId + ".avg");
+        File file = loadFile("play/story", chapterId, "avg");
         return Play.loadChapter(file);
     }
 
     public static Play.GlobalConfig loadGlobalConfig() {
-        File file = loadFileInClasspath(PLAY_PATH + "story/global.avg");
+        File file = loadFile("play/story", "global", "avg");
         return Play.loadGlobalConfig(file);
     }
 
     public static Image loadScene(String name) {
-        return loadImage(PLAY_PATH + "scene/" + name, "jpg");
+        return new Image(loadFileUrl("play/scene", name, "jpg"));
     }
 
     public static Image loadPersonState(String id, String state) {
-        return loadImage(PLAY_PATH + "person/" + id + "_" + state, "png");
+        return new Image(loadFileUrl("play/person", id + "_" + state, "png"));
     }
 
     private static Image loadImageSystem(String path, String format) {
-        return new Image(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResourceAsStream(path + "." + format)));
-    }
-
-    private static Image loadImage(String path, String format) {
-        return new Image(Objects.requireNonNull(ConfigCenter.class.getClassLoader().getResourceAsStream(path + "." + format)));
+        return new Image(loadFileUrl("config/images", path, format));
     }
 
     public static Media loadBgm(String name) {
-        return new Media(Objects.requireNonNull(ConfigCenter.class.getClassLoader().
-                getResource(PLAY_PATH + "bgm/" + name + ".mp3")).toExternalForm());
+        return new Media(loadFileUrl("play/bgm", name, "mp3"));
+    }
+
+    private static Media loadSystemBgm(String name) {
+        return new Media(loadFileUrl("config/bgms", name, "mp3"));
+    }
+
+    private static Font loadSystemFont(String path, double size) {
+        Font font = Font.loadFont(loadFileUrl("config/fonts", path, "ttf"), size);
+        return font;
     }
 
     public static AudioClip loadAudio(String name) {
-        return new AudioClip(Objects.requireNonNull(ConfigCenter.class.getClassLoader().
-                getResource(PLAY_PATH + "audio/" + name + ".wav")).toExternalForm());
+        return new AudioClip(loadFileUrl("play/audio", name, "wav"));
+    }
+
+    private static String loadFileUrl(String lib, String name, String format) {
+        try {
+            return new File(getRealPath(lib, name, format)).toURI().toURL().toExternalForm();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    private static File loadFile(String lib, String name, String format) {
+        return new File(getRealPath(lib, name, format));
+    }
+
+    private static String getRealPath(String lib, String name, String format) {
+        return "../Play/" + lib + "/" + name + "." + format;
     }
 }

@@ -72,12 +72,12 @@ public interface FaceHandlers {
         int index = 0, dest;
         String type;
 
-        private void skipWord(FaceData d,String text){
+        private void skipWord(FaceData d, String text) {
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i != text.length(); ++i) {
                 int cx = i / ConfigCenter.WORD_LINE_COLUMN;
                 int cy = i % ConfigCenter.WORD_LINE_COLUMN;
-                d.strPro(GameFaceLife.findWordAt(cx, cy)).setValue(text.charAt(i)+"");
+                d.strPro(GameFaceLife.findWordAt(cx, cy)).setValue(text.charAt(i) + "");
                 builder.append(d.strPro(GameFaceLife.findWordAt(cx, cy)).get());
             }
             d.property("cache").put("word", builder.toString());
@@ -85,8 +85,8 @@ public interface FaceHandlers {
         }
 
         private void Word(FaceData d, String text) {
-            if(d.boolPro("skip").get()){
-                skipWord(d,text);
+            if (d.boolPro("skip").get()) {
+                skipWord(d, text);
                 return;
             }
 
@@ -171,12 +171,24 @@ public interface FaceHandlers {
         @Override
         public void handle(FaceData data, FaceHead head, Arg arg) {
             switch (arg.name()) {
-                case "In" -> In(data, arg.data()[0]);
-                case "Out" -> Out(data, arg.data()[0]);
-                case "Show" -> Show(data, head, arg.data()[0], arg.data()[1]);
-                case "No.Show" -> NoShow(data, head, arg.data()[0]);
-                case "Hide" -> Hide(data, head, arg.data()[0]);
-                case "Change.State" -> ChangeState(data, head, arg.data()[0], arg.data()[1]);
+                case "In":
+                    In(data, arg.data()[0]);
+                    break;
+                case "Out":
+                    Out(data, arg.data()[0]);
+                    break;
+                case "Show":
+                    Show(data, head, arg.data()[0], arg.data()[1]);
+                    break;
+                case "No.Show":
+                    NoShow(data, head, arg.data()[0]);
+                    break;
+                case "Hide":
+                    Hide(data, head, arg.data()[0]);
+                    break;
+                case "Change.State":
+                    ChangeState(data, head, arg.data()[0], arg.data()[1]);
+                    break;
             }
         }
 
@@ -222,21 +234,21 @@ public interface FaceHandlers {
 
         private void NoShow(FaceData d, FaceHead h, String pos) {
             switch (pos) {
-                case "L" -> {
+                case "L":
                     d.strPro("leftPerson").set("");
                     ((ImageView) h.fetch("leftPerson")).setImage(null);
                     d.property("cache").put("leftp", "");
-                }
-                case "C" -> {
+                    break;
+                case "C":
                     d.strPro("centerPerson").set("");
                     ((ImageView) h.fetch("centerPerson")).setImage(null);
                     d.property("cache").put("centerp", "");
-                }
-                case "R" -> {
+                    break;
+                case "R":
                     d.strPro("rightPerson").set("");
                     ((ImageView) h.fetch("rightPerson")).setImage(null);
                     d.property("cache").put("rightp", "");
-                }
+                    break;
             }
         }
 
@@ -244,38 +256,45 @@ public interface FaceHandlers {
             Map<String, Person> playedPersons = GameFaceLife.playedPersons;
             Person p = playedPersons.get(pid);
             if (p == null) return;
+            ImageView v;
 
             switch (pos) {
-                case "L" -> {
+                case "L":
                     d.strPro("leftPerson").set(p.getId());
-                    ImageView v = (ImageView) h.fetch("leftPerson");
+                    v = (ImageView) h.fetch("leftPerson");
                     v.setImage(p.getNowStateImage());
                     v.setVisible(true);
                     d.property("cache").put("leftp", p.getId());
-                }
-                case "C" -> {
+                    break;
+                case "C":
                     d.strPro("centerPerson").set(p.getId());
-                    ImageView v = (ImageView) h.fetch("centerPerson");
+                    v = (ImageView) h.fetch("centerPerson");
                     v.setImage(p.getNowStateImage());
                     v.setVisible(true);
                     d.property("cache").put("centerp", p.getId());
-                }
-                case "R" -> {
+                    break;
+                case "R":
                     d.strPro("rightPerson").set(p.getId());
-                    ImageView v = (ImageView) h.fetch("rightPerson");
+                    v = (ImageView) h.fetch("rightPerson");
                     v.setImage(p.getNowStateImage());
                     v.setVisible(true);
                     d.property("cache").put("rightp", p.getId());
-                }
+                    break;
             }
         }
 
         private void Hide(FaceData d, FaceHead h, String pos) {
             String v = "L";
             switch (pos) {
-                case "L" -> v = "leftPerson";
-                case "C" -> v = "centerPerson";
-                case "R" -> v = "rightPerson";
+                case "L":
+                    v = "leftPerson";
+                    break;
+                case "C":
+                    v = "centerPerson";
+                    break;
+                case "R":
+                    v = "rightPerson";
+                    break;
             }
             ImageView view = (ImageView) h.fetch(v);
             view.setVisible(false);
@@ -285,36 +304,36 @@ public interface FaceHandlers {
             Person p;
             final String FAILED = "ChangeState Failed: Don't Change On A Null Person";
             switch (pos) {
-                case "L" -> {
+                case "L":
                     p = GameFaceLife.leftPerson;
                     if (p == null) {
                         System.out.println(FAILED);
                         return;
                     }
                     p.changeStateTo(newState);
-                    d.property("cache").put("leftstate",p.getNowState());
+                    d.property("cache").put("leftstate", p.getNowState());
                     ((ImageView) head.fetch("leftPerson")).setImage(p.getNowStateImage());
-                }
-                case "C" -> {
+                    break;
+                case "C":
                     p = GameFaceLife.centerPerson;
                     if (p == null) {
                         System.out.println(FAILED);
                         return;
                     }
                     p.changeStateTo(newState);
-                    d.property("cache").put("centerstate",p.getNowState());
+                    d.property("cache").put("centerstate", p.getNowState());
                     ((ImageView) head.fetch("centerPerson")).setImage(p.getNowStateImage());
-                }
-                case "R" -> {
+                    break;
+                case "R":
                     p = GameFaceLife.rightPerson;
                     if (p == null) {
                         System.out.println(FAILED);
                         return;
                     }
                     p.changeStateTo(newState);
-                    d.property("cache").put("rightstate",p.getNowState());
+                    d.property("cache").put("rightstate", p.getNowState());
                     ((ImageView) head.fetch("rightPerson")).setImage(p.getNowStateImage());
-                }
+                    break;
             }
         }
     }
@@ -327,9 +346,9 @@ public interface FaceHandlers {
         @Override
         public void handle(FaceData data, FaceHead head, Arg arg) {
             switch (arg.name()) {
-                case "Save" -> Save(data, arg.name(), arg.data()[0]);
-                case "Plus" -> Plus(data, arg.name(), Integer.parseInt(arg.data()[0]));
-                case "Minus" -> Minus(data, arg.name(), Integer.parseInt(arg.data()[0]));
+                case "Save" :Save(data, arg.name(), arg.data()[0]);break;
+                case "Plus" :Plus(data, arg.name(), Integer.parseInt(arg.data()[0]));break;
+                case "Minus" :Minus(data, arg.name(), Integer.parseInt(arg.data()[0]));break;
             }
         }
 
@@ -366,22 +385,22 @@ public interface FaceHandlers {
         @Override
         public void handle(FaceData data, FaceHead head, Arg arg) {
             switch (arg.name()) {
-                case "Bgm.Play" -> BgmPlay(data,arg.data()[0]);
-                case "Bgm.Pause" -> BgmPause();
-                case "Bgm.Resume" -> BgmResume();
-                case "Bgm.Stop" -> BgmStop(data);
-                case "Sound.Play" -> AudioPlay(arg.data()[0]);
+                case "Bgm.Play" :BgmPlay(data, arg.data()[0]);break;
+                case "Bgm.Pause":BgmPause();break;
+                case "Bgm.Resume": BgmResume();break;
+                case "Bgm.Stop" : BgmStop(data);break;
+                case "Sound.Play" : AudioPlay(arg.data()[0]);break;
             }
         }
 
-        private void BgmPlay(FaceData data,String name) {
+        private void BgmPlay(FaceData data, String name) {
             MediaView mediaView = MainEntry.Controller().getMediaView();
             MediaPlayer mediaPlayer;
             if (mediaView.getMediaPlayer() != null) {
                 mediaPlayer = mediaView.getMediaPlayer();
                 mediaPlayer.stop();
             }
-            data.property("cache").put("bgm",name);
+            data.property("cache").put("bgm", name);
             Media media = ConfigCenter.loadBgm(name);
             assert media != null;
             mediaPlayer = new MediaPlayer(media);
@@ -409,7 +428,7 @@ public interface FaceHandlers {
         }
 
         private void BgmStop(FaceData data) {
-            data.property("cache").put("bgm","");
+            data.property("cache").put("bgm", "");
             MediaView mediaView = MainEntry.Controller().getMediaView();
             MediaPlayer mediaPlayer;
             if (mediaView.getMediaPlayer() != null) {
@@ -434,8 +453,8 @@ public interface FaceHandlers {
             data.strPro("nowSelectId").set(arg.data()[0]);
             for (int i = 1; i != arg.data().length; ++i) {
                 String s = arg.data()[i];
-                int dest=i-1;
-                String dex=GameFaceLife.findSelectAt(dest);
+                int dest = i - 1;
+                String dex = GameFaceLife.findSelectAt(dest);
                 data.strPro(dex).set(s);
                 data.boolPro(dex).set(Boolean.TRUE);
             }
@@ -453,18 +472,18 @@ public interface FaceHandlers {
         @Override
         public void handle(FaceData data, FaceHead head, Arg arg) {
             switch (arg.name()) {
-                case "Scene" -> Scene(data,head,arg.data()[0]);
-                case "Shake" -> Shake(data,head,arg.data()[0]);
-                case "Darking" -> Darking(data,head,Integer.parseInt(arg.data()[0]));
-                case "Lighting" -> Lighting(data,head,Integer.parseInt(arg.data()[0]));
+                case "Scene" :Scene(data, head, arg.data()[0]);break;
+                case "Shake" :Shake(data, head, arg.data()[0]);break;
+                case "Darking": Darking(data, head, Integer.parseInt(arg.data()[0]));break;
+                case "Lighting": Lighting(data, head, Integer.parseInt(arg.data()[0]));break;
             }
         }
 
-        private void Scene(FaceData data,FaceHead head, String newSceneName) {
+        private void Scene(FaceData data, FaceHead head, String newSceneName) {
             Image scene = ConfigCenter.loadScene(newSceneName);
             ImageView img = (ImageView) head.fetch("scene");
             img.setImage(scene);
-            data.property("cache").put("scene",newSceneName);
+            data.property("cache").put("scene", newSceneName);
         }
 
         int leftCount;
@@ -474,14 +493,14 @@ public interface FaceHandlers {
         double px;
         boolean right;
 
-        private void Shake(FaceData data,FaceHead head,String pos) {
+        private void Shake(FaceData data, FaceHead head, String pos) {
 
             switch (pos) {
                 case "L":
                     view = (ImageView) head.fetch("leftPerson");
                     break;
                 case "C":
-                    view =(ImageView) head.fetch("centerPerson");
+                    view = (ImageView) head.fetch("centerPerson");
                     break;
                 case "R":
                     view = (ImageView) head.fetch("rightPerson");
@@ -533,7 +552,7 @@ public interface FaceHandlers {
             shakeLine.setOnFinished(event -> {
                 data.boolPro("maskShow").set(false);
                 data.intPro("gameState").set(GameFaceLife.GAME_STATE_WAIT_NEXT);
-                data.property("cache").put("maskShow","false");
+                data.property("cache").put("maskShow", "false");
                 data.animate(false);
             });
 
@@ -541,16 +560,17 @@ public interface FaceHandlers {
             data.boolPro("globalMask").set(true);
             shakeLine.play();
         }
+
         int dest;
         int count;
 
-        private void Darking(FaceData data,FaceHead head,Integer seconds) {
+        private void Darking(FaceData data, FaceHead head, Integer seconds) {
             dest = seconds / 50;
             count = 0;
             Timeline timeline = new Timeline();
 
-            final Rectangle mask= (Rectangle) head.fetch("globalMask");
-            mask.setFill(Color.color(0,0,0,0.0));
+            final Rectangle mask = (Rectangle) head.fetch("globalMask");
+            mask.setFill(Color.color(0, 0, 0, 0.0));
             data.boolPro("maskShow").set(true);
 
             KeyFrame frame = new KeyFrame(Duration.millis(50), event -> {
@@ -562,20 +582,20 @@ public interface FaceHandlers {
             timeline.setOnFinished(event -> {
                 data.intPro("gameState").set(GameFaceLife.GAME_STATE_WAIT_NEXT);
                 data.animate(false);
-                data.property("cache").put("maskShow","true");
+                data.property("cache").put("maskShow", "true");
             });
 
             data.animate(true);
             timeline.play();
         }
 
-        private void Lighting(FaceData data,FaceHead head,Integer seconds) {
+        private void Lighting(FaceData data, FaceHead head, Integer seconds) {
             dest = seconds / 50;
             count = 0;
             Timeline timeline = new Timeline();
 
-            final Rectangle mask= (Rectangle) head.fetch("globalMask");
-            mask.setFill(Color.color(0,0,0,1.0));
+            final Rectangle mask = (Rectangle) head.fetch("globalMask");
+            mask.setFill(Color.color(0, 0, 0, 1.0));
             data.boolPro("maskShow").set(true);
 
             KeyFrame frame = new KeyFrame(Duration.millis(50), event -> {
