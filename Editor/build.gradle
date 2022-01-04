@@ -1,0 +1,25 @@
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
+}
+
+group 'albertgame.avg'
+version '1.0-SNAPSHOT'
+
+javafx {
+    version = "17"
+    modules = ['javafx.controls', 'javafx.media']
+}
+
+mainClassName = 'albertgame.avg.editor.MainEntry'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}

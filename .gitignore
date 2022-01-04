@@ -4,3 +4,6 @@
 /Content/.gradle
 /Content/gradle
 /Content/build
+/Editor/.gradle
+/Editor/gradle
+/Editor/build
