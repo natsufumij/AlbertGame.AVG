@@ -8,7 +8,7 @@ version '1.0-SNAPSHOT'
 
 javafx {
     version = "17"
-    modules = ['javafx.controls', 'javafx.media']
+    modules = ['javafx.controls', 'javafx.media','javafx.fxml']
 }
 
 mainClassName = "$moduleName/albertgame.avg.editor.MainEntry"

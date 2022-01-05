@@ -307,6 +307,6 @@ public class ConfigCenter {
     }
 
     private static String getRealPath(String lib, String name, String format) {
-        return "Play/" + lib + "/" + name + "." + format;
+        return "Assets/" + lib + "/" + name + "." + format;
     }
 }
