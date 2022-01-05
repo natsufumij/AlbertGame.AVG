@@ -11,7 +11,7 @@ javafx {
     modules = ['javafx.controls', 'javafx.media']
 }
 
-mainClassName = 'albertgame.avg.editor.MainEntry'
+mainClassName = "$moduleName/albertgame.avg.editor.MainEntry"
 
 repositories {
     mavenCentral()
