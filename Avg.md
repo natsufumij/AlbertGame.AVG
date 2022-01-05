@@ -144,10 +144,10 @@
   Select0  0.2,0.3,0.4,0.1
   Select1  0.8,0.3,0.4,0.1
 #Images
-  Icon  IconImage
-  default  DefaultImage
-  start  StartBack
-  store  StoreBack
+  Icon  IconImage  format
+  default  DefaultImage  format
+  start  StartBack  format
+  store  StoreBack  format
 #Bgms
   Start  bgm1
   Store  bgm2

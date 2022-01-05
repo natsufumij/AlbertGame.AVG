@@ -137,10 +137,9 @@ public class ConfigCenter {
     public static final int CACHE_X = WINDOW_WIDTH / 2 - CACHE_ALL_WIDTH / 2;
     public static final int CACHE_Y = WINDOW_HEIGHT / 2 - CACHE_ALL_HEIGHT / 2;
 
-
     public static final String WINDOW_TITLE = "AlbertGame.AVG";
 
-    private static final String CACHE_PATH = System.getProperty("user.home") + "/.Cache/AlbertGame.AVG/Store_";
+    private static final String CACHE_PATH = System.getProperty("user.home") + "/.Cache/AlbertGame/AVG/Store_";
 
     public static boolean isCacheExist(int index) {
         String dest = CACHE_PATH + index + ".properties";
@@ -151,11 +150,14 @@ public class ConfigCenter {
     public static boolean clearCache(int index) {
         String dest = CACHE_PATH + index + ".properties";
         File file = new File(dest);
-        Path path = Path.of(file.toURI());
-        try {
-            Files.delete(path);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (file.exists()) {
+            Path path = Path.of(file.toURI());
+            try {
+                Files.delete(path);
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return false;
     }
@@ -163,11 +165,14 @@ public class ConfigCenter {
     public static boolean clearCacheData(int index) {
         String dest = CACHE_PATH + index + ".data.properties";
         File file = new File(dest);
-        Path path = Path.of(file.toURI());
-        try {
-            Files.delete(path);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (file.exists()) {
+            Path path = Path.of(file.toURI());
+            try {
+                Files.delete(path);
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return false;
     }
@@ -223,8 +228,17 @@ public class ConfigCenter {
 
     private static void saveC(String dest, String comment, Properties properties) {
         File file = new File(dest);
+        if(!file.exists()){
+            File f=file.getParentFile();
+            f.mkdirs();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         try (FileOutputStream stream = new FileOutputStream(file)) {
-            properties.store(new OutputStreamWriter(stream, StandardCharsets.UTF_8), "存档");
+            properties.store(new OutputStreamWriter(stream, StandardCharsets.UTF_8), comment);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -293,6 +307,6 @@ public class ConfigCenter {
     }
 
     private static String getRealPath(String lib, String name, String format) {
-        return "../Play/" + lib + "/" + name + "." + format;
+        return "Play/" + lib + "/" + name + "." + format;
     }
 }
