@@ -8,6 +8,7 @@ import javafx.scene.text.Font;
 
 import java.io.*;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,7 +31,7 @@ public class ConfigCenter {
         systemFontSizeConfig.put("Select", 24.0);
         systemFontSizeConfig.put("CacheDate", 14.0);
 
-        Play.SystemConfig config = Play.loadSystemConfig(loadFile("config", "system", "avg"));
+        Play.SystemConfig config = Play.loadSystemConfig(loadUrl("config", "system", "avg"));
         assert config != null;
         colorMap.putAll(config.colorMap());
         loadFont(config.fontMap(), systemFontSizeConfig);
@@ -250,18 +251,15 @@ public class ConfigCenter {
     }
 
     public static Play loadPlay(String chapterId, String name) {
-        File file = loadFile("play/story", chapterId + "/" + name, "avg");
-        return Play.loadPlay(file);
+        return Play.loadPlay(loadUrl("play/story", chapterId + "/" + name, "avg"));
     }
 
     public static Play.Chapter loadChapter(String chapterId) {
-        File file = loadFile("play/story", chapterId, "avg");
-        return Play.loadChapter(file);
+        return Play.loadChapter(loadUrl("play/story", chapterId, "avg"));
     }
 
     public static Play.GlobalConfig loadGlobalConfig() {
-        File file = loadFile("play/story", "global", "avg");
-        return Play.loadGlobalConfig(file);
+        return Play.loadGlobalConfig(loadUrl("play/story", "global", "avg"));
     }
 
     public static Image loadScene(String name) {
@@ -294,19 +292,10 @@ public class ConfigCenter {
     }
 
     private static String loadFileUrl(String lib, String name, String format) {
-        try {
-            return new File(getRealPath(lib, name, format)).toURI().toURL().toExternalForm();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        return "";
+        return ConfigCenter.class.getResource(lib + "/" + name + "." + format).toExternalForm();
     }
 
-    private static File loadFile(String lib, String name, String format) {
-        return new File(getRealPath(lib, name, format));
-    }
-
-    private static String getRealPath(String lib, String name, String format) {
-        return "Assets/" + lib + "/" + name + "." + format;
+    private static URL loadUrl(String lib,String name,String format){
+        return ConfigCenter.class.getResource(lib+"/"+name+"."+format);
     }
 }

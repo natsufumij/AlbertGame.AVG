@@ -13,10 +13,9 @@ A Love story Page.
     ```
     如果想打包，输入如下命令:
     ```
-    gradle jlink
+    gradle jlinkZip
     ```
-    打完包之后，需要将资源文件即主目录下的Play文件夹，复制粘贴到Content项目的build/image的文件夹下，
-    启动程序为build/image/bin/albertgame.avg.content.bat,点击此批处理文件既能运行成功。
+    将压缩文件放到任何路径，解压打开，点击bin/albertgame.avg.content.bat 就能运行成功.
 
 4. 如果想运行游戏的编辑器来写剧本……目前正在实现中，还要等个把星期左右。
 5. 欢迎fork学习及pr。

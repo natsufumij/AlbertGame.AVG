@@ -32,43 +32,36 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="588.0" prefWidth="899.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<VBox alignment="TOP_CENTER" prefHeight="588.0" prefWidth="899.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="albertgame.avg.editor.MainFormController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
         <Menu mnemonicParsing="false" text="Project">
           <items>
-            <MenuItem mnemonicParsing="false" text="New" />
-            <MenuItem mnemonicParsing="false" text="Open…" />
-            <Menu mnemonicParsing="false" text="Open Recent" />
-            <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Close" />
-            <MenuItem mnemonicParsing="false" text="Save" />
-            <MenuItem mnemonicParsing="false" text="Save As…" />
-            <MenuItem mnemonicParsing="false" text="Revert" />
-            <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Preferences…" />
-            <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Quit" />
+            <MenuItem mnemonicParsing="false" onAction="#openProject" text="Open…" />
+            <MenuItem mnemonicParsing="false" onAction="#saveProject" text="Save" />
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
           <items>
-            <MenuItem mnemonicParsing="false" text="About" />
+            <MenuItem mnemonicParsing="false" onAction="#aboutEditor" text="About" />
           </items>
         </Menu>
       </menus>
@@ -79,28 +72,28 @@
                <children>
                   <Accordion>
                     <panes>
-                      <TitledPane animated="false" text="Config">
+                      <TitledPane animated="false" text="Config" wrapText="true">
                            <content>
                               <Accordion>
                                 <panes>
-                                  <TitledPane animated="false" text="Fonts">
+                                  <TitledPane fx:id="fontsTitled" animated="false" text="+ Fonts">
                                        <content>
-                                          <VBox prefHeight="200.0" prefWidth="100.0" />
+                                          <ListView fx:id="fontsListV" prefHeight="200.0" prefWidth="200.0" />
                                        </content>
                                   </TitledPane>
-                                  <TitledPane animated="false" text="Colors">
+                                  <TitledPane fx:id="ColorsTitled" animated="false" text="+ Colors">
                                        <content>
-                                          <VBox prefHeight="200.0" prefWidth="100.0" />
+                                          <ListView fx:id="colorListV" prefHeight="200.0" prefWidth="200.0" />
                                        </content>
                                   </TitledPane>
-                                  <TitledPane animated="false" text="Images">
+                                  <TitledPane fx:id="imagesTitled" animated="false" text="+ Images">
                                        <content>
-                                          <VBox prefHeight="200.0" prefWidth="100.0" />
+                                          <ListView fx:id="imagesListV" prefHeight="200.0" prefWidth="200.0" />
                                        </content>
                                   </TitledPane>
-                                    <TitledPane animated="false" text="Bgms">
+                                    <TitledPane fx:id="bgmsTitled" animated="false" text="+ Bgms">
                                        <content>
-                                          <VBox prefHeight="200.0" prefWidth="100.0" />
+                                          <ListView fx:id="bgmsListV" prefHeight="200.0" prefWidth="200.0" />
                                        </content>
                                     </TitledPane>
                                 </panes>
@@ -111,35 +104,35 @@
                            <content>
                               <Accordion>
                                 <panes>
-                                  <TitledPane animated="false" text="Audio">
-                                    <content>
-                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                                    </content>
-                                  </TitledPane>
-                                  <TitledPane animated="false" text="Bgm">
-                                    <content>
-                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                                    </content>
-                                  </TitledPane>
-                                  <TitledPane animated="false" text="Person">
-                                    <content>
-                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                                    </content>
-                                  </TitledPane>
-                                    <TitledPane animated="false" text="Scene">
+                                  <TitledPane fx:id="audioTitled" animated="false" text="+ Audio">
                                        <content>
-                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                          <ListView fx:id="storyAudioListV" prefHeight="200.0" prefWidth="200.0" />
+                                       </content>
+                                  </TitledPane>
+                                  <TitledPane fx:id="bgmTitled" animated="false" text="+ Bgm">
+                                       <content>
+                                          <ListView fx:id="storyBgmListV" prefHeight="200.0" prefWidth="200.0" />
+                                       </content>
+                                  </TitledPane>
+                                  <TitledPane fx:id="personTitled" animated="false" text="+ Person">
+                                       <content>
+                                          <ListView fx:id="storyPersonListV" prefHeight="200.0" prefWidth="200.0" />
+                                       </content>
+                                  </TitledPane>
+                                    <TitledPane fx:id="sceneTitled" animated="false" text="+ Scene">
+                                       <content>
+                                          <ListView fx:id="storySceneListV" prefHeight="200.0" prefWidth="200.0" />
                                        </content>
                                     </TitledPane>
-                                    <TitledPane animated="false" text="Story">
+                                    <TitledPane fx:id="personDataTitled" animated="false" text="+ PersonsData">
                                        <content>
-                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                          <ListView fx:id="personDataListV" prefHeight="200.0" prefWidth="200.0" />
                                        </content>
                                     </TitledPane>
-                                    <TitledPane animated="false" text="PersonsData">
-                                      <content>
-                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                                      </content>
+                                    <TitledPane fx:id="storyTitled" animated="false" text="+ Story">
+                                       <content>
+                                          <TreeView fx:id="storyTreeV" prefHeight="200.0" prefWidth="200.0" />
+                                       </content>
                                     </TitledPane>
                                 </panes>
                               </Accordion>
@@ -151,43 +144,43 @@
             </VBox>
             <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
               <items>
-                  <Pane prefHeight="200.0" prefWidth="200.0">
+                  <Pane fx:id="graphPane" prefHeight="200.0" prefWidth="200.0">
                      <children>
                         <Button fx:id="graphButton" layoutX="295.0" layoutY="3.0" mnemonicParsing="false" text="C: Chapter" />
                      </children>
                   </Pane>
-                  <SplitPane dividerPositions="0.564769975786925" prefHeight="160.0" prefWidth="200.0">
+                  <SplitPane dividerPositions="0.564769975786925" prefHeight="302.0" prefWidth="661.0">
                     <items>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
+                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                            <children>
                               <ScrollPane prefHeight="243.0" prefWidth="291.0">
                                  <content>
-                                    <VBox prefHeight="248.0" prefWidth="368.0" />
+                                    <VBox fx:id="playViewVBox" prefHeight="248.0" prefWidth="368.0" />
                                  </content>
                               </ScrollPane>
-                              <ToolBar prefHeight="37.0" prefWidth="291.0">
+                              <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="37.0" prefWidth="291.0">
                                 <items>
-                                  <Button mnemonicParsing="false" text="Button" />
-                                    <Button mnemonicParsing="false" text="Button" />
-                                    <Button mnemonicParsing="false" text="Button" />
-                                    <Button mnemonicParsing="false" text="Button" />
-                                    <Button mnemonicParsing="false" text="Button" />
-                                    <Button mnemonicParsing="false" text="Button" />
+                                  <Button mnemonicParsing="false" onAction="#onAudioAct" text="Audio" />
+                                    <Button mnemonicParsing="false" onAction="#onDialogAct" text="Dialog" />
+                                    <Button mnemonicParsing="false" onAction="#onViewAct" text="View" />
+                                    <Button mnemonicParsing="false" onAction="#onSelectAct" text="Select" />
+                                    <Button mnemonicParsing="false" onAction="#onStoreAct" text="Store" />
+                                    <Button mnemonicParsing="false" onAction="#onPersonAct" text="Person" />
                                 </items>
                               </ToolBar>
                            </children>
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
-                              <ScrollPane prefHeight="243.0" prefWidth="291.0">
-                                 <content>
-                                    <VBox prefHeight="248.0" prefWidth="368.0" />
-                                 </content>
-                              </ScrollPane>
-                              <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="37.0" prefWidth="291.0">
+                              <TextArea fx:id="wordArea" prefHeight="241.0" prefWidth="249.0" promptText="Input Your Story Words.">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </VBox.margin></TextArea>
+                              <ToolBar maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="RIGHT_TO_LEFT" prefHeight="37.0" prefWidth="291.0">
                                  <items>
-                                    <Button mnemonicParsing="false" text="Button" />
-                                    <Button mnemonicParsing="false" text="Button" />
+                                    <Button mnemonicParsing="false" onAction="#onWordEnter" text="Enter" />
+                                    <Button mnemonicParsing="false" onAction="#onWordClear" text="Clear" />
+                                    <ChoiceBox fx:id="personChoiceBox" prefWidth="150.0" />
                                  </items>
                               </ToolBar>
                            </children></VBox>

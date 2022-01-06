@@ -2,17 +2,15 @@ package albertgame.avg.content;
 
 import javafx.scene.paint.Color;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Play {
 
-    String id,name,startStruck;
-    Map<String,BodyStruck> bodyStruckMap;
+    String id, name, startStruck;
+    Map<String, BodyStruck> bodyStruckMap;
 
     public Play(String id, String name, String startStruck, Map<String, BodyStruck> bodyStruckMap) {
         this.id = id;
@@ -38,6 +36,7 @@ public class Play {
     }
 
     public static final Play NONE_PLAY = null;
+
     public BodyStruck nextBodyStruck(String id, Map<String, String> data) {
         BodyStruck struck = bodyStruckMap.get(id);
         String dis = struck.optionStruck.struckNextOption(data);
@@ -49,7 +48,7 @@ public class Play {
     }
 
 
-    public static class BodyStruck{
+    public static class BodyStruck {
         public static final BodyStruck NONE_BODY = null;
 
         String id;
@@ -75,9 +74,9 @@ public class Play {
         }
     }
 
-    public static class OptionStruck{
+    public static class OptionStruck {
         String id;
-        String[] selectExpression,destIds;
+        String[] selectExpression, destIds;
 
         public static final String NONE_ID = "00";
 
@@ -183,8 +182,8 @@ public class Play {
             if (v10 >= '0' && v10 <= '9') {
                 return Integer.parseInt(v);
             } else {
-                String s=data.get(v);
-                if(s==null)return -1;
+                String s = data.get(v);
+                if (s == null) return -1;
                 else return Integer.parseInt(s);
             }
         }
@@ -265,8 +264,8 @@ public class Play {
     //[Person  In  DataId]
     //,这是注释
     public static List<String[]> parseCmd(String s) {
-        if (s.startsWith("[")&&s.endsWith("]")) {
-            String f = s.substring(1, s.length()-1);
+        if (s.startsWith("[") && s.endsWith("]")) {
+            String f = s.substring(1, s.length() - 1);
             f = f.strip();
             ArrayList<String[]> arrayList = new ArrayList<>();
             arrayList.add(f.split(" {2}"));
@@ -310,33 +309,32 @@ public class Play {
         } else return Collections.emptyList();
     }
 
-    private static List<BodyNodeH> loadBodyNodeH(File file) {
+    private static List<BodyNodeH> loadBodyNodeH(URL url) {
         List<BodyNodeH> bodyNodeHS = new ArrayList<>();
-        Stack<BodyNodeH> stack = new Stack<>();
-
         try {
-            if (file.exists() && file.isFile()) {
-                InputStreamReader reader;
-                reader = new InputStreamReader(new FileInputStream(file),
-                        StandardCharsets.UTF_8);
-                BufferedReader r = new BufferedReader(reader);
-                String line;
-                while ((line = r.readLine()) != null) {
-                    line = line.strip();
-                    if (!line.isBlank()) {
-                        parseFile(bodyNodeHS, stack, line);
-                    }
+            Stack<BodyNodeH> stack = new Stack<>();
+
+            InputStreamReader reader;
+            reader = new InputStreamReader(url.openStream(),
+                    StandardCharsets.UTF_8);
+            BufferedReader r = new BufferedReader(reader);
+            String line;
+            while (true) {
+                if (!((line = r.readLine()) != null)) break;
+                line = line.strip();
+                if (!line.isBlank()) {
+                    parseFile(bodyNodeHS, stack, line);
                 }
-                parseFile(bodyNodeHS, stack, END_SIGN);
             }
-        } catch (Exception e) {
+            parseFile(bodyNodeHS, stack, END_SIGN);
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return bodyNodeHS;
     }
 
-    public static Play loadPlay(File file) {
-        return loadPlay(loadBodyNodeH(file));
+    public static Play loadPlay(URL url) {
+        return loadPlay(loadBodyNodeH(url));
     }
 
     private static Play loadPlay(List<BodyNodeH> hs) {
@@ -345,7 +343,7 @@ public class Play {
         Map<String, String[]> optionMap = new HashMap<>();
         BodyNodeH bodyN = null;
         BodyNodeH progressN = null;
-        String id = "00", name = "00",startStruck = "00";
+        String id = "00", name = "00", startStruck = "00";
         for (BodyNodeH b : hs) {
             switch (b.name) {
                 case "Info":
@@ -373,7 +371,7 @@ public class Play {
         }
 
         //生成OptionStruck
-        op=loadOptionStruckM(progressN,optionMap);
+        op = loadOptionStruckM(progressN, optionMap);
 
         //生成Map<String, BodyStruck>
         assert bodyN != null;
@@ -387,7 +385,7 @@ public class Play {
             bodyStruckMap.put(hid, struck);
         }
 
-        return new Play(id, name,startStruck, bodyStruckMap);
+        return new Play(id, name, startStruck, bodyStruckMap);
     }
 
     //拼接成:Type  Name  Word  EXTRA[0]  EXTRA[1] ...
@@ -408,11 +406,11 @@ public class Play {
         struck.expressions.addAll(destList);
     }
 
-    public static Chapter loadChapter(File file) {
+    public static Chapter loadChapter(URL url) {
         Chapter chapter;
         String id = null, name = null, startName = null;
 
-        List<BodyNodeH> list = loadBodyNodeH(file);
+        List<BodyNodeH> list = loadBodyNodeH(url);
         BodyNodeH progressH = null;
         Map<String, String[]> optionExMap = new HashMap<>();
 
@@ -443,21 +441,21 @@ public class Play {
             return Chapter.NONE_CHAPTER;
         }
 
-        Map<String, OptionStruck> optionStruckMap = loadOptionStruckM(progressH,optionExMap);
+        Map<String, OptionStruck> optionStruckMap = loadOptionStruckM(progressH, optionExMap);
 
         chapter = new Chapter(id, name, startName, optionStruckMap);
         return chapter;
     }
 
-    public static GlobalConfig loadGlobalConfig(File file){
+    public static GlobalConfig loadGlobalConfig(URL file) {
 
-        List<BodyNodeH> bodyNodeHS=loadBodyNodeH(file);
-        Map<String,String[]> optionExpressionMap=new HashMap<>();
-        BodyNodeH progressH=null;
-        Map<String,GlobalConfig.PersonConfig> personConfigMap=new HashMap<>();
-        Map<String,OptionStruck> optionStruckMap;
-        String startName="";
-        for(BodyNodeH h:bodyNodeHS){
+        List<BodyNodeH> bodyNodeHS = loadBodyNodeH(file);
+        Map<String, String[]> optionExpressionMap = new HashMap<>();
+        BodyNodeH progressH = null;
+        Map<String, GlobalConfig.PersonConfig> personConfigMap = new HashMap<>();
+        Map<String, OptionStruck> optionStruckMap;
+        String startName = "";
+        for (BodyNodeH h : bodyNodeHS) {
             switch (h.name) {
                 case "Info":
                     if (h.texts.size() != 2 || !h.texts.get(h.texts.size() - 1).equals("Global")) {
@@ -488,18 +486,18 @@ public class Play {
             }
         }
 
-        optionStruckMap=loadOptionStruckM(progressH,optionExpressionMap);
+        optionStruckMap = loadOptionStruckM(progressH, optionExpressionMap);
 
-        return new GlobalConfig(startName,optionStruckMap,personConfigMap);
+        return new GlobalConfig(startName, optionStruckMap, personConfigMap);
     }
 
-    public static SystemConfig loadSystemConfig(File file){
-        List<BodyNodeH> bodyNodeHS=loadBodyNodeH(file);
-        Map<String,String> fontMap=new HashMap<>();
-        Map<String,Color> colorMap=new HashMap<>();
-        Map<String,ImageC> imageMap=new HashMap<>();
-        Map<String,String> bgmMap=new HashMap<>();
-        for(BodyNodeH b:bodyNodeHS){
+    public static SystemConfig loadSystemConfig(URL url) {
+        List<BodyNodeH> bodyNodeHS = loadBodyNodeH(url);
+        Map<String, String> fontMap = new HashMap<>();
+        Map<String, Color> colorMap = new HashMap<>();
+        Map<String, ImageC> imageMap = new HashMap<>();
+        Map<String, String> bgmMap = new HashMap<>();
+        for (BodyNodeH b : bodyNodeHS) {
             switch (b.name) {
                 case "Info":
                     if (!b.texts.get(0).equals("System")) {
@@ -545,29 +543,28 @@ public class Play {
             }
         }
 
-        return new SystemConfig(fontMap,colorMap,imageMap,bgmMap);
+        return new SystemConfig(fontMap, colorMap, imageMap, bgmMap);
     }
 
-    private static Map<String,OptionStruck> loadOptionStruckM(BodyNodeH progressH,Map<String,String[]> expressions){
-        Map<String,OptionStruck> struck=new HashMap<>();
-        if(progressH!=null){
+    private static Map<String, OptionStruck> loadOptionStruckM(BodyNodeH progressH, Map<String, String[]> expressions) {
+        Map<String, OptionStruck> struck = new HashMap<>();
+        if (progressH != null) {
             for (String s : progressH.texts) {
                 String x = s.replaceAll(" {2}", "");
                 String[] xl = x.split("->");
                 String sourceId = xl[0];
                 String optionName = xl[1];
                 String[] select = xl[2].split(",");
-                struck.put(sourceId, new OptionStruck(optionName, expressions.get(optionName),select));
+                struck.put(sourceId, new OptionStruck(optionName, expressions.get(optionName), select));
             }
         }
         return struck;
     }
 
 
-
-    public static class Chapter{
-        String id,name,startPlayId;
-        Map<String,OptionStruck> playOptionMap;
+    public static class Chapter {
+        String id, name, startPlayId;
+        Map<String, OptionStruck> playOptionMap;
         public static final Chapter NONE_CHAPTER = null;
 
         public Chapter(String id, String name, String startPlayId, Map<String, OptionStruck> playOptionMap) {
@@ -608,10 +605,10 @@ public class Play {
         }
     }
 
-    public static class GlobalConfig{
+    public static class GlobalConfig {
         String startChapter;
-        Map<String,OptionStruck> chapterOptionMap;
-        Map<String,PersonConfig> personConfigs;
+        Map<String, OptionStruck> chapterOptionMap;
+        Map<String, PersonConfig> personConfigs;
 
         public GlobalConfig(String startChapter, Map<String, OptionStruck> chapterOptionMap, Map<String, PersonConfig> personConfigs) {
             this.startChapter = startChapter;
@@ -631,7 +628,7 @@ public class Play {
             return personConfigs;
         }
 
-        public static final GlobalConfig NONE_GLOBAL_CONFIG=null;
+        public static final GlobalConfig NONE_GLOBAL_CONFIG = null;
 
         public String nextChapter(String id, Map<String, String> data) {
             OptionStruck struck = chapterOptionMap.get(id);
@@ -648,9 +645,8 @@ public class Play {
         }
 
 
-
-        public static class PersonConfig{
-            String id,name;
+        public static class PersonConfig {
+            String id, name;
             List<String> state;
 
             public PersonConfig(String id, String name, List<String> state) {
@@ -673,11 +669,11 @@ public class Play {
         }
     }
 
-    public static class SystemConfig{
-        Map<String,String> fontMap;
+    public static class SystemConfig {
+        Map<String, String> fontMap;
         Map<String, Color> colorMap;
-        Map<String,ImageC> imageMap;
-        Map<String,String> bgmMap;
+        Map<String, ImageC> imageMap;
+        Map<String, String> bgmMap;
 
         public SystemConfig(Map<String, String> fontMap, Map<String, Color> colorMap, Map<String, ImageC> imageMap, Map<String, String> bgmMap) {
             this.fontMap = fontMap;
@@ -703,17 +699,19 @@ public class Play {
         }
     }
 
-    public static class ImageC{
-        String path,format;
+    public static class ImageC {
+        String path, format;
 
         public ImageC(String path, String format) {
             this.path = path;
             this.format = format;
         }
-        public String path(){
+
+        public String path() {
             return path;
         }
-        public String format(){
+
+        public String format() {
             return format;
         }
     }
