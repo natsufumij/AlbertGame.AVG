@@ -23,12 +23,13 @@ repositories {
 dependencies {
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
 jlink {
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
-    launcher {
+    launcher{
         name = 'avg.editor'
     }
+}
+
+tasks.withType(JavaCompile){
+    options.encoding="UTF-8"
 }

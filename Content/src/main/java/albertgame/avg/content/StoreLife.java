@@ -146,7 +146,6 @@ public class StoreLife implements FaceLife {
 
 
         rect.setOnMouseClicked(event -> {
-            System.out.println("You Select Store " + index);
             MainEntry.Controller().getData().put("index", index + "");
             d.intPro("click").set(index);
         });

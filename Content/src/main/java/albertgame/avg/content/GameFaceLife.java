@@ -29,7 +29,6 @@ public class GameFaceLife implements FaceLife {
 
         @Override
         public void handle(MouseEvent event) {
-            System.out.println("Skip");
             _d.boolPro("skip").set(true);
             _d.intPro("gameState").set(GAME_STATE_WAIT_NEXT);
         }
@@ -126,7 +125,6 @@ public class GameFaceLife implements FaceLife {
         initHead(d, h);
         initBind(d, h);
         initGame(d, h);
-        debugPropertyView(d);
     }
 
     private void initGame(FaceData data, FaceHead head) {
@@ -149,7 +147,6 @@ public class GameFaceLife implements FaceLife {
             restoreGame(data, head);
         } else {
             loadFromGlobal(data);
-            System.out.println("导入...");
         }
     }
 
@@ -540,7 +537,6 @@ public class GameFaceLife implements FaceLife {
             rectangle.setTranslateX(ConfigCenter.SELECT_X - 10);
             rectangle.setTranslateY(ty - 27.0);
             rectangle.setOnMouseClicked(event -> {
-                System.out.println("You Select " + rectangle.getUserData());
                 for (int j = 0; j != selectText.length; ++j) {
                     Text desist = selectText[j];
                     desist.visibleProperty().set(false);
@@ -635,10 +631,6 @@ public class GameFaceLife implements FaceLife {
             int cy = i % ConfigCenter.WORD_LINE_COLUMN;
             data.strPro(findWordAt(cx, cy)).bindBidirectional(words[i].textProperty());
         }
-    }
-
-    private void debugPropertyView(FaceData data) {
-        data.intPro("gameState").addListener((v, o, n) -> System.out.println("gameState Change From " + o + " to " + n));
     }
 
     public static String findWordAt(int cx, int cy) {

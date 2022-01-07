@@ -1,0 +1,15 @@
+#Info
+    chapter0
+    Global
+#Progress
+    chapter0->Option1->chapter1
+#Options
+    >>Option1
+        Else
+#PersonData
+    >>bishojo
+        美少女
+        1,
+    >>bishojo2
+        美少女战士
+        1,

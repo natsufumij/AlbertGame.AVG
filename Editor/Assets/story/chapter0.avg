@@ -1,0 +1,11 @@
+#Info
+    chapter0
+    序章
+    demo
+    Chapter
+#Progress
+    demo->Option1->demo2,demo3
+#Options
+    >>Option1
+        A=1
+        A=2

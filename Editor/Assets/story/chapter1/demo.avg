@@ -1,0 +1,49 @@
+#Info
+    demo
+    第一章的第0剧本
+    begins
+    Play
+
+#Body
+    >>begins
+        [Dialog  Close]
+        [View  Scene  back_demo1]
+        [Audio  Bgm.Play  battle]
+        [View  Lighting  3000]
+        [Dialog  Open]
+        第一章的第0剧本
+
+    >>Struck1
+        第一章。第0个剧本第一块
+        进入第二个剧本还是第三个剧本
+        [Select  Go  B  第二个剧本  第三个剧本]
+
+    >>Struck3
+        第一章。第0个剧本第三块
+        进入第一块还是第二块
+        [Select  Go  Pound.B  第一块  第二块]
+
+    >>Struck2
+        第一章。第0个剧本第二块
+        进入第二个剧本还是第三个剧本
+        [Select  Go  B  第二个剧本  第三个剧本]
+
+    >>End
+        结束，进入下一个剧本
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]
+
+#Progress
+    begins->Option1->Struck3
+    Struck3->Option2->Struck1,Struck2
+    Struck1->Option1->End
+    Struck2->Option1->End
+
+#Options
+    >>Option1
+        Else
+
+    >>Option2
+        Pound.B=1
+        Pound.B=2

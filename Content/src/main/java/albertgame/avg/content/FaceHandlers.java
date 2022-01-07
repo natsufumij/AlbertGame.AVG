@@ -70,6 +70,7 @@ public interface FaceHandlers {
         Timeline line;
         String destWords;
         int index = 0, dest;
+        int ix, iy;
         String type;
 
         private void skipWord(FaceData d, String text) {
@@ -84,15 +85,20 @@ public interface FaceHandlers {
             d.property("cache").put("wordtype", type);
         }
 
+        //如果有\号，表示下面的需要换一行显示.
         private void Word(FaceData d, String text) {
             if (d.boolPro("skip").get()) {
                 skipWord(d, text);
                 return;
             }
 
+            final int[] line_first = new int[]{ConfigCenter.WORD_LINE_COLUMN,
+                    ConfigCenter.WORD_LINE_COLUMN * 2};
+
             index = 0;
             destWords = text;
             dest = destWords.length();
+            ix = iy = 0;
 
             if (line == null) {
                 line = new Timeline();
@@ -104,7 +110,7 @@ public interface FaceHandlers {
                     period = Duration.millis(100);
                 }
                 KeyFrame keyFrame = new KeyFrame(period, "WordDisplaying", event -> {
-                    if (index == dest) {
+                    if (index == dest || ix >= ConfigCenter.WORD_LINE_ROW) {
                         //如果是普通文字显示状态，则切换为等待输入状态
                         //否则为自动响应状态，无需更改状态,无需等待用户反应文字显示，直接等待下一个命令
                         if (!d.boolPro("auto").get()) {
@@ -112,21 +118,19 @@ public interface FaceHandlers {
                         } else {
                             d.intPro("gameState").set(GameFaceLife.GAME_STATE_WAIT_NEXT);
                         }
-                        StringBuilder builder = new StringBuilder();
-                        for (int i = 0; i != text.length(); ++i) {
-                            int cx = i / ConfigCenter.WORD_LINE_COLUMN;
-                            int cy = i % ConfigCenter.WORD_LINE_COLUMN;
-                            builder.append(d.strPro(GameFaceLife.findWordAt(cx, cy)).get());
-                        }
-                        d.property("cache").put("word", builder.toString());
+                        d.property("cache").put("word", text);
                         d.property("cache").put("wordtype", type);
                         line.stop();
                     } else {
                         //继续贴字
                         char c = destWords.charAt(index);
-                        int cx = index / ConfigCenter.WORD_LINE_COLUMN;
-                        int cy = index % ConfigCenter.WORD_LINE_COLUMN;
-                        d.strPro(GameFaceLife.findWordAt(cx, cy)).setValue(String.valueOf(c));
+                        if (c == '\\' || iy == ConfigCenter.WORD_LINE_COLUMN) {
+                            ++ix;
+                            iy = 0;
+                        } else {
+                            d.strPro(GameFaceLife.findWordAt(ix, iy)).setValue(String.valueOf(c));
+                            ++iy;
+                        }
                         ++index;
                     }
                 });
@@ -302,12 +306,10 @@ public interface FaceHandlers {
 
         private void ChangeState(FaceData d, FaceHead head, String pos, String newState) {
             Person p;
-            final String FAILED = "ChangeState Failed: Don't Change On A Null Person";
             switch (pos) {
                 case "L":
                     p = GameFaceLife.leftPerson;
                     if (p == null) {
-                        System.out.println(FAILED);
                         return;
                     }
                     p.changeStateTo(newState);
@@ -317,7 +319,6 @@ public interface FaceHandlers {
                 case "C":
                     p = GameFaceLife.centerPerson;
                     if (p == null) {
-                        System.out.println(FAILED);
                         return;
                     }
                     p.changeStateTo(newState);
@@ -327,7 +328,6 @@ public interface FaceHandlers {
                 case "R":
                     p = GameFaceLife.rightPerson;
                     if (p == null) {
-                        System.out.println(FAILED);
                         return;
                     }
                     p.changeStateTo(newState);
@@ -346,9 +346,15 @@ public interface FaceHandlers {
         @Override
         public void handle(FaceData data, FaceHead head, Arg arg) {
             switch (arg.name()) {
-                case "Save" :Save(data, arg.name(), arg.data()[0]);break;
-                case "Plus" :Plus(data, arg.name(), Integer.parseInt(arg.data()[0]));break;
-                case "Minus" :Minus(data, arg.name(), Integer.parseInt(arg.data()[0]));break;
+                case "Save":
+                    Save(data, arg.name(), arg.data()[0]);
+                    break;
+                case "Plus":
+                    Plus(data, arg.name(), Integer.parseInt(arg.data()[0]));
+                    break;
+                case "Minus":
+                    Minus(data, arg.name(), Integer.parseInt(arg.data()[0]));
+                    break;
             }
         }
 
@@ -385,11 +391,21 @@ public interface FaceHandlers {
         @Override
         public void handle(FaceData data, FaceHead head, Arg arg) {
             switch (arg.name()) {
-                case "Bgm.Play" :BgmPlay(data, arg.data()[0]);break;
-                case "Bgm.Pause":BgmPause();break;
-                case "Bgm.Resume": BgmResume();break;
-                case "Bgm.Stop" : BgmStop(data);break;
-                case "Sound.Play" : AudioPlay(arg.data()[0]);break;
+                case "Bgm.Play":
+                    BgmPlay(data, arg.data()[0]);
+                    break;
+                case "Bgm.Pause":
+                    BgmPause();
+                    break;
+                case "Bgm.Resume":
+                    BgmResume();
+                    break;
+                case "Bgm.Stop":
+                    BgmStop(data);
+                    break;
+                case "Sound.Play":
+                    AudioPlay(arg.data()[0]);
+                    break;
             }
         }
 
@@ -472,10 +488,18 @@ public interface FaceHandlers {
         @Override
         public void handle(FaceData data, FaceHead head, Arg arg) {
             switch (arg.name()) {
-                case "Scene" :Scene(data, head, arg.data()[0]);break;
-                case "Shake" :Shake(data, head, arg.data()[0]);break;
-                case "Darking": Darking(data, head, Integer.parseInt(arg.data()[0]));break;
-                case "Lighting": Lighting(data, head, Integer.parseInt(arg.data()[0]));break;
+                case "Scene":
+                    Scene(data, head, arg.data()[0]);
+                    break;
+                case "Shake":
+                    Shake(data, head, arg.data()[0]);
+                    break;
+                case "Darking":
+                    Darking(data, head, Integer.parseInt(arg.data()[0]));
+                    break;
+                case "Lighting":
+                    Lighting(data, head, Integer.parseInt(arg.data()[0]));
+                    break;
             }
         }
 

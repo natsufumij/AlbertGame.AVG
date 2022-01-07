@@ -52,6 +52,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.media.MediaView?>
+<?import javafx.scene.text.Font?>
 
 <VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="albertgame.avg.editor.MainFormController">
   <children>
@@ -230,7 +231,7 @@
                         <Button fx:id="graphButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="C: Chapter" />
                      </children>
                   </AnchorPane>
-                  <SplitPane dividerPositions="0.564769975786925" prefHeight="302.0" prefWidth="661.0">
+                  <SplitPane dividerPositions="0.46905940594059403" prefHeight="302.0" prefWidth="661.0">
                     <items>
                         <VBox alignment="CENTER">
                            <children>
@@ -241,7 +242,6 @@
                               <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="37.0" prefWidth="291.0">
                                 <items>
                                   <Button mnemonicParsing="false" onAction="#onAudioAct" text="Audio" />
-                                    <Button mnemonicParsing="false" onAction="#onDialogAct" text="Dialog" />
                                     <Button mnemonicParsing="false" onAction="#onViewAct" text="View" />
                                     <Button mnemonicParsing="false" onAction="#onSelectAct" text="Select" />
                                     <Button mnemonicParsing="false" onAction="#onStoreAct" text="Store" />
@@ -252,10 +252,13 @@
                         </VBox>
                         <VBox alignment="TOP_CENTER" nodeOrientation="LEFT_TO_RIGHT">
                            <children>
-                              <TextArea fx:id="wordArea" prefHeight="714.0" prefWidth="269.0" promptText="Input Your Story Words.">
+                              <TextArea fx:id="wordArea" prefColumnCount="30" prefHeight="714.0" prefRowCount="3" promptText="Input Your Story Words.">
                                  <VBox.margin>
                                     <Insets left="5.0" right="5.0" top="5.0" />
-                                 </VBox.margin></TextArea>
+                                 </VBox.margin>
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font></TextArea>
                               <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="11.0" prefWidth="278.0">
                                  <items>
                                     <Button mnemonicParsing="false" onAction="#onWordEnter" text="Enter" />

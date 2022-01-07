@@ -1,45 +1,79 @@
 package albertgame.avg.editor;
 
+import albertgame.avg.editor.FormController.StoryView;
+import albertgame.avg.editor.FormController.MediaC;
+import albertgame.avg.editor.FormController.StoryBody;
+import albertgame.avg.editor.FormController.PersonC;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
+import javafx.scene.media.MediaView;
 
 public class MainFormController {
+
+    @FXML
+    private MediaView mediaView;
 
     @FXML
     private Button graphButton;
 
     @FXML
-    private ChoiceBox<?> personChoiceBox;
+    private ChoiceBox<String> personChoiceBox;
 
     @FXML
-    private ListView<?> playsView;
+    private ListView<StoryView> playsView;
 
     @FXML
     private Canvas shapeCanvas;
 
     @FXML
-    private ListView<?> storyAudioListV;
+    private ListView<MediaC> storyAudioListV;
 
     @FXML
-    private ListView<?> storyBgmListV;
+    private ListView<MediaC> storyBgmListV;
 
     @FXML
-    private ListView<?> storyPersonListV;
+    private ListView<PersonC> storyPersonListV;
 
     @FXML
-    private ListView<?> storySceneListV;
+    private ListView<MediaC> storySceneListV;
 
     @FXML
-    private TreeView<?> storyTreeV;
+    private TreeView<StoryBody> storyTreeV;
 
     @FXML
     private TextArea wordArea;
+
+
+    @FXML
+    void initialize(){
+        storyAudioListV.setCellFactory(l->new FormController.AudioListCell());
+        storyBgmListV.setCellFactory(l->new FormController.BgmListCell(mediaView));
+        storyPersonListV.setCellFactory(l->new FormController.PersonListCell());
+        storySceneListV.setCellFactory(l->new FormController.SceneListCell());
+
+        testListView();
+    }
+
+    void testListView(){
+
+        MediaC c=new MediaC("audio1","Name1");
+        storyAudioListV.getItems().addAll(c);
+
+        MediaC c4=new MediaC("bgm1","第一个场景");
+        MediaC c5=new MediaC("battle","战斗场景");
+        storyBgmListV.getItems().addAll(c4,c5);
+
+        PersonC personC=new PersonC("bishojo","美少女","1","默认状态");
+        PersonC personC2=new PersonC("otoko","男人","1","默认状态");
+        storyPersonListV.getItems().addAll(personC,personC2);
+
+        MediaC mediaC=new MediaC("back_demo1","背景1");
+        MediaC mediaC2=new MediaC("demo2","背景2");
+        storySceneListV.getItems().addAll(mediaC,mediaC2);
+    }
 
     @FXML
     void aboutEditor(ActionEvent event) {
@@ -78,11 +112,6 @@ public class MainFormController {
 
     @FXML
     void onBgmRemove(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onDialogAct(ActionEvent event) {
 
     }
 
