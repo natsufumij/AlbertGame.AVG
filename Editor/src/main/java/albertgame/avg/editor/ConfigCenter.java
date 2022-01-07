@@ -1,19 +1,76 @@
 package albertgame.avg.editor;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.List;
 
 public class ConfigCenter {
     public static final int WORD_MAX_SIZE = 3 * 30;
+
+    public static final String[] AUDIO_COMMANDS=new String[]{
+            "Bgm.Play","Bgm.Pause","Bgm.Resume",
+            "Bgm.Stop","Sound.Play"
+    };
+    public static final int BGM_PLAY=0;
+    public static final int BGM_PAUSE=1;
+    public static final int BGM_RESUME=2;
+    public static final int BGM_STOP=3;
+    public static final int SOUND_PLAY=4;
+    public static final ObservableList<String> AUDIO_OB_LIST= FXCollections.observableList(
+            List.of(AUDIO_COMMANDS));
+
+    public static final String[] STORAGE_COMMANDS=new String[]{
+            "Save","Plus","Minus"
+    };
+    public static final int SAVE=0;
+    public static final int PLUS=1;
+    public static final int MINUS=2;
+    public static final ObservableList<String> STORAGE_OB_LIST=FXCollections.observableList(
+            List.of(STORAGE_COMMANDS));
+
+    public static final String[] VIEW_COMMANDS=new String[]{
+            "Scene","Shake","Darking","Lighting"
+    };
+    public static final int SCENE=0;
+    public static final int SHAKE=1;
+    public static final int DARKING=2;
+    public static final int LIGHTING=3;
+    public static final ObservableList<String> VIEW_OB_LIST=FXCollections.observableList(
+            List.of(VIEW_COMMANDS)
+    );
+
+    public static final String[] PERSON_COMMANDS=new String[]{
+            "In","Out","Show","No.Show","Hide","Change.State"
+    };
+    public static final int IN=0;
+    public static final int OUT=1;
+    public static final int SHOW=2;
+    public static final int NO_SHOW=3;
+    public static final int HIDE=4;
+    public static final int CHANGE_STATE=5;
+    public static final ObservableList<String> PERSON_OB_LIST=FXCollections.observableList(
+            List.of(PERSON_COMMANDS)
+    );
+
+    public static final String[] DIALOG_COMMANDS=new String[]{
+            "Open","Clear","Close"
+    };
+    public static final int OPEN=0;
+    public static final int CLEAR=1;
+    public static final int CLOSE=2;
+    public static final ObservableList<String> DIALOG_OB_LIST=FXCollections.observableList(
+            List.of(DIALOG_COMMANDS)
+    );
 
     public static BorderPane createBorderPane(Node left1, Node left2, Node right) {
         BorderPane pane = new BorderPane();
