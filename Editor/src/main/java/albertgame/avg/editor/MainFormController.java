@@ -4,17 +4,17 @@ import albertgame.avg.editor.FormController.MediaC;
 import albertgame.avg.editor.FormController.PersonC;
 import albertgame.avg.editor.FormController.StoryBody;
 import albertgame.avg.editor.FormController.StoryView;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaView;
-import javafx.stage.FileChooser;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class MainFormController {
 
@@ -61,12 +61,33 @@ public class MainFormController {
         storyPersonListV.setCellFactory(l -> new FormController.PersonListCell());
         storySceneListV.setCellFactory(l -> new FormController.SceneListCell());
         storyTreeV.setCellFactory(l -> new FormController.ChapterPlayTreeCell());
-        playsView.setCellFactory(l->new FormController.StoryViewListCell(mediaView));
+        playsView.setCellFactory(l -> new FormController.StoryViewListCell(mediaView));
 
         storyTreeV.setEditable(true);
 
+        initCommandTypes();
         addListener();
         testListView();
+    }
+
+    void initCommandTypes() {
+        String[] types = new String[]{"Audio", "Dialog", "Store", "Select",
+                "View"};
+        List<ObservableList<String>> olist = new ArrayList<>();
+        olist.add(ConfigCenter.AUDIO_OB_LIST);
+        olist.add(ConfigCenter.DIALOG_OB_LIST);
+        olist.add(ConfigCenter.STORAGE_OB_LIST);
+        olist.add(ConfigCenter.SELECT_OB_LIST);
+        olist.add(ConfigCenter.VIEW_OB_LIST);
+        typeChoice.getItems().addAll(types);
+        typeChoice.getSelectionModel().selectedIndexProperty().addListener((v,o,n)->{
+            if(n.intValue()>=0&&n.intValue()<olist.size()){
+                System.out.println("n="+n);
+                ObservableList<String> de=olist.get(n.intValue());
+                nameChoice.getItems().clear();
+                nameChoice.getItems().addAll(de);
+            }
+        });
     }
 
     void addListener() {
@@ -77,7 +98,7 @@ public class MainFormController {
         });
         storyBgmListV.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
             if (n != null) {
-                System.out.println("Select Bgm :"+n.name);
+                System.out.println("Select Bgm :" + n.name);
                 storyBgmListV.setUserData(n);
             }
         });
@@ -91,8 +112,8 @@ public class MainFormController {
                 storySceneListV.setUserData(n);
             }
         });
-        storyTreeV.getSelectionModel().selectedItemProperty().addListener((v,o,n)->{
-            if(n!=null){
+        storyTreeV.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
+            if (n != null) {
                 storyTreeV.setUserData(n);
             }
         });
@@ -131,13 +152,13 @@ public class MainFormController {
         chapter2.getChildren().add(play4);
         storyTreeV.setRoot(rootNode);
 
-        StoryView v1=new StoryView("Dialog","Open",NONE_DATA);
-        StoryView v2=new StoryView("Dialog","Word",new String[]{"这是一个很好的天气\\啊啊啊\\啊啊啊\\啊啊"});
-        StoryView v3=new StoryView("Audio","Bgm.Play",new String[]{"第一个场景"});
-        playsView.getItems().addAll(v1,v2,v3);
+        StoryView v1 = new StoryView("Dialog", "Open", NONE_DATA);
+        StoryView v2 = new StoryView("Dialog", "Word", new String[]{"这是一个很好的天气\\啊啊啊\\啊啊啊\\啊啊"});
+        StoryView v3 = new StoryView("Audio", "Bgm.Play", new String[]{"第一个场景"});
+        playsView.getItems().addAll(v1, v2, v3);
     }
 
-    public static final String[] NONE_DATA=new String[0];
+    public static final String[] NONE_DATA = new String[0];
 
     @FXML
     void aboutEditor(ActionEvent event) {
@@ -151,45 +172,26 @@ public class MainFormController {
     }
 
     @FXML
-    void onAddCommand(ActionEvent event){
+    void onAddCommand(ActionEvent event) {
 
     }
 
     @FXML
-    void onEditCommand(ActionEvent event){
+    void onEditCommand(ActionEvent event) {
 
     }
 
     @FXML
     void onAudioAdd(ActionEvent event) {
-        Dialog<MediaC> mediaCDialog=new Dialog<>();
-        Label nameL=new Label("Name");
-        TextField field=new TextField();
-        Label pathl=new Label("Path");
-        Button button=new Button("Select");
-        button.setOnAction(e->{
-            FileChooser fileChooser=new FileChooser();
-            fileChooser.setSelectedExtensionFilter(
-                    new FileChooser.ExtensionFilter(
-                            "Audio Asset","*.wav"));
-            fileChooser.setTitle("Select Audio Asset");
-            FormController.setSelectFile(
-                    fileChooser.showOpenDialog(MainEntry.stage()));
+        Dialog<MediaC> mediaCDialog = ConfigCenter.createMediaDialog(
+                "Audio Select", "Select Audio", "wav");
+        Optional<MediaC> mediaC = mediaCDialog.showAndWait();
+        mediaC.ifPresent(l -> {
+            String id = l.id;
+            ConfigCenter.moveFileTo(FormController.getSelectFile(), "audio", id);
+            FormController.get().getAudioMap().put(l.name, l);
+            storyAudioListV.getItems().add(l);
         });
-        GridPane pane=ConfigCenter.createDialogGrid(
-                new Node[]{nameL,field,pathl,button});
-        ButtonType buttonType=new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancel=new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-        mediaCDialog.getDialogPane().getButtonTypes().addAll(buttonType,cancel);
-        Button buttonOk=(Button)mediaCDialog.getDialogPane().lookupButton(buttonType);
-        buttonOk.setDisable(true);
-        field.textProperty().addListener((v,o,n)->{
-            if(n!=null&&FormController.getSelectFile()!=null){
-                buttonOk.setDisable(false);
-            }
-        });
-        mediaCDialog.getDialogPane().setGraphic(pane);
-        mediaCDialog.showAndWait();
     }
 
     @FXML
@@ -203,12 +205,21 @@ public class MainFormController {
         if (m != null) {
             FormController.get().getAudioMap().remove(m.name);
             storyAudioListV.getItems().remove(m);
+            ConfigCenter.removeFile("audio", m.id, "wav");
         }
     }
 
     @FXML
     void onBgmAdd(ActionEvent event) {
-
+        Dialog<MediaC> mediaCDialog = ConfigCenter.createMediaDialog(
+                "Bgm Select", "Bgm", "mp3");
+        Optional<MediaC> mediaC = mediaCDialog.showAndWait();
+        mediaC.ifPresent(l -> {
+            String id = l.id;
+            ConfigCenter.moveFileTo(FormController.getSelectFile(), "bgm", id);
+            FormController.get().getBgmMap().put(l.name, l);
+            storyBgmListV.getItems().add(l);
+        });
     }
 
     @FXML
@@ -223,12 +234,22 @@ public class MainFormController {
             FormController.get().getBgmMap().remove(m.name);
             System.out.println("On Bgm Remove:" + m.name);
             storyBgmListV.getItems().remove(m);
+            ConfigCenter.removeFile("bgm", m.id, "mp3");
         }
     }
 
     @FXML
     void onPersonAdd(ActionEvent event) {
-
+        Dialog<PersonC> dialog=ConfigCenter.createPersonDialog();
+        Optional<PersonC> result=dialog.showAndWait();
+        result.ifPresent(l->{
+            String id=l.id;
+            String stateId=l.stateId;
+            String person_id=id+"_"+stateId;
+            FormController.get().getPersonMap().put(person_id,l);
+            storyPersonListV.getItems().add(l);
+            ConfigCenter.moveFileTo(FormController.getSelectFile(),"person",person_id);
+        });
     }
 
     @FXML
@@ -238,7 +259,15 @@ public class MainFormController {
 
     @FXML
     void onSceneAdd(ActionEvent event) {
-
+        Dialog<MediaC> mediaCDialog = ConfigCenter.createMediaDialog(
+                "Scene Select", "Scene Image", "jpg");
+        Optional<MediaC> mediaC = mediaCDialog.showAndWait();
+        mediaC.ifPresent(l -> {
+            String id = l.id;
+            ConfigCenter.moveFileTo(FormController.getSelectFile(), "scene", id);
+            FormController.get().getSceneMap().put(l.name, l);
+            storySceneListV.getItems().add(l);
+        });
     }
 
     @FXML
@@ -248,10 +277,11 @@ public class MainFormController {
 
     @FXML
     void onSceneRemove(ActionEvent event) {
-        MediaC mediaC=(MediaC) storySceneListV.getUserData();
-        if(mediaC!=null){
+        MediaC mediaC = (MediaC) storySceneListV.getUserData();
+        if (mediaC != null) {
             FormController.get().getSceneMap().remove(mediaC.name);
             storySceneListV.getItems().remove(mediaC);
+            ConfigCenter.removeFile("scene", mediaC.id, "jpg");
         }
     }
 
@@ -286,6 +316,7 @@ public class MainFormController {
         if (m != null) {
             FormController.get().getPersonMap().remove(m.name);
             storyPersonListV.getItems().remove(m);
+            ConfigCenter.removeFile("person", m.id + "_" + m.stateId, "png");
         }
     }
 

@@ -5,16 +5,21 @@ import javafx.collections.ObservableList;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
+import javafx.stage.FileChooser;
+import javafx.util.Callback;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 public class ConfigCenter {
     public static final int WORD_MAX_COLUMN = 30;
@@ -75,6 +80,10 @@ public class ConfigCenter {
     public static final ObservableList<String> DIALOG_OB_LIST = FXCollections.observableList(
             List.of(DIALOG_COMMANDS)
     );
+    public static final String[] SELECT_COMMANDS = new String[]{"Go"};
+    public static final ObservableList<String> SELECT_OB_LIST=FXCollections.observableList(
+            List.of(SELECT_COMMANDS)
+    );
 
     public static BorderPane createBorderPane(Node[] lefts, Node right) {
         BorderPane pane = new BorderPane();
@@ -99,19 +108,136 @@ public class ConfigCenter {
         return pane;
     }
 
+    public static Dialog<FormController.MediaC> createDialog(String headerText,
+                                                             Callback<ButtonType, FormController.MediaC> value,
+                                                             Node[] list, ButtonType[] buttonTypes) {
+        Dialog<FormController.MediaC> mediaCDialog = new Dialog<>();
+        for (ButtonType type : buttonTypes) {
+            mediaCDialog.getDialogPane().getButtonTypes().add(type);
+        }
+        mediaCDialog.setResultConverter(value);
+        GridPane pane = createDialogGrid(list);
+        mediaCDialog.setHeaderText(headerText);
+        mediaCDialog.getDialogPane().setContent(pane);
+        return mediaCDialog;
+    }
+
+    public static Dialog<FormController.MediaC> createMediaDialog(String headerText, String description, String format) {
+        Label nameL = new Label("Name");
+        TextField field = new TextField();
+        Button button = new Button("Select");
+        final Label pathl = new Label("Path");
+        button.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(new File("."));
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter(description, "*." + format));
+            fileChooser.setTitle(headerText);
+            File file = fileChooser.showOpenDialog(MainEntry.stage());
+            if (file != null) {
+                pathl.setText(file.getPath());
+                FormController.setSelectFile(file);
+            }
+        });
+        ButtonType buttonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        Callback<ButtonType, FormController.MediaC> callback = new Callback<ButtonType, FormController.MediaC>() {
+            @Override
+            public FormController.MediaC call(ButtonType param) {
+                if (param == buttonType) {
+                    String id = FormController.getUniqueId();
+                    String name = field.getText();
+                    return new FormController.MediaC(id, name);
+                }
+                return null;
+            }
+        };
+
+        Dialog<FormController.MediaC> mediaCDialog = ConfigCenter.createDialog(headerText, callback,
+                new Node[]{nameL, field, button, pathl}, new ButtonType[]{buttonType, cancel});
+
+        Button buttonOk = (Button) mediaCDialog.getDialogPane().lookupButton(buttonType);
+        buttonOk.setDisable(true);
+        field.textProperty().addListener((v, o, n) -> {
+            if (n != null && FormController.getSelectFile() != null) {
+                buttonOk.setDisable(false);
+            }
+        });
+
+        return mediaCDialog;
+    }
+
+    public static Dialog<FormController.PersonC> createPersonDialog(){
+        Label nameL = new Label("Name");
+        TextField field = new TextField();
+        Button button = new Button("Select");
+        Label path=new Label("Path");
+        Label state=new Label("State");
+        TextField field1=new TextField();
+        button.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(new File("."));
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Person Image", "*.png"));
+            fileChooser.setTitle("Select Person State Image");
+            File file = fileChooser.showOpenDialog(MainEntry.stage());
+            if (file != null) {
+                path.setText(file.getPath());
+                FormController.setSelectFile(file);
+            }
+        });
+        ButtonType buttonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        Callback<ButtonType, FormController.PersonC> callback = param -> {
+            if (param == buttonType) {
+                String id = FormController.getUniqueId();
+                String stateId=FormController.getUniqueId();
+                String name = field.getText();
+                return new FormController.PersonC(id, name,stateId,field1.getText());
+            }
+            return null;
+        };
+
+        Dialog<FormController.PersonC> personCDialog=new Dialog<>();
+        GridPane pane=createDialogGrid(new Node[]{nameL,field,state,field1,button,path});
+        personCDialog.getDialogPane().setContent(pane);
+        personCDialog.getDialogPane().getButtonTypes().addAll(buttonType,cancel);
+        personCDialog.setResultConverter(callback);
+
+        personCDialog.setHeaderText("Select Person State Image");
+        Button buttonOk = (Button) personCDialog.getDialogPane().lookupButton(buttonType);
+        buttonOk.setDisable(true);
+        field.textProperty().addListener((v, o, n) -> {
+            if (n != null && !field1.textProperty().get().isBlank()
+                    && FormController.getSelectFile() != null) {
+                buttonOk.setDisable(false);
+            }
+        });
+        field1.textProperty().addListener((v,o,n)->{
+            if (n != null && !field.textProperty().get().isBlank()
+                    && FormController.getSelectFile() != null) {
+                buttonOk.setDisable(false);
+            }
+        });
+
+        return personCDialog;
+    }
+
     //node[0] node[1]
     //node[2] node[3]
     //node[4] node[5]
     //....
-    public static GridPane createDialogGrid(Node[] list){
-        GridPane gridPane=new GridPane();
+    public static GridPane createDialogGrid(Node[] list) {
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(5.0);
+        gridPane.setVgap(5.0);
         gridPane.setAlignment(Pos.CENTER);
-        for(int i=0;i!=list.length;++i){
-            int cx=i/2;
-            int cy=i%2;
+        for (int i = 0; i != list.length; ++i) {
+            int cx = i / 2;
+            int cy = i % 2;
             gridPane.getChildren().add(list[i]);
-            GridPane.setColumnIndex(list[i],cy);
-            GridPane.setRowIndex(list[i],cx);
+            GridPane.setColumnIndex(list[i], cy);
+            GridPane.setRowIndex(list[i], cx);
         }
 
         return gridPane;
@@ -155,8 +281,26 @@ public class ConfigCenter {
         } else return null;
     }
 
-    //把文件复制到 /lib/id.format里
-    public static void moveFileTo(File file,String lib,String id){
+    public static String getRealPath(String lib, String id, String format) {
+        return FormController.getNowPath() + "/" + lib + "/" + id + "." + format;
+    }
 
+    //把文件复制到 /lib/id.format里
+    public static void moveFileTo(File file, String lib, String id) {
+        String[] ss = file.getAbsolutePath().split("\\.");
+        String format = ss[ss.length - 1];
+        String destPath = getRealPath(lib, id, format);
+        File destF = new File(destPath);
+        boolean result = file.renameTo(destF);
+        if (!result) {
+            System.out.println("Move Failed.");
+        }
+    }
+
+    public static void removeFile(String lib, String id, String format) {
+        File file = new File(getRealPath(lib, id, format));
+        if (file.exists()) {
+            file.delete();
+        }
     }
 }

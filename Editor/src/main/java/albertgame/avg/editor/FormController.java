@@ -419,47 +419,41 @@ public class FormController {
         return _instance;
     }
 
-    public static void main(String[] args) {
-        setId("dbdb9999");
-        for(int i=0;i!=200;++i){
-            System.out.println("Uid:"+getUniqueId());
-        }
-    }
-
     private static final Object _lock = new Object();
 
-    private static int uniqueId=0;
+    private static int uniqueId = 0;
 
     //aaaa0000 - 00000000
     public static void setId(String uid) {
-        if(uid.length()!=8){
-            System.out.println("Invalid Uid :"+uid);
+        if (uid.length() != 8) {
+            System.out.println("Invalid Uid :" + uid);
             return;
         }
-
-        int a0= uid.charAt(0)-(int)'a';
-        int a1= uid.charAt(1)-(int)'a';
-        int a2= uid.charAt(2)-(int)'a';
-        int a3= uid.charAt(3)-(int)'a';
-        int a4=Integer.parseInt(uid.charAt(4)+"");
-        int a5=Integer.parseInt(uid.charAt(5)+"");
-        int a6=Integer.parseInt(uid.charAt(6)+"");
-        int a7=Integer.parseInt(uid.charAt(7)+"");
-        uniqueId=a0*10000000+a1*1000000+a2*100000+
-                a3*10000+a4*1000+a5*100+a6*10+a7;
+        final int[] level1 = new int[]{10000000, 1000000, 100000, 10000};
+        int dest = 0;
+        for (int i = 0; i != 4; ++i) {
+            int a = uid.charAt(i) - (int) 'a';
+            dest += (a * level1[i]);
+        }
+        final int[] level2 = new int[]{1000, 100, 10, 1};
+        for (int i = 0; i != 4; ++i) {
+            int a = Integer.parseInt(uid.charAt(i + 4) + "");
+            dest += (a * level2[i]);
+        }
+        uniqueId=dest;
     }
 
-    public static String getUniqueId(){
+    public static String getUniqueId() {
         ++uniqueId;
-        StringBuilder builder=new StringBuilder();
-        final int[] level=new int[]{10000000,1000000,100000,10000};
-        for(int i=0;i!=4;++i){
-            char c= (char) ((int)('a')+(uniqueId%(level[i]*10))/level[i]);
+        StringBuilder builder = new StringBuilder();
+        final int[] level = new int[]{10000000, 1000000, 100000, 10000};
+        for (int i = 0; i != 4; ++i) {
+            char c = (char) ((int) ('a') + (uniqueId % (level[i] * 10)) / level[i]);
             builder.append(c);
         }
-        final int[] level2=new int[]{1000,100,10,1};
-        for(int i=0;i!=4;++i){
-            char a= (char) ((int)('0')+(uniqueId%(level2[i]*10))/level2[i]);
+        final int[] level2 = new int[]{1000, 100, 10, 1};
+        for (int i = 0; i != 4; ++i) {
+            char a = (char) ((int) ('0') + (uniqueId % (level2[i] * 10)) / level2[i]);
             builder.append(a);
         }
         return builder.toString();
@@ -469,7 +463,7 @@ public class FormController {
     private final Map<String, MediaC> audioMap;
     private final Map<String, MediaC> bgmMap;
     private final Map<String, MediaC> sceneMap;
-    private final Map<String, PersonConfig> personMap;
+    private final Map<String, PersonC> personMap;
 
     //均为Id - Map的映射
     private final Map<String, StoryBody> chapterMap;
@@ -496,7 +490,7 @@ public class FormController {
         return sceneMap;
     }
 
-    public Map<String, PersonConfig> getPersonMap() {
+    public Map<String, PersonC> getPersonMap() {
         return personMap;
     }
 
