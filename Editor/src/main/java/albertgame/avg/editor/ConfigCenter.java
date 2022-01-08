@@ -1,7 +1,9 @@
 package albertgame.avg.editor;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -15,8 +17,9 @@ import javafx.scene.media.Media;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
-import java.io.File;
+import java.io.*;
 import java.net.MalformedURLException;
+import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -81,7 +84,7 @@ public class ConfigCenter {
             List.of(DIALOG_COMMANDS)
     );
     public static final String[] SELECT_COMMANDS = new String[]{"Go"};
-    public static final ObservableList<String> SELECT_OB_LIST=FXCollections.observableList(
+    public static final ObservableList<String> SELECT_OB_LIST = FXCollections.observableList(
             List.of(SELECT_COMMANDS)
     );
 
@@ -167,13 +170,13 @@ public class ConfigCenter {
         return mediaCDialog;
     }
 
-    public static Dialog<FormController.PersonC> createPersonDialog(){
+    public static Dialog<FormController.PersonC> createPersonDialog() {
         Label nameL = new Label("Name");
         TextField field = new TextField();
         Button button = new Button("Select");
-        Label path=new Label("Path");
-        Label state=new Label("State");
-        TextField field1=new TextField();
+        Label path = new Label("Path");
+        Label state = new Label("State");
+        TextField field1 = new TextField();
         button.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File("."));
@@ -191,17 +194,17 @@ public class ConfigCenter {
         Callback<ButtonType, FormController.PersonC> callback = param -> {
             if (param == buttonType) {
                 String id = FormController.getUniqueId();
-                String stateId=FormController.getUniqueId();
+                String stateId = FormController.getUniqueId();
                 String name = field.getText();
-                return new FormController.PersonC(id, name,stateId,field1.getText());
+                return new FormController.PersonC(id, name, stateId, field1.getText());
             }
             return null;
         };
 
-        Dialog<FormController.PersonC> personCDialog=new Dialog<>();
-        GridPane pane=createDialogGrid(new Node[]{nameL,field,state,field1,button,path});
+        Dialog<FormController.PersonC> personCDialog = new Dialog<>();
+        GridPane pane = createDialogGrid(new Node[]{nameL, field, state, field1, button, path});
         personCDialog.getDialogPane().setContent(pane);
-        personCDialog.getDialogPane().getButtonTypes().addAll(buttonType,cancel);
+        personCDialog.getDialogPane().getButtonTypes().addAll(buttonType, cancel);
         personCDialog.setResultConverter(callback);
 
         personCDialog.setHeaderText("Select Person State Image");
@@ -213,7 +216,7 @@ public class ConfigCenter {
                 buttonOk.setDisable(false);
             }
         });
-        field1.textProperty().addListener((v,o,n)->{
+        field1.textProperty().addListener((v, o, n) -> {
             if (n != null && !field.textProperty().get().isBlank()
                     && FormController.getSelectFile() != null) {
                 buttonOk.setDisable(false);
@@ -287,14 +290,53 @@ public class ConfigCenter {
 
     //把文件复制到 /lib/id.format里
     public static void moveFileTo(File file, String lib, String id) {
-        String[] ss = file.getAbsolutePath().split("\\.");
-        String format = ss[ss.length - 1];
-        String destPath = getRealPath(lib, id, format);
-        File destF = new File(destPath);
-        boolean result = file.renameTo(destF);
-        if (!result) {
-            System.out.println("Move Failed.");
-        }
+        Task<Void> task=new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                String[] ss = file.getAbsolutePath().split("\\.");
+                String format = ss[ss.length - 1];
+                String destPath = getRealPath(lib, id, format);
+                File destF = new File(destPath);
+
+                FileChannel inputChannel = null;
+                FileChannel outputChannel = null;
+                boolean result;
+                try {
+                    inputChannel = new FileInputStream(file).getChannel();
+                    outputChannel = new FileOutputStream(destF).getChannel();
+                    outputChannel.transferFrom(inputChannel,0,inputChannel.size());
+                    result=true;
+                    succeeded();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    result=false;
+                } finally {
+                    try {
+                        if (inputChannel != null) {
+                            inputChannel.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        if (outputChannel != null) {
+                            outputChannel.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if (!result) {
+                    System.out.println("Move Failed.");
+                }
+                return null;
+            }
+        };
+        task.setOnSucceeded(e->{
+            System.out.println("Move File To Asset Success");
+        });
+        Platform.runLater(task);
     }
 
     public static void removeFile(String lib, String id, String format) {
