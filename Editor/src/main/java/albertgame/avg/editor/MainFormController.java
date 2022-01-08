@@ -1,17 +1,20 @@
 package albertgame.avg.editor;
 
-import albertgame.avg.editor.FormController.StoryView;
 import albertgame.avg.editor.FormController.MediaC;
-import albertgame.avg.editor.FormController.StoryBody;
 import albertgame.avg.editor.FormController.PersonC;
-
-import javafx.collections.ObservableList;
+import albertgame.avg.editor.FormController.StoryBody;
+import albertgame.avg.editor.FormController.StoryView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaView;
+import javafx.stage.FileChooser;
+
+import java.io.File;
 
 public class MainFormController {
 
@@ -20,9 +23,6 @@ public class MainFormController {
 
     @FXML
     private Button graphButton;
-
-    @FXML
-    private ChoiceBox<String> personChoiceBox;
 
     @FXML
     private ListView<StoryView> playsView;
@@ -144,14 +144,52 @@ public class MainFormController {
 
     }
 
+
     @FXML
-    void onAudioAct(ActionEvent event) {
+    void onRemoveCommand(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onAddCommand(ActionEvent event){
+
+    }
+
+    @FXML
+    void onEditCommand(ActionEvent event){
 
     }
 
     @FXML
     void onAudioAdd(ActionEvent event) {
-
+        Dialog<MediaC> mediaCDialog=new Dialog<>();
+        Label nameL=new Label("Name");
+        TextField field=new TextField();
+        Label pathl=new Label("Path");
+        Button button=new Button("Select");
+        button.setOnAction(e->{
+            FileChooser fileChooser=new FileChooser();
+            fileChooser.setSelectedExtensionFilter(
+                    new FileChooser.ExtensionFilter(
+                            "Audio Asset","*.wav"));
+            fileChooser.setTitle("Select Audio Asset");
+            FormController.setSelectFile(
+                    fileChooser.showOpenDialog(MainEntry.stage()));
+        });
+        GridPane pane=ConfigCenter.createDialogGrid(
+                new Node[]{nameL,field,pathl,button});
+        ButtonType buttonType=new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel=new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        mediaCDialog.getDialogPane().getButtonTypes().addAll(buttonType,cancel);
+        Button buttonOk=(Button)mediaCDialog.getDialogPane().lookupButton(buttonType);
+        buttonOk.setDisable(true);
+        field.textProperty().addListener((v,o,n)->{
+            if(n!=null&&FormController.getSelectFile()!=null){
+                buttonOk.setDisable(false);
+            }
+        });
+        mediaCDialog.getDialogPane().setGraphic(pane);
+        mediaCDialog.showAndWait();
     }
 
     @FXML
@@ -189,11 +227,6 @@ public class MainFormController {
     }
 
     @FXML
-    void onPersonAct(ActionEvent event) {
-
-    }
-
-    @FXML
     void onPersonAdd(ActionEvent event) {
 
     }
@@ -223,16 +256,6 @@ public class MainFormController {
     }
 
     @FXML
-    void onSelectAct(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onStoreAct(ActionEvent event) {
-
-    }
-
-    @FXML
     void onStoryAdd(ActionEvent event) {
 
     }
@@ -244,11 +267,6 @@ public class MainFormController {
 
     @FXML
     void onStoryRemove(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onViewAct(ActionEvent event) {
 
     }
 
@@ -280,5 +298,4 @@ public class MainFormController {
     void saveProject(ActionEvent event) {
 
     }
-
 }

@@ -243,11 +243,9 @@
                                  </VBox.margin></ListView>
                               <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="37.0" prefWidth="291.0">
                                 <items>
-                                  <Button mnemonicParsing="false" onAction="#onAudioAct" text="Audio" />
-                                    <Button mnemonicParsing="false" onAction="#onViewAct" text="View" />
-                                    <Button mnemonicParsing="false" onAction="#onSelectAct" text="Select" />
-                                    <Button mnemonicParsing="false" onAction="#onStoreAct" text="Store" />
-                                    <Button mnemonicParsing="false" onAction="#onPersonAct" text="Person" />
+                                  <Button mnemonicParsing="false" onAction="#onAddCommand" text="+" />
+                                    <Button mnemonicParsing="false" onAction="#onRemoveCommand" text=" -" />
+                                    <Button mnemonicParsing="false" onAction="#onEditCommand" text=" E" />
                                 </items>
                               </ToolBar>
                            </children>

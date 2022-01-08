@@ -2,10 +2,12 @@ package albertgame.avg.editor;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
@@ -97,6 +99,24 @@ public class ConfigCenter {
         return pane;
     }
 
+    //node[0] node[1]
+    //node[2] node[3]
+    //node[4] node[5]
+    //....
+    public static GridPane createDialogGrid(Node[] list){
+        GridPane gridPane=new GridPane();
+        gridPane.setAlignment(Pos.CENTER);
+        for(int i=0;i!=list.length;++i){
+            int cx=i/2;
+            int cy=i%2;
+            gridPane.getChildren().add(list[i]);
+            GridPane.setColumnIndex(list[i],cy);
+            GridPane.setRowIndex(list[i],cx);
+        }
+
+        return gridPane;
+    }
+
     public static AudioClip getClip(String id) {
         String url = getSourceUrl("audio", id, "wav");
         if (url == null) return null;
@@ -133,5 +153,10 @@ public class ConfigCenter {
                 return null;
             }
         } else return null;
+    }
+
+    //把文件复制到 /lib/id.format里
+    public static void moveFileTo(File file,String lib,String id){
+
     }
 }

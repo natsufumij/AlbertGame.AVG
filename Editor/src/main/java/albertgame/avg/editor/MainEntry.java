@@ -9,9 +9,15 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class MainEntry extends Application {
+
+    private static Stage _stage;
+    public static Stage stage() {
+        return _stage;
+    }
+
     @Override
     public void start(Stage primaryStage) {
-
+        _stage=primaryStage;
         try {
             Parent parent=FXMLLoader.load(MainEntry.class.getResource("form.fxml"));
             Scene scene = new Scene(parent);
@@ -20,7 +26,6 @@ public class MainEntry extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public static void main(String[] args) {
