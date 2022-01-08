@@ -43,16 +43,18 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.media.MediaView?>
-<?import javafx.scene.text.Font?>
 
 <VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="albertgame.avg.editor.MainFormController">
   <children>
@@ -252,19 +254,38 @@
                         </VBox>
                         <VBox alignment="TOP_CENTER" nodeOrientation="LEFT_TO_RIGHT">
                            <children>
-                              <TextArea fx:id="wordArea" prefColumnCount="30" prefHeight="714.0" prefRowCount="3" promptText="Input Your Story Words.">
-                                 <VBox.margin>
-                                    <Insets left="5.0" right="5.0" top="5.0" />
-                                 </VBox.margin>
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font></TextArea>
+                              <VBox prefHeight="386.0" prefWidth="340.0">
+                                 <children>
+                                    <GridPane alignment="CENTER">
+                                      <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                       <children>
+                                          <Label text="Type:" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                                          <ChoiceBox fx:id="typeChoice" prefWidth="150.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                                          <Label text="Name:" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                                          <ChoiceBox fx:id="nameChoice" prefWidth="150.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                                       </children>
+                                    </GridPane>
+                                    <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                                       <content>
+                                          <VBox fx:id="commands" prefHeight="200.0" />
+                                       </content>
+                                    </ScrollPane>
+                                 </children></VBox>
                               <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="11.0" prefWidth="278.0">
                                  <items>
                                     <Button mnemonicParsing="false" onAction="#onWordEnter" text="Enter" />
                                     <Button mnemonicParsing="false" onAction="#onWordClear" text="Clear" />
-                                    <ChoiceBox fx:id="personChoiceBox" prefWidth="150.0" />
                                  </items>
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
                               </ToolBar>
                            </children></VBox>
                     </items>

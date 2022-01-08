@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaView;
 
 public class MainFormController {
@@ -45,8 +46,13 @@ public class MainFormController {
     private TreeView<StoryBody> storyTreeV;
 
     @FXML
-    private TextArea wordArea;
+    private VBox commands;
 
+    @FXML
+    private ChoiceBox<String> nameChoice;
+
+    @FXML
+    private ChoiceBox<String> typeChoice;
 
     @FXML
     void initialize() {
@@ -64,7 +70,6 @@ public class MainFormController {
     }
 
     void addListener() {
-        //TODO: 添加监听器，给Controller添加、修改、或者删除指定Item
         storyAudioListV.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
             if (n != null) {
                 storyAudioListV.setUserData(n);
@@ -158,6 +163,7 @@ public class MainFormController {
     void onAudioRemove(ActionEvent event) {
         MediaC m = (MediaC) storyAudioListV.getUserData();
         if (m != null) {
+            FormController.get().getAudioMap().remove(m.name);
             storyAudioListV.getItems().remove(m);
         }
     }
@@ -176,6 +182,7 @@ public class MainFormController {
     void onBgmRemove(ActionEvent event) {
         MediaC m = (MediaC) storyBgmListV.getUserData();
         if (m != null) {
+            FormController.get().getBgmMap().remove(m.name);
             System.out.println("On Bgm Remove:" + m.name);
             storyBgmListV.getItems().remove(m);
         }
@@ -210,6 +217,7 @@ public class MainFormController {
     void onSceneRemove(ActionEvent event) {
         MediaC mediaC=(MediaC) storySceneListV.getUserData();
         if(mediaC!=null){
+            FormController.get().getSceneMap().remove(mediaC.name);
             storySceneListV.getItems().remove(mediaC);
         }
     }
@@ -258,6 +266,7 @@ public class MainFormController {
     void onePersonRemove(ActionEvent event) {
         PersonC m = (PersonC) storyPersonListV.getUserData();
         if (m != null) {
+            FormController.get().getPersonMap().remove(m.name);
             storyPersonListV.getItems().remove(m);
         }
     }
