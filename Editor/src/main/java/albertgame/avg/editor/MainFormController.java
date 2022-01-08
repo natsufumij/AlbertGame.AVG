@@ -55,6 +55,8 @@ public class MainFormController {
         storyPersonListV.setCellFactory(l -> new FormController.PersonListCell());
         storySceneListV.setCellFactory(l -> new FormController.SceneListCell());
         storyTreeV.setCellFactory(l -> new FormController.ChapterPlayTreeCell());
+        playsView.setCellFactory(l->new FormController.StoryViewListCell(mediaView));
+
         storyTreeV.setEditable(true);
 
         addListener();
@@ -62,6 +64,7 @@ public class MainFormController {
     }
 
     void addListener() {
+        //TODO: 添加监听器，给Controller添加、修改、或者删除指定Item
         storyAudioListV.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
             if (n != null) {
                 storyAudioListV.setUserData(n);
@@ -81,6 +84,11 @@ public class MainFormController {
         storySceneListV.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
             if (n != null) {
                 storySceneListV.setUserData(n);
+            }
+        });
+        storyTreeV.getSelectionModel().selectedItemProperty().addListener((v,o,n)->{
+            if(n!=null){
+                storyTreeV.setUserData(n);
             }
         });
     }
@@ -117,7 +125,14 @@ public class MainFormController {
         chapter2.getChildren().add(play3);
         chapter2.getChildren().add(play4);
         storyTreeV.setRoot(rootNode);
+
+        StoryView v1=new StoryView("Dialog","Open",NONE_DATA);
+        StoryView v2=new StoryView("Dialog","Word",new String[]{"这是一个很好的天气\\啊啊啊\\啊啊啊\\啊啊"});
+        StoryView v3=new StoryView("Audio","Bgm.Play",new String[]{"第一个场景"});
+        playsView.getItems().addAll(v1,v2,v3);
     }
+
+    public static final String[] NONE_DATA=new String[0];
 
     @FXML
     void aboutEditor(ActionEvent event) {
