@@ -72,15 +72,16 @@
 #Info
   id
   name
+  startStruck
   Play
 #Body
   >>Begin  
-    #View  Scene  Name1
-    #Audio  Bgm.Play  bgm1
-    #View  Lighting  3000
+    [View  Scene  Name1]
+    [Audio  Bgm.Play  bgm1]
+    [View  Lighting  3000]
   >>End  
-    #Audio  Bgm.Stop
-    #View  Darking  3000
+    [Audio  Bgm.Stop]
+    [View  Darking  3000]
   >>Start0  
   	...  
   >>Start1  

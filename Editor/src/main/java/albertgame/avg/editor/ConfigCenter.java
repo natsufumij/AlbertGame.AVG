@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -17,12 +16,15 @@ import javafx.scene.media.Media;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.Set;
 
 public class ConfigCenter {
     public static final int WORD_MAX_COLUMN = 30;
@@ -125,11 +127,22 @@ public class ConfigCenter {
         return mediaCDialog;
     }
 
-    public static Dialog<FormController.MediaC> createMediaDialog(String headerText, String description, String format) {
+    public static Dialog<FormController.MediaC> createMediaDialog(String headerText, String description, String format,
+                                                                  String name, String lib, String id) {
         Label nameL = new Label("Name");
         TextField field = new TextField();
+        if (name != null) {
+            field.setText(name);
+        }
         Button button = new Button("Select");
-        final Label pathl = new Label("Path");
+        final Label pathl = new Label("Id");
+        if (id != null) {
+            pathl.setText(id);
+            File destF = new File(getRealPath(lib, id, format));
+            if (destF != null && destF.exists()) {
+                FormController.setSelectFile(destF);
+            }
+        }
         button.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File("."));
@@ -138,7 +151,8 @@ public class ConfigCenter {
             fileChooser.setTitle(headerText);
             File file = fileChooser.showOpenDialog(MainEntry.stage());
             if (file != null) {
-                pathl.setText(file.getPath());
+                String id_ = FormController.getUniqueId();
+                pathl.setText(id_);
                 FormController.setSelectFile(file);
             }
         });
@@ -148,7 +162,7 @@ public class ConfigCenter {
             @Override
             public FormController.MediaC call(ButtonType param) {
                 if (param == buttonType) {
-                    String id = FormController.getUniqueId();
+                    String id = pathl.getText();
                     String name = field.getText();
                     return new FormController.MediaC(id, name);
                 }
@@ -170,13 +184,26 @@ public class ConfigCenter {
         return mediaCDialog;
     }
 
-    public static Dialog<FormController.PersonC> createPersonDialog() {
+    public static Dialog<FormController.PersonC> createPersonDialog(String name, String stateName, String id) {
         Label nameL = new Label("Name");
         TextField field = new TextField();
+        if (name != null) {
+            field.setText(name);
+        }
         Button button = new Button("Select");
         Label path = new Label("Path");
+        if (id != null) {
+            path.setText(id);
+            File file = new File(getRealPath("scene", id, "jpg"));
+            if (file != null && file.exists()) {
+                FormController.setSelectFile(file);
+            }
+        }
         Label state = new Label("State");
         TextField field1 = new TextField();
+        if (stateName != null) {
+            field1.setText(stateName);
+        }
         button.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File("."));
@@ -185,7 +212,8 @@ public class ConfigCenter {
             fileChooser.setTitle("Select Person State Image");
             File file = fileChooser.showOpenDialog(MainEntry.stage());
             if (file != null) {
-                path.setText(file.getPath());
+                String uid = FormController.getUniqueId();
+                path.setText(uid);
                 FormController.setSelectFile(file);
             }
         });
@@ -193,10 +221,9 @@ public class ConfigCenter {
         ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
         Callback<ButtonType, FormController.PersonC> callback = param -> {
             if (param == buttonType) {
-                String id = FormController.getUniqueId();
+                String _id = path.getText();
                 String stateId = FormController.getUniqueId();
-                String name = field.getText();
-                return new FormController.PersonC(id, name, stateId, field1.getText());
+                return new FormController.PersonC(_id, field.getText(), stateId, field1.getText());
             }
             return null;
         };
@@ -226,6 +253,55 @@ public class ConfigCenter {
         return personCDialog;
     }
 
+    public static Dialog<FormController.StoryBody> createStoryDialog() {
+        Dialog<FormController.StoryBody> dialog = new Dialog<>();
+        Label label = new Label("Type");
+        ChoiceBox<String> stringChoiceBox = new ChoiceBox<>();
+        Label name = new Label("Name");
+        TextField field = new TextField("");
+        Label chapter = new Label("Chapter");
+        stringChoiceBox.getItems().addAll("Chapter", "Play");
+        ChoiceBox<String> chapterSelect = new ChoiceBox<>();
+        chapterSelect.setDisable(true);
+        stringChoiceBox.getSelectionModel().selectedIndexProperty().addListener((v, o, n) -> {
+            if (n.intValue() == 1) {
+                chapterSelect.getItems().clear();
+                Set<String> names = FormController.get().getChapterTree().keySet();
+                chapterSelect.getItems().addAll(names);
+                chapterSelect.setDisable(false);
+            } else {
+                chapterSelect.getItems().clear();
+                chapterSelect.setDisable(true);
+            }
+        });
+        GridPane gridPane = createDialogGrid(new Node[]{label, stringChoiceBox,
+                name, field,
+                chapter, chapterSelect});
+
+        ButtonType buttonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.setResultConverter(l->{
+            if(l==buttonType){
+                if(stringChoiceBox.getSelectionModel().getSelectedIndex()==0){
+                    String id=FormController.getUniqueId();
+                    return new FormController.StoryBody(FormController.StoryBody.Type.CHAPTER,
+                            field.getText(),id,null);
+                }else if(stringChoiceBox.getSelectionModel().getSelectedIndex()==1){
+                    String id=FormController.getUniqueId();
+                    String pName=chapterSelect.getSelectionModel().getSelectedItem();
+                    return new FormController.StoryBody(FormController.StoryBody.Type.PLAY,
+                            field.getText(),id,pName);
+                }
+            }
+            return null;
+        });
+        dialog.getDialogPane().getButtonTypes().addAll(buttonType,cancel);
+        dialog.setHeaderText("Add A New Story");
+        dialog.getDialogPane().setContent(gridPane);
+
+        return dialog;
+    }
+
     //node[0] node[1]
     //node[2] node[3]
     //node[4] node[5]
@@ -244,6 +320,12 @@ public class ConfigCenter {
         }
 
         return gridPane;
+    }
+
+    //TODO: 完成每个种类StoryView修改页面
+    public static GridPane createStoryViewEditPane(){
+
+        return null;
     }
 
     public static AudioClip getClip(String id) {
@@ -290,7 +372,7 @@ public class ConfigCenter {
 
     //把文件复制到 /lib/id.format里
     public static void moveFileTo(File file, String lib, String id) {
-        Task<Void> task=new Task<Void>() {
+        Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
                 String[] ss = file.getAbsolutePath().split("\\.");
@@ -304,12 +386,12 @@ public class ConfigCenter {
                 try {
                     inputChannel = new FileInputStream(file).getChannel();
                     outputChannel = new FileOutputStream(destF).getChannel();
-                    outputChannel.transferFrom(inputChannel,0,inputChannel.size());
-                    result=true;
+                    outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
+                    result = true;
                     succeeded();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    result=false;
+                    result = false;
                 } finally {
                     try {
                         if (inputChannel != null) {
@@ -333,7 +415,7 @@ public class ConfigCenter {
                 return null;
             }
         };
-        task.setOnSucceeded(e->{
+        task.setOnSucceeded(e -> {
             System.out.println("Move File To Asset Success");
         });
         Platform.runLater(task);
@@ -343,6 +425,29 @@ public class ConfigCenter {
         File file = new File(getRealPath(lib, id, format));
         if (file.exists()) {
             file.delete();
+        }
+    }
+
+    public static void createFile(String lib,String id,String format){
+        File file=new File(getRealPath(lib,id,format));
+        if(!file.exists()){
+            try {
+                File p=file.getParentFile();
+                p.mkdirs();
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static URL getStoryFileUrl(String id){
+        File file=new File(getRealPath("story",id,"avg"));
+        try {
+            return file.toURI().toURL();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

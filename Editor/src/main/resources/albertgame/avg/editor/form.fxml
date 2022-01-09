@@ -201,7 +201,7 @@
                            <graphic>
                               <HBox alignment="CENTER_RIGHT" nodeOrientation="RIGHT_TO_LEFT">
                                  <children>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onStoryEdit" text="E" textAlignment="CENTER">
+                                    <Button alignment="CENTER" disable="true" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="E" textAlignment="CENTER">
                                        <HBox.margin>
                                           <Insets right="2.5" />
                                        </HBox.margin>
@@ -245,7 +245,6 @@
                                 <items>
                                   <Button mnemonicParsing="false" onAction="#onAddCommand" text="+" />
                                     <Button mnemonicParsing="false" onAction="#onRemoveCommand" text=" -" />
-                                    <Button mnemonicParsing="false" onAction="#onEditCommand" text=" E" />
                                 </items>
                               </ToolBar>
                            </children>
@@ -279,7 +278,6 @@
                               <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="11.0" prefWidth="278.0">
                                  <items>
                                     <Button mnemonicParsing="false" onAction="#onWordEnter" text="Enter" />
-                                    <Button mnemonicParsing="false" onAction="#onWordClear" text="Clear" />
                                  </items>
                                  <VBox.margin>
                                     <Insets />

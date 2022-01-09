@@ -1,6 +1,6 @@
 package albertgame.avg.editor;
 
-import albertgame.avg.editor.Play.GlobalConfig.PersonConfig;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,14 +9,16 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,12 +56,15 @@ public class FormController {
 
     //里面的Id全部为Name
     public static class StoryView {
+        //在BodyStruck里的位置
+        int bindLine;
         String type;
         String name;
         String[] data;
 
-        public StoryView(String type, String name, String[] data) {
+        public StoryView(int bindLine,String type, String name, String[] data) {
             this.type = type;
+            this.bindLine=bindLine;
             this.name = name;
             this.data = data;
         }
@@ -73,11 +78,13 @@ public class FormController {
         Type type;
         String name;
         String id;
+        String parent_name;
 
-        public StoryBody(Type type, String name, String id) {
+        public StoryBody(Type type, String name, String id,String parent_name) {
             this.type = type;
             this.name = name;
             this.id = id;
+            this.parent_name=parent_name;
         }
     }
 
@@ -229,6 +236,8 @@ public class FormController {
             }
         }
 
+        String _prefName;
+
         @Override
         public void startEdit() {
             super.startEdit();
@@ -240,7 +249,29 @@ public class FormController {
                 field = new TextField();
                 field.setOnKeyReleased(event -> {
                     if (event.getCode() == KeyCode.ENTER) {
-                        commitEdit(new StoryBody(getItem().type, field.getText(), getItem().id));
+                        StoryBody now=getItem();
+                        StoryBody newB=new StoryBody(now.type,field.getText(),now.id,now.parent_name);
+                        if(now.type== StoryBody.Type.CHAPTER){
+                            ObservableList<StoryBody> playList=FormController.get().
+                                    getPlayInChapterMap().get(_prefName);
+                            TreeItem<StoryBody> item=FormController.get().getChapterTree().get(_prefName);
+                            item.getValue().name=newB.name;
+                            FormController.get().getChapterTree().remove(_prefName);
+                            FormController.get().getChapterTree().put(newB.name,item);
+                            FormController.get().getPlayInChapterMap().put(newB.name, playList);
+                        }else if(now.type== StoryBody.Type.PLAY){
+                            ObservableList<StoryBody> playList=FormController.get().
+                                    getPlayInChapterMap().get(now.parent_name);
+                            if(playList!=null){
+                                playList.remove(now);
+                                playList.add(newB);
+                            }else {
+                                playList= FXCollections.observableList(new ArrayList<>());
+                                FormController.get().getPlayInChapterMap().put(now.parent_name,playList);
+                                playList.add(newB);
+                            }
+                        }
+                        commitEdit(newB);
                     } else if (event.getCode() == KeyCode.ESCAPE) {
                         cancelEdit();
                     }
@@ -250,6 +281,8 @@ public class FormController {
             setText(null);
             setGraphic(field);
             field.selectAll();
+            _prefName=getItem().name;
+            System.out.println("_prefName:"+_prefName);
         }
 
         @Override
@@ -295,6 +328,7 @@ public class FormController {
             box.setAlignment(Pos.CENTER_LEFT);
             if (getItem().data.length != 1) {
                 Label label = new Label();
+                label.setFont(Font.font("System", FontWeight.BOLD,20));
                 String id = getItem().data[0];
                 if (id.equals("M")) {
                     label.setText("Me Say:");
@@ -306,6 +340,7 @@ public class FormController {
                 box.getChildren().add(label);
             } else {
                 Label label = new Label();
+                label.setFont(Font.font("System", FontWeight.BOLD,20));
                 label.setText("Pound Say:");
                 box.getChildren().add(label);
             }
@@ -318,6 +353,7 @@ public class FormController {
                 //超过一行的结尾,或者强行换行
                 if (cy == ConfigCenter.WORD_MAX_COLUMN || c == '\\') {
                     Label line = new Label();
+                    line.setFont(Font.font("System", FontWeight.BOLD,20));
                     line.setText(builder.toString());
                     box.getChildren().add(line);
                     builder = new StringBuilder();
@@ -465,17 +501,25 @@ public class FormController {
     private final Map<String, MediaC> sceneMap;
     private final Map<String, PersonC> personMap;
 
-    //均为Id - Map的映射
-    private final Map<String, StoryBody> chapterMap;
+    private TreeItem<StoryBody> global;
+    private final Map<String,TreeItem<StoryBody>> chapterTree;
     private final Map<String, ObservableList<StoryBody>> playInChapterMap;
+
+    private Play.GlobalConfig globalConfig;
+    private Play.Chapter nowChapter;
+    private Play nowPlay;
+    private Play.BodyStruck nowStruck;
+
+    private StoryView nowEditExpression;
+    private int nowEditIndex;
 
     private FormController() {
         audioMap = new HashMap<>();
         bgmMap = new HashMap<>();
         sceneMap = new HashMap<>();
         personMap = new HashMap<>();
-        chapterMap = new HashMap<>();
         playInChapterMap = new HashMap<>();
+        chapterTree=new HashMap<>();
     }
 
     public Map<String, MediaC> getAudioMap() {
@@ -494,11 +538,67 @@ public class FormController {
         return personMap;
     }
 
-    public Map<String, StoryBody> getChapterMap() {
-        return chapterMap;
-    }
-
     public Map<String, ObservableList<StoryBody>> getPlayInChapterMap() {
         return playInChapterMap;
+    }
+
+    public Map<String, TreeItem<StoryBody>> getChapterTree() {
+        return chapterTree;
+    }
+
+    public TreeItem<StoryBody> getGlobal() {
+        return global;
+    }
+
+    public void setGlobal(TreeItem<StoryBody> global) {
+        this.global = global;
+    }
+
+    public Play.GlobalConfig getGlobalConfig() {
+        return globalConfig;
+    }
+
+    public void setGlobalConfig(Play.GlobalConfig globalConfig) {
+        this.globalConfig = globalConfig;
+    }
+
+    public Play.Chapter getNowChapter() {
+        return nowChapter;
+    }
+
+    public void setNowChapter(Play.Chapter nowChapter) {
+        this.nowChapter = nowChapter;
+    }
+
+    public Play getNowPlay() {
+        return nowPlay;
+    }
+
+    public void setNowPlay(Play nowPlay) {
+        this.nowPlay = nowPlay;
+    }
+
+    public Play.BodyStruck getNowStruck() {
+        return nowStruck;
+    }
+
+    public void setNowStruck(Play.BodyStruck nowStruck) {
+        this.nowStruck = nowStruck;
+    }
+
+    public StoryView getNowEditExpression() {
+        return nowEditExpression;
+    }
+
+    public void setNowEditExpression(StoryView nowEditExpression) {
+        this.nowEditExpression = nowEditExpression;
+    }
+
+    public int getNowEditIndex() {
+        return nowEditIndex;
+    }
+
+    public void setNowEditIndex(int nowEditIndex) {
+        this.nowEditIndex = nowEditIndex;
     }
 }

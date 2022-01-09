@@ -4,6 +4,7 @@ import albertgame.avg.editor.FormController.MediaC;
 import albertgame.avg.editor.FormController.PersonC;
 import albertgame.avg.editor.FormController.StoryBody;
 import albertgame.avg.editor.FormController.StoryView;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,6 +15,7 @@ import javafx.scene.media.MediaView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class MainFormController {
@@ -62,8 +64,8 @@ public class MainFormController {
         storySceneListV.setCellFactory(l -> new FormController.SceneListCell());
         storyTreeV.setCellFactory(l -> new FormController.ChapterPlayTreeCell());
         playsView.setCellFactory(l -> new FormController.StoryViewListCell(mediaView));
-
         storyTreeV.setEditable(true);
+        initStoryTree();
 
         initCommandTypes();
         addListener();
@@ -80,10 +82,10 @@ public class MainFormController {
         olist.add(ConfigCenter.SELECT_OB_LIST);
         olist.add(ConfigCenter.VIEW_OB_LIST);
         typeChoice.getItems().addAll(types);
-        typeChoice.getSelectionModel().selectedIndexProperty().addListener((v,o,n)->{
-            if(n.intValue()>=0&&n.intValue()<olist.size()){
-                System.out.println("n="+n);
-                ObservableList<String> de=olist.get(n.intValue());
+        typeChoice.getSelectionModel().selectedIndexProperty().addListener((v, o, n) -> {
+            if (n.intValue() >= 0 && n.intValue() < olist.size()) {
+                System.out.println("n=" + n);
+                ObservableList<String> de = olist.get(n.intValue());
                 nameChoice.getItems().clear();
                 nameChoice.getItems().addAll(de);
             }
@@ -117,9 +119,19 @@ public class MainFormController {
                 storyTreeV.setUserData(n);
             }
         });
+        playsView.getSelectionModel().selectedIndexProperty().addListener((v,o,n)->{
+            if(n!=null){
+                System.out.println("Select "+n.intValue());
+                playsView.setUserData(playsView.getItems().get(n.intValue()));
+                StoryView storyView=playsView.getItems().get(n.intValue());
+                FormController.get().setNowEditExpression(storyView);
+                FormController.get().setNowEditIndex(n.intValue());
+            }
+        });
     }
 
     void testListView() {
+
 
         MediaC c = new MediaC("audio1", "Name1");
         storyAudioListV.getItems().addAll(c);
@@ -136,26 +148,52 @@ public class MainFormController {
         MediaC mediaC2 = new MediaC("demo2", "背景2");
         storySceneListV.getItems().addAll(mediaC, mediaC2);
 
-        TreeItem<StoryBody> rootNode = new TreeItem<>(new StoryBody(StoryBody.Type.GLOBAL, "Global", "000"));
-        TreeItem<StoryBody> chapter1 = new TreeItem<>(new StoryBody(StoryBody.Type.CHAPTER, "Chapter1", "AAA"));
-        TreeItem<StoryBody> chapter2 = new TreeItem<>(new StoryBody(StoryBody.Type.CHAPTER, "Chapter2", "AAB"));
-        TreeItem<StoryBody> play1 = new TreeItem<>(new StoryBody(StoryBody.Type.CHAPTER, "Play1", "AAC"));
-        TreeItem<StoryBody> play2 = new TreeItem<>(new StoryBody(StoryBody.Type.CHAPTER, "Play2", "AAD"));
-        TreeItem<StoryBody> play3 = new TreeItem<>(new StoryBody(StoryBody.Type.CHAPTER, "Play3", "AAE"));
-        TreeItem<StoryBody> play4 = new TreeItem<>(new StoryBody(StoryBody.Type.CHAPTER, "Play4", "AAF"));
+        TreeItem<StoryBody> globalItem = FormController.get().getGlobal();
+        ;
+        StoryBody global = globalItem.getValue();
+        StoryBody b1 = new StoryBody(StoryBody.Type.CHAPTER, "第一章",
+                FormController.getUniqueId(), global.id);
+        StoryBody b2 = new StoryBody(StoryBody.Type.CHAPTER, "第二章",
+                FormController.getUniqueId(), global.id);
+        StoryBody b3 = new StoryBody(StoryBody.Type.PLAY, "第一节",
+                FormController.getUniqueId(), b1.id);
+        StoryBody b4 = new StoryBody(StoryBody.Type.PLAY, "第二节",
+                FormController.getUniqueId(), b1.id);
+        StoryBody b5 = new StoryBody(StoryBody.Type.PLAY, "第一节",
+                FormController.getUniqueId(), b2.id);
+        StoryBody b6 = new StoryBody(StoryBody.Type.PLAY, "第二节",
+                FormController.getUniqueId(), b2.id);
 
-        rootNode.getChildren().add(chapter1);
-        rootNode.getChildren().add(chapter2);
+        TreeItem<StoryBody> chapter1 = new TreeItem<>(b1);
+        TreeItem<StoryBody> chapter2 = new TreeItem<>(b2);
+        TreeItem<StoryBody> play1 = new TreeItem<>(b3);
+        TreeItem<StoryBody> play2 = new TreeItem<>(b4);
+        TreeItem<StoryBody> play3 = new TreeItem<>(b5);
+        TreeItem<StoryBody> play4 = new TreeItem<>(b6);
+
+        globalItem.getChildren().add(chapter1);
+        globalItem.getChildren().add(chapter2);
         chapter1.getChildren().add(play1);
         chapter1.getChildren().add(play2);
         chapter2.getChildren().add(play3);
         chapter2.getChildren().add(play4);
-        storyTreeV.setRoot(rootNode);
 
-        StoryView v1 = new StoryView("Dialog", "Open", NONE_DATA);
-        StoryView v2 = new StoryView("Dialog", "Word", new String[]{"这是一个很好的天气\\啊啊啊\\啊啊啊\\啊啊"});
-        StoryView v3 = new StoryView("Audio", "Bgm.Play", new String[]{"第一个场景"});
+
+        StoryView v1 = new StoryView(0,"Dialog", "Open", NONE_DATA);
+        StoryView v2 = new StoryView(1,"Dialog", "Word", new String[]{"这是一个很好的天气\\啊啊啊\\啊啊啊\\啊啊"});
+        StoryView v3 = new StoryView(2,"Audio", "Bgm.Play", new String[]{"第一个场景"});
         playsView.getItems().addAll(v1, v2, v3);
+    }
+
+    void initStoryTree() {
+        StoryBody global = new StoryBody(StoryBody.Type.GLOBAL, "Global",
+                FormController.getUniqueId(), null);
+        TreeItem<StoryBody> rootNode = new TreeItem<>(global);
+        storyTreeV.setRoot(rootNode);
+        storyTreeV.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
+            storyTreeV.setUserData(n);
+        });
+        FormController.get().setGlobal(rootNode);
     }
 
     public static final String[] NONE_DATA = new String[0];
@@ -168,7 +206,18 @@ public class MainFormController {
 
     @FXML
     void onRemoveCommand(ActionEvent event) {
+        StoryView storyView= (StoryView) playsView.getUserData();
+        if(storyView!=null){
 
+            //删除BodyStruck里的指定一行
+            playsView.getItems().remove(storyView);
+        }else {
+            if(playsView.getItems().size()==1){
+
+                //清空BodyStruck
+                playsView.getItems().clear();
+            }
+        }
     }
 
     @FXML
@@ -177,32 +226,35 @@ public class MainFormController {
     }
 
     @FXML
-    void onEditCommand(ActionEvent event) {
-
-    }
-
-    @FXML
     void onAudioAdd(ActionEvent event) {
         Dialog<MediaC> mediaCDialog = ConfigCenter.createMediaDialog(
-                "Audio Select", "Select Audio", "wav");
+                "Audio Select", "Select Audio", "wav", null, null, null);
         Optional<MediaC> mediaC = mediaCDialog.showAndWait();
         mediaC.ifPresent(l -> {
-            String id = l.id;
-            ConfigCenter.moveFileTo(FormController.getSelectFile(), "audio", id);
-            FormController.get().getAudioMap().put(l.name, l);
-            storyAudioListV.getItems().add(l);
+            mediaCAdd(l, "audio", FormController.get().getAudioMap(), storyAudioListV);
         });
     }
 
     @FXML
     void onAudioEdit(ActionEvent event) {
-
+        MediaC m = (MediaC) storyAudioListV.getUserData();
+        if (m != null) {
+            Dialog<MediaC> mediaCDialog = ConfigCenter.createMediaDialog(
+                    "Audio Edit", "Select Audio", "wav", m.name, "audio", m.id);
+            Optional<MediaC> mediaC = mediaCDialog.showAndWait();
+            mediaC.ifPresent(l -> {
+                storyAudioListV.setUserData(null);
+                onAudioRemove(null);
+                mediaCAdd(l, "audio", FormController.get().getAudioMap(), storyAudioListV);
+            });
+        }
     }
 
     @FXML
     void onAudioRemove(ActionEvent event) {
         MediaC m = (MediaC) storyAudioListV.getUserData();
         if (m != null) {
+            storyAudioListV.setUserData(null);
             FormController.get().getAudioMap().remove(m.name);
             storyAudioListV.getItems().remove(m);
             ConfigCenter.removeFile("audio", m.id, "wav");
@@ -212,19 +264,34 @@ public class MainFormController {
     @FXML
     void onBgmAdd(ActionEvent event) {
         Dialog<MediaC> mediaCDialog = ConfigCenter.createMediaDialog(
-                "Bgm Select", "Bgm", "mp3");
+                "Bgm Select", "Bgm", "mp3", null, null, null);
         Optional<MediaC> mediaC = mediaCDialog.showAndWait();
         mediaC.ifPresent(l -> {
-            String id = l.id;
-            ConfigCenter.moveFileTo(FormController.getSelectFile(), "bgm", id);
-            FormController.get().getBgmMap().put(l.name, l);
-            storyBgmListV.getItems().add(l);
+            mediaCAdd(l, "bgm", FormController.get().getBgmMap(), storyBgmListV);
         });
     }
 
     @FXML
     void onBgmEdit(ActionEvent event) {
+        MediaC mediaC = (MediaC) storyBgmListV.getUserData();
+        if (mediaC != null) {
+            Dialog<MediaC> mediaCDialog = ConfigCenter.createMediaDialog(
+                    "Bgm Select", "Bgm File", "mp3",
+                    "bgm", mediaC.name, mediaC.id);
+            Optional<MediaC> med = mediaCDialog.showAndWait();
+            med.ifPresent(l -> {
+                storyBgmListV.setUserData(null);
+                onBgmRemove(null);
+                mediaCAdd(l, "bgm", FormController.get().getBgmMap(), storyBgmListV);
+            });
+        }
+    }
 
+    private void mediaCAdd(MediaC l, String bgm, Map<String, MediaC> BgmMap, ListView<MediaC> storyBgmListV) {
+        String id = l.id;
+        ConfigCenter.moveFileTo(FormController.getSelectFile(), bgm, id);
+        BgmMap.put(l.name, l);
+        storyBgmListV.getItems().add(l);
     }
 
     @FXML
@@ -240,39 +307,60 @@ public class MainFormController {
 
     @FXML
     void onPersonAdd(ActionEvent event) {
-        Dialog<PersonC> dialog=ConfigCenter.createPersonDialog();
-        Optional<PersonC> result=dialog.showAndWait();
-        result.ifPresent(l->{
-            String id=l.id;
-            String stateId=l.stateId;
-            String person_id=id+"_"+stateId;
-            FormController.get().getPersonMap().put(person_id,l);
-            storyPersonListV.getItems().add(l);
-            ConfigCenter.moveFileTo(FormController.getSelectFile(),"person",person_id);
+        Dialog<PersonC> dialog = ConfigCenter.createPersonDialog(null, null, null);
+        Optional<PersonC> result = dialog.showAndWait();
+        result.ifPresent(l -> {
+            personAdd_(l);
         });
     }
 
     @FXML
     void onPersonEdit(ActionEvent event) {
+        PersonC personC = (PersonC) storyPersonListV.getUserData();
+        if (personC != null) {
+            Dialog<PersonC> dialog = ConfigCenter.createPersonDialog(
+                    personC.name, personC.stateName, personC.id);
+            Optional<PersonC> result = dialog.showAndWait();
+            result.ifPresent(l -> {
+                onePersonRemove(null);
+                personAdd_(l);
+            });
+        }
+    }
 
+    private void personAdd_(PersonC l) {
+        String id = l.id;
+        String stateId = l.stateId;
+        String person_id = id + "_" + stateId;
+        FormController.get().getPersonMap().put(person_id, l);
+        storyPersonListV.getItems().add(l);
+        ConfigCenter.moveFileTo(FormController.getSelectFile(), "person", person_id);
     }
 
     @FXML
     void onSceneAdd(ActionEvent event) {
         Dialog<MediaC> mediaCDialog = ConfigCenter.createMediaDialog(
-                "Scene Select", "Scene Image", "jpg");
+                "Scene Select", "Scene Image", "jpg", null, null, null);
         Optional<MediaC> mediaC = mediaCDialog.showAndWait();
         mediaC.ifPresent(l -> {
-            String id = l.id;
-            ConfigCenter.moveFileTo(FormController.getSelectFile(), "scene", id);
-            FormController.get().getSceneMap().put(l.name, l);
-            storySceneListV.getItems().add(l);
+            mediaCAdd(l, "scene", FormController.get().getSceneMap(), storySceneListV);
         });
     }
 
     @FXML
     void onSceneEdit(ActionEvent event) {
-
+        MediaC mediaC = (MediaC) storySceneListV.getUserData();
+        if (mediaC != null) {
+            Dialog<MediaC> mediaCDialog = ConfigCenter.createMediaDialog(
+                    "Scene Select", "Scene Image", "jpg",
+                    mediaC.name, "scene", mediaC.id);
+            Optional<MediaC> med = mediaCDialog.showAndWait();
+            med.ifPresent(l -> {
+                storyAudioListV.setUserData(null);
+                onSceneRemove(null);
+                mediaCAdd(l, "scene", FormController.get().getSceneMap(), storySceneListV);
+            });
+        }
     }
 
     @FXML
@@ -287,22 +375,42 @@ public class MainFormController {
 
     @FXML
     void onStoryAdd(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onStoryEdit(ActionEvent event) {
-
+        Dialog<StoryBody> dialog = ConfigCenter.createStoryDialog();
+        Optional<StoryBody> result = dialog.showAndWait();
+        result.ifPresent(l -> {
+            if (l.type == StoryBody.Type.CHAPTER) {
+                TreeItem<StoryBody> chapter = new TreeItem<>(l);
+                FormController.get().getGlobal().getChildren().add(chapter);
+                FormController.get().getChapterTree().put(l.name, chapter);
+                FormController.get().getPlayInChapterMap().put(l.name, FXCollections.observableList(new ArrayList<>()));
+                ConfigCenter.createFile("story", l.id, "avg");
+                System.out.println("Add A Chapter" + l.name);
+            } else if (l.type == StoryBody.Type.PLAY) {
+                TreeItem<StoryBody> play = new TreeItem<>(l);
+                TreeItem<StoryBody> p = FormController.get().getChapterTree().get(l.parent_name);
+                p.getChildren().add(play);
+                FormController.get().getPlayInChapterMap().get(l.parent_name).add(l);
+                ConfigCenter.createFile("story", l.parent_name + "/" + l.id, "avg");
+            }
+        });
     }
 
     @FXML
     void onStoryRemove(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onWordClear(ActionEvent event) {
-
+        TreeItem<StoryBody> item = (TreeItem<StoryBody>) storyTreeV.getUserData();
+        if (item != null) {
+            if (item.getParent() != null) {
+                item.getParent().getChildren().remove(item);
+            }
+            StoryBody body = item.getValue();
+            if (body.type == StoryBody.Type.CHAPTER) {
+                FormController.get().getChapterTree().remove(body.name);
+                FormController.get().getPlayInChapterMap().remove(body.name);
+            } else if (body.type == StoryBody.Type.PLAY) {
+                FormController.get().getPlayInChapterMap().
+                        get(body.parent_name).remove(body);
+            }
+        }
     }
 
     @FXML

@@ -715,4 +715,166 @@ public class Play {
             return format;
         }
     }
+
+    public static void outputToFile(Play play, File destFile) {
+        List<String> lines = new ArrayList<>();
+        outputToLine(play, lines);
+        output(lines, destFile);
+    }
+
+    private static void output(List<String> lines, File destFile) {
+        try (FileOutputStream outputStream = new FileOutputStream(destFile, false);
+             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream))) {
+            for (String s : lines) {
+                writer.append(s);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void outputToLine(Play play, List<String> lines) {
+        String[] linesI = new String[]{"Info", "Body", "Progress", "Options"};
+        lines.add("#" + linesI[0]);
+        lines.add(play.id);
+        lines.add(play.name);
+        lines.add(play.startStruck);
+        lines.add("Play");
+        lines.add("");
+
+        lines.add("#" + linesI[1]);
+        List<String> progress = new ArrayList<>();
+        List<String> options = new ArrayList<>();
+        for (Map.Entry<String, BodyStruck> bodys : play.bodyStruckMap.entrySet()) {
+            lines.add("  >>" + bodys.getKey());
+            for (String s : bodys.getValue().expressions) {
+                if(!s.isBlank()){
+                    lines.add("    " + changeToFileCommands(s));
+                }
+            }
+
+            BodyStruck b = bodys.getValue();
+            OptionStruck optionStruck = b.optionStruck();
+            String sourceId = b.id;
+            outputOption(sourceId, optionStruck, progress, options);
+        }
+        lines.add("");
+
+        lines.add("#" + linesI[2]);
+        lines.addAll(progress);
+
+        lines.add("#" + linesI[3]);
+        lines.addAll(options);
+    }
+
+    private static String changeToFileCommands(String expression) {
+        final String splitS = "Dialog  Word";
+        if (expression.startsWith(splitS)) {
+            String s = "Dialog  Word  M";
+            String a = "Dialog  Word  S";
+            String s1 = "@M";
+            String s2 = "@S";
+            if (expression.startsWith(s)) {
+                return s1 + expression.substring(s.length());
+            } else if (expression.startsWith(a)) {
+                return s2 + expression.substring(a.length());
+            } else {
+                String[] strings = expression.split(" {2}");
+                if (strings.length == 4) {
+                    return "@" + strings[2] + "  " + strings[3];
+                } else if (strings.length == 3) {
+                    return strings[2];
+                } else return "";
+            }
+        } else {
+            return "[" + expression + "]";
+        }
+    }
+
+    private static void outputToLine(Chapter chapter, List<String> lines) {
+        String[] lineI = new String[]{"Info", "Progress", "Options"};
+        lines.add("#" + lineI[0]);
+        lines.add(chapter.id);
+        lines.add(chapter.name);
+        lines.add(chapter.startPlayId);
+        lines.add("Chapter");
+
+        lines.add("");
+        lines.add("#" + lineI[1]);
+        List<String> opts = new ArrayList<>();
+        for (Map.Entry<String, OptionStruck> options : chapter.playOptionMap.entrySet()) {
+            OptionStruck op = options.getValue();
+            String sourceId = options.getKey();
+
+            outputOption(sourceId, op, lines, opts);
+        }
+
+        lines.add("");
+        lines.add("#" + lineI[2]);
+        lines.addAll(opts);
+    }
+
+    private static void outputOption(String sourceId, OptionStruck op,
+                                     List<String> progress, List<String> opts) {
+        StringBuilder w = new StringBuilder();
+
+        w.append(sourceId).append("->").append(op.id).append("->");
+        w.append(op.destIds[0]).append(",");
+        for (int i = 1; i < op.destIds.length; ++i) {
+            w.append(op.destIds[i]);
+            w.append(",");
+        }
+        w.deleteCharAt(w.length() - 1);
+        progress.add("  " + w.toString());
+
+        String oId = op.id;
+        opts.add("  >>" + oId);
+        for (String s : op.selectExpression) {
+            opts.add("    " + s);
+        }
+        opts.add("");
+    }
+
+    public static void outputToFile(Chapter chapter, File destFile) {
+        List<String> lines = new ArrayList<>();
+        outputToLine(chapter, lines);
+        output(lines, destFile);
+    }
+
+    private static void outputToLine(GlobalConfig globalConfig, List<String> lines) {
+        String[] lineI = new String[]{"Info", "Progress", "Options", "PersonData"};
+        lines.add("#"+lineI[0]);
+        lines.add(globalConfig.startChapter);
+        lines.add("Global");
+
+        lines.add("");
+        lines.add("#"+lineI[1]);
+        List<String> options=new ArrayList<>();
+        for (Map.Entry<String,OptionStruck> bodys : globalConfig.chapterOptionMap.entrySet()) {
+            String sourceId = bodys.getKey();
+            outputOption(sourceId, bodys.getValue(), lines, options);
+        }
+
+        lines.add("");
+        lines.add("#"+lineI[2]);
+        lines.addAll(options);
+
+        lines.add("#"+lineI[3]);
+        for(Map.Entry<String, GlobalConfig.PersonConfig> p:globalConfig.personConfigs.entrySet()){
+            lines.add("  >>"+p.getKey());
+            lines.add("    "+p.getValue().name);
+            StringBuilder builder=new StringBuilder();
+            for(String s:p.getValue().state){
+                builder.append(s).append(",");
+            }
+            lines.add("    "+builder);
+        }
+    }
+
+    public static void outputToFile(GlobalConfig globalConfig, File destFile) {
+        List<String> lines = new ArrayList<>();
+        outputToLine(globalConfig, lines);
+        output(lines, destFile);
+    }
 }
