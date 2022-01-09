@@ -36,10 +36,10 @@ ProjectIds=xxxa;xxxb;xxxc;xxxd
 Last.ProjectId=xxxa
 ```
 
-2. avg.xxxa.properties
+2. _idxx.properties
 ```
-RandomId.Alpha=aaaa
-RandomId.Number=1000
+RandomId=aaaa0000
+NowPath=xxxxxxx
 
 Global.StartChapter=XXX
 Global.PersonDataId=XXX;XXX;XXX;XXX

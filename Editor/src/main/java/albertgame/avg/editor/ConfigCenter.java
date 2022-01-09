@@ -1,6 +1,8 @@
 package albertgame.avg.editor;
 
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -11,20 +13,18 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ConfigCenter {
     public static final int WORD_MAX_COLUMN = 30;
@@ -280,22 +280,22 @@ public class ConfigCenter {
 
         ButtonType buttonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
         ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-        dialog.setResultConverter(l->{
-            if(l==buttonType){
-                if(stringChoiceBox.getSelectionModel().getSelectedIndex()==0){
-                    String id=FormController.getUniqueId();
+        dialog.setResultConverter(l -> {
+            if (l == buttonType) {
+                if (stringChoiceBox.getSelectionModel().getSelectedIndex() == 0) {
+                    String id = FormController.getUniqueId();
                     return new FormController.StoryBody(FormController.StoryBody.Type.CHAPTER,
-                            field.getText(),id,null);
-                }else if(stringChoiceBox.getSelectionModel().getSelectedIndex()==1){
-                    String id=FormController.getUniqueId();
-                    String pName=chapterSelect.getSelectionModel().getSelectedItem();
+                            field.getText(), id, null);
+                } else if (stringChoiceBox.getSelectionModel().getSelectedIndex() == 1) {
+                    String id = FormController.getUniqueId();
+                    String pName = chapterSelect.getSelectionModel().getSelectedItem();
                     return new FormController.StoryBody(FormController.StoryBody.Type.PLAY,
-                            field.getText(),id,pName);
+                            field.getText(), id, pName);
                 }
             }
             return null;
         });
-        dialog.getDialogPane().getButtonTypes().addAll(buttonType,cancel);
+        dialog.getDialogPane().getButtonTypes().addAll(buttonType, cancel);
         dialog.setHeaderText("Add A New Story");
         dialog.getDialogPane().setContent(gridPane);
 
@@ -322,8 +322,12 @@ public class ConfigCenter {
         return gridPane;
     }
 
+    private interface storyViewEditBuilder{
+        GridPane create(FormController.StoryView view, ReadOnlyObjectProperty<String> typeSelectItem);
+    }
+
     //TODO: 完成每个种类StoryView修改页面
-    public static GridPane createStoryViewEditPane(){
+    public static GridPane createStoryViewEditPane() {
 
         return null;
     }
@@ -421,6 +425,40 @@ public class ConfigCenter {
         Platform.runLater(task);
     }
 
+    private static Properties properties;
+    private static Properties lastProperties;
+
+    final static String CACHE_PATH = System.getProperty("user.home")
+            + "/.Cache/" + "AlbertGame.AVG/Editor/Projects.properties";
+    final static String CACHE_ITEM_PATH = System.getProperty("user.home")
+            + "/.Cache/" + "AlbertGame.AVG/Editor/Item_";
+
+    static {
+        properties = new Properties();
+        lastProperties = new Properties();
+        try {
+            properties.load(new FileReader(CACHE_PATH));
+            if (!properties.isEmpty()) {
+                _loadCache();
+            }
+        } catch (IOException e) {
+        }
+    }
+
+    //ProjectIds=xxxa;xxxb;xxxc;xxxd
+    //Last.ProjectId=xxxa
+    private static void _loadCache() {
+        String lastProjectId = properties.getProperty("Last.ProjectId");
+        if (lastProjectId != null) {
+            try {
+                lastProperties.load(new FileReader(CACHE_ITEM_PATH + lastProjectId + ".properties"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            FormController.get().loadProject(lastProperties);
+        }
+    }
+
     public static void removeFile(String lib, String id, String format) {
         File file = new File(getRealPath(lib, id, format));
         if (file.exists()) {
@@ -428,11 +466,11 @@ public class ConfigCenter {
         }
     }
 
-    public static void createFile(String lib,String id,String format){
-        File file=new File(getRealPath(lib,id,format));
-        if(!file.exists()){
+    public static void createFile(String lib, String id, String format) {
+        File file = new File(getRealPath(lib, id, format));
+        if (!file.exists()) {
             try {
-                File p=file.getParentFile();
+                File p = file.getParentFile();
                 p.mkdirs();
                 file.createNewFile();
             } catch (IOException e) {
@@ -441,8 +479,8 @@ public class ConfigCenter {
         }
     }
 
-    public static URL getStoryFileUrl(String id){
-        File file=new File(getRealPath("story",id,"avg"));
+    public static URL getStoryFileUrl(String id) {
+        File file = new File(getRealPath("story", id, "avg"));
         try {
             return file.toURI().toURL();
         } catch (MalformedURLException e) {

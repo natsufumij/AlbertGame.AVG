@@ -251,7 +251,7 @@
                         </VBox>
                         <VBox alignment="TOP_CENTER" nodeOrientation="LEFT_TO_RIGHT">
                            <children>
-                              <VBox prefHeight="386.0" prefWidth="340.0">
+                              <VBox alignment="TOP_CENTER" prefHeight="386.0" prefWidth="340.0">
                                  <children>
                                     <GridPane alignment="CENTER">
                                       <columnConstraints>
@@ -269,9 +269,13 @@
                                           <ChoiceBox fx:id="nameChoice" prefWidth="150.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
                                        </children>
                                     </GridPane>
-                                    <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                                    <ScrollPane prefHeight="200.0">
                                        <content>
-                                          <VBox fx:id="commands" prefHeight="200.0" />
+                                          <VBox fx:id="commands" alignment="CENTER" prefHeight="190.0" prefWidth="328.0">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </VBox>
                                        </content>
                                     </ScrollPane>
                                  </children></VBox>

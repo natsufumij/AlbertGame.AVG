@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaView;
 
@@ -58,12 +59,12 @@ public class MainFormController {
 
     @FXML
     void initialize() {
-        storyAudioListV.setCellFactory(l -> new FormController.AudioListCell());
-        storyBgmListV.setCellFactory(l -> new FormController.BgmListCell(mediaView));
-        storyPersonListV.setCellFactory(l -> new FormController.PersonListCell());
-        storySceneListV.setCellFactory(l -> new FormController.SceneListCell());
-        storyTreeV.setCellFactory(l -> new FormController.ChapterPlayTreeCell());
-        playsView.setCellFactory(l -> new FormController.StoryViewListCell(mediaView));
+        storyAudioListV.setCellFactory(l -> new CellHelp.AudioListCell());
+        storyBgmListV.setCellFactory(l -> new CellHelp.BgmListCell(mediaView));
+        storyPersonListV.setCellFactory(l -> new CellHelp.PersonListCell());
+        storySceneListV.setCellFactory(l -> new CellHelp.SceneListCell());
+        storyTreeV.setCellFactory(l -> new CellHelp.ChapterPlayTreeCell());
+        playsView.setCellFactory(l -> new CellHelp.StoryViewListCell(mediaView));
         storyTreeV.setEditable(true);
         initStoryTree();
 
@@ -119,13 +120,15 @@ public class MainFormController {
                 storyTreeV.setUserData(n);
             }
         });
-        playsView.getSelectionModel().selectedIndexProperty().addListener((v,o,n)->{
-            if(n!=null){
-                System.out.println("Select "+n.intValue());
+        playsView.getSelectionModel().selectedIndexProperty().addListener((v, o, n) -> {
+            if (n != null) {
+                System.out.println("Select " + n.intValue());
                 playsView.setUserData(playsView.getItems().get(n.intValue()));
-                StoryView storyView=playsView.getItems().get(n.intValue());
+                StoryView storyView = playsView.getItems().get(n.intValue());
                 FormController.get().setNowEditExpression(storyView);
-                FormController.get().setNowEditIndex(n.intValue());
+                gotoStoryView(playsView.getItems().get(n.intValue()));
+                typeChoice.setValue(storyView.type);
+                nameChoice.setValue(storyView.name);
             }
         });
     }
@@ -179,9 +182,9 @@ public class MainFormController {
         chapter2.getChildren().add(play4);
 
 
-        StoryView v1 = new StoryView(0,"Dialog", "Open", NONE_DATA);
-        StoryView v2 = new StoryView(1,"Dialog", "Word", new String[]{"这是一个很好的天气\\啊啊啊\\啊啊啊\\啊啊"});
-        StoryView v3 = new StoryView(2,"Audio", "Bgm.Play", new String[]{"第一个场景"});
+        StoryView v1 = new StoryView(0, "Dialog", "Open", NONE_DATA);
+        StoryView v2 = new StoryView(1, "Dialog", "Word", new String[]{"这是一个很好的天气\\啊啊啊\\啊啊啊\\啊啊"});
+        StoryView v3 = new StoryView(2, "Audio", "Bgm.Play", new String[]{"第一个场景"});
         playsView.getItems().addAll(v1, v2, v3);
     }
 
@@ -206,13 +209,13 @@ public class MainFormController {
 
     @FXML
     void onRemoveCommand(ActionEvent event) {
-        StoryView storyView= (StoryView) playsView.getUserData();
-        if(storyView!=null){
+        StoryView storyView = (StoryView) playsView.getUserData();
+        if (storyView != null) {
 
             //删除BodyStruck里的指定一行
             playsView.getItems().remove(storyView);
-        }else {
-            if(playsView.getItems().size()==1){
+        } else {
+            if (playsView.getItems().size() == 1) {
 
                 //清空BodyStruck
                 playsView.getItems().clear();
@@ -436,5 +439,9 @@ public class MainFormController {
     @FXML
     void saveProject(ActionEvent event) {
 
+    }
+
+    void gotoStoryView(StoryView view) {
+        FormController.get().setNowEditExpression(view);
     }
 }
