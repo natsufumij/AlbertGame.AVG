@@ -77,11 +77,13 @@ public class ConfigCenter {
     );
 
     public static final String[] DIALOG_COMMANDS = new String[]{
-            "Open", "Clear", "Close"
+            "Open", "Clear", "Close", "Word", "Pound"
     };
     public static final int OPEN = 0;
     public static final int CLEAR = 1;
     public static final int CLOSE = 2;
+    public static final int WORD = 3;
+    public static final int POUND = 4;
     public static final ObservableList<String> DIALOG_OB_LIST = FXCollections.observableList(
             List.of(DIALOG_COMMANDS)
     );
@@ -322,7 +324,7 @@ public class ConfigCenter {
         return gridPane;
     }
 
-    private interface storyViewEditBuilder{
+    private interface storyViewEditBuilder {
         GridPane create(FormController.StoryView view, ReadOnlyObjectProperty<String> typeSelectItem);
     }
 

@@ -25,7 +25,7 @@
 剧本命令格式  
 
 - 对话
-  - Dialog  Word  #Text  旁白文字
+  - Dialog  Pound  #Text  旁白文字
   - Dialog  Word  @S  #Text  对话文字，使用名称？？？，以后都如此
   - Dialog  Word  @M  #Text  对话文字，以‘我’为名称，以后都如此
   - Dialog  Word  @DataId  #Text  对话文字,以id的人物名称，以后都如此

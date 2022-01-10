@@ -226,9 +226,10 @@ public class CellHelp {
             super.updateItem(item, empty);
             setText(null);
             if (!empty) {
-                if (item.name.equals("Word")) {
+                if (item.name.equals("Pound") || item.name.equals("Word")) {
                     setWord();
-                } else if (item.name.equals("Bgm.Play") || item.name.equals("Sound.Play")) {
+                } else if (item.type.equals("Audio") &&
+                        (item.name.equals("Bgm.Play") || item.name.equals("Sound.Play"))) {
                     setAudio();
                 } else {
                     setNormalCommand(this);
@@ -238,7 +239,7 @@ public class CellHelp {
             }
         }
 
-        //Dialog Word XXXX
+        //Dialog Pound XXXX
         //Dialog Word M XXXX
         //Dialog Word S XXXX
         //Dialog Word DataId XXXX
@@ -246,7 +247,7 @@ public class CellHelp {
             System.out.println("Set Word...");
             VBox box = new VBox();
             box.setAlignment(Pos.CENTER_LEFT);
-            if (getItem().data.length != 1) {
+            if (getItem().name.equals("Word")) {
                 Label label = new Label();
                 label.setFont(Font.font("System", FontWeight.BOLD, 20));
                 String id = getItem().data[0];
@@ -258,13 +259,18 @@ public class CellHelp {
                     label.setText(id + "Say:");
                 }
                 box.getChildren().add(label);
-            } else {
+            } else if(getItem().name.equals("Pound")) {
                 Label label = new Label();
                 label.setFont(Font.font("System", FontWeight.BOLD, 20));
                 label.setText("Pound Say:");
                 box.getChildren().add(label);
             }
-            String word = getItem().data[getItem().data.length - 1];
+            String word;
+            if(getItem().name.equals("Pound")){
+                word=getItem().data[0];
+            }else {
+                word=getItem().data[1];
+            }
             StringBuilder builder = new StringBuilder();
             int cy = 0;
             int addCount = 0;
@@ -279,7 +285,6 @@ public class CellHelp {
                     builder = new StringBuilder();
                     cy = 0;
                     ++addCount;
-                    System.out.println("Append:" + line.getText());
                     //否则就把当前的添加到builder里
                 } else {
                     builder.append(c);
@@ -290,6 +295,7 @@ public class CellHelp {
             //如果builder里还有剩下的文字，但是并没有到一行，并且还有空着的一行，则当作一行存入
             if (addCount != ConfigCenter.WORD_MAX_ROW && builder.length() > 0) {
                 Label line = new Label(builder.toString());
+                line.setFont(Font.font("System", FontWeight.BOLD, 20));
                 box.getChildren().add(line);
             }
 
@@ -350,12 +356,13 @@ public class CellHelp {
             type.setPadding(new Insets(0, 10, 0, 0));
             Label name = new Label(storyViewListCell.getItem().name);
             name.setPadding(new Insets(0, 0, 0, 10));
-            Label[] data = new Label[storyViewListCell.getItem().data.length + 2];
+            FormController.StoryView item = storyViewListCell.getItem();
+            Label[] data = new Label[item.data.length + 2];
             data[0] = type;
             data[1] = name;
-            if (storyViewListCell.getItem().data.length != 0) {
-                for (int i = 0; i < data.length; ++i) {
-                    data[i + 2] = new Label(storyViewListCell.getItem().data[i]);
+            if (item.data.length != 0) {
+                for (int i = 0; i < item.data.length; ++i) {
+                    data[i + 2] = new Label(item.data[i]);
                     data[i + 2].setPadding(new Insets(0, 0, 0, 10));
                 }
             }

@@ -4,22 +4,26 @@ import albertgame.avg.editor.FormController.MediaC;
 import albertgame.avg.editor.FormController.PersonC;
 import albertgame.avg.editor.FormController.StoryBody;
 import albertgame.avg.editor.FormController.StoryView;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaView;
+import javafx.scene.text.Text;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class MainFormController {
+
+    Map<String, StoryViewEdit> editMap;
 
     @FXML
     private MediaView mediaView;
@@ -30,8 +34,7 @@ public class MainFormController {
     @FXML
     private ListView<StoryView> playsView;
 
-    @FXML
-    private Canvas shapeCanvas;
+    private Group shapeGroup;
 
     @FXML
     private ListView<MediaC> storyAudioListV;
@@ -57,8 +60,17 @@ public class MainFormController {
     @FXML
     private ChoiceBox<String> typeChoice;
 
+    int selectPlayViewIndex=-1;
+
     @FXML
     void initialize() {
+        editMap = new HashMap<>();
+        for (int i = 0; i != StoryViewEdit.names.length; ++i) {
+            String name = StoryViewEdit.names[i];
+            StoryViewEdit edit = StoryViewEdit.views[i];
+            editMap.put(name, edit);
+        }
+
         storyAudioListV.setCellFactory(l -> new CellHelp.AudioListCell());
         storyBgmListV.setCellFactory(l -> new CellHelp.BgmListCell(mediaView));
         storyPersonListV.setCellFactory(l -> new CellHelp.PersonListCell());
@@ -74,7 +86,7 @@ public class MainFormController {
     }
 
     void initCommandTypes() {
-        String[] types = new String[]{"Audio", "Dialog", "Store", "Select",
+        String[] types = new String[]{"Audio", "Dialog", "Storage", "Select",
                 "View"};
         List<ObservableList<String>> olist = new ArrayList<>();
         olist.add(ConfigCenter.AUDIO_OB_LIST);
@@ -124,35 +136,46 @@ public class MainFormController {
             if (n != null) {
                 System.out.println("Select " + n.intValue());
                 playsView.setUserData(playsView.getItems().get(n.intValue()));
-                StoryView storyView = playsView.getItems().get(n.intValue());
-                FormController.get().setNowEditExpression(storyView);
-                gotoStoryView(playsView.getItems().get(n.intValue()));
-                typeChoice.setValue(storyView.type);
-                nameChoice.setValue(storyView.name);
+                selectPlayViewIndex=n.intValue();
+            }
+        });
+        typeChoice.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
+            if (n != null) {
+                FormController formController = FormController.get();
+                if (formController.getNewExpression() != null && !formController.isEditMode()) {
+                    formController.getNewExpression().type = n;
+                    gotoStoryView(formController.getNewExpression());
+                }
             }
         });
     }
 
     void testListView() {
 
-
         MediaC c = new MediaC("audio1", "Name1");
         storyAudioListV.getItems().addAll(c);
+        FormController.get().getAudioMap().put(c.name, c);
 
         MediaC c4 = new MediaC("bgm1", "第一个场景");
         MediaC c5 = new MediaC("battle", "战斗场景");
         storyBgmListV.getItems().addAll(c4, c5);
+        FormController.get().getBgmMap().put(c4.name, c4);
+        FormController.get().getBgmMap().put(c5.name, c5);
 
         PersonC personC = new PersonC("bishojo", "美少女", "1", "默认状态");
         PersonC personC2 = new PersonC("otoko", "男人", "1", "默认状态");
         storyPersonListV.getItems().addAll(personC, personC2);
+        FormController.get().getPersonMap().put(personC.name, personC);
+        FormController.get().getPersonMap().put(personC2.name, personC2);
+
 
         MediaC mediaC = new MediaC("back_demo1", "背景1");
         MediaC mediaC2 = new MediaC("demo2", "背景2");
         storySceneListV.getItems().addAll(mediaC, mediaC2);
+        FormController.get().getSceneMap().put(mediaC.name, mediaC);
+        FormController.get().getSceneMap().put(mediaC2.name, mediaC2);
 
         TreeItem<StoryBody> globalItem = FormController.get().getGlobal();
-        ;
         StoryBody global = globalItem.getValue();
         StoryBody b1 = new StoryBody(StoryBody.Type.CHAPTER, "第一章",
                 FormController.getUniqueId(), global.id);
@@ -183,9 +206,18 @@ public class MainFormController {
 
 
         StoryView v1 = new StoryView(0, "Dialog", "Open", NONE_DATA);
-        StoryView v2 = new StoryView(1, "Dialog", "Word", new String[]{"这是一个很好的天气\\啊啊啊\\啊啊啊\\啊啊"});
-        StoryView v3 = new StoryView(2, "Audio", "Bgm.Play", new String[]{"第一个场景"});
-        playsView.getItems().addAll(v1, v2, v3);
+        StoryView v2 = new StoryView(1, "Dialog", "Pound", new String[]{"这是一个很好的天气\\啊啊啊\\啊啊啊\\啊啊"});
+        StoryView v3 = new StoryView(3, "Dialog", "Word", new String[]{
+                "M", "这是我的话语，你不要说给别人听"
+        });
+        StoryView v4 = new StoryView(4, "Dialog", "Word", new String[]{
+                "S", "这是我的话语，你不要说给别人听"
+        });
+        StoryView v5 = new StoryView(5, "Audio", "Bgm.Play", new String[]{"第一个场景"});
+        StoryView v6 = new StoryView(6, "Select", "Go", new String[]{"Option1", "我选择", "我不选择", "让他选择"});
+        StoryView v7 = new StoryView(7, "Storage", "Save", new String[]{"A", "10"});
+        StoryView v8 = new StoryView(8, "View", "Scene", new String[]{"第一个场景"});
+        playsView.getItems().addAll(v1, v2, v3, v4, v5, v6, v7, v8);
     }
 
     void initStoryTree() {
@@ -225,7 +257,9 @@ public class MainFormController {
 
     @FXML
     void onAddCommand(ActionEvent event) {
-
+        StoryView view = new StoryView(10, "Audio", "", new String[]{"","","","","","",""});
+        FormController.get().setEditMode(false);
+        gotoStoryView(view);
     }
 
     @FXML
@@ -418,7 +452,26 @@ public class MainFormController {
 
     @FXML
     void onWordEnter(ActionEvent event) {
-
+        System.out.println("On Enter");
+        FormController formController = FormController.get();
+        StoryView editView = formController.getNewExpression();
+        if(editView!=null){
+            //将type、name重新写入StoryView
+            if(FormController.get().isEditMode()){
+                StoryView source = formController.getNowEditExpression();
+                String[] newD=new String[editView.data.length];
+                System.arraycopy(editView.data,0,newD,0,newD.length);
+                source.data=newD;
+            }else {
+                playsView.getItems().add(selectPlayViewIndex+1,editView);
+            }
+        }
+        FormController.get().setNowEditExpression(null);
+        typeChoice.setDisable(true);
+        nameChoice.setDisable(true);
+        FormController.get().eraseNewExpression();
+        FormController.get().setEditEnd(true);
+        commands.getChildren().clear();
     }
 
     @FXML
@@ -441,7 +494,52 @@ public class MainFormController {
 
     }
 
+
+    @FXML
+    void onCommandEdit(ActionEvent event) {
+        StoryView storyView = playsView.getItems().get(selectPlayViewIndex);
+        FormController.get().setEditMode(true);
+        gotoStoryView(storyView);
+    }
+
     void gotoStoryView(StoryView view) {
+        FormController.get().createNewExpression(view);
         FormController.get().setNowEditExpression(view);
+        StoryView newV = FormController.get().getNewExpression();
+
+        StoryViewEdit edit = editMap.get(newV.type);
+        commands.getChildren().clear();
+        commands.setAlignment(Pos.CENTER);
+
+        if (edit != null) {
+            FormController.get().setEditEnd(false);
+
+            typeChoice.setValue(newV.type);
+            ReadOnlyObjectProperty<String> onlyObjectProperty=nameChoice.getSelectionModel().selectedItemProperty();
+            onlyObjectProperty.addListener((v,o,n)->{
+                if(n!=null){
+                    StoryView e=FormController.get().getNewExpression();
+                    if(e!=null&&!FormController.get().isEditMode()){
+                        e.name=n;
+                    }
+                }
+            });
+
+            GridPane pane = edit.create(newV, nameChoice.getSelectionModel().selectedItemProperty());
+            if (pane != null) {
+                pane.setAlignment(Pos.CENTER);
+                pane.setMinWidth(Region.USE_COMPUTED_SIZE);
+                commands.getChildren().clear();
+                commands.getChildren().add(pane);
+                if (FormController.get().isEditMode()) {
+                    typeChoice.setDisable(true);
+                    nameChoice.setValue(newV.name);
+                    nameChoice.setDisable(true);
+                }else {
+                    typeChoice.setDisable(false);
+                    nameChoice.setDisable(false);
+                }
+            }
+        }
     }
 }

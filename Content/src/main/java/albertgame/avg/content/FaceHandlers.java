@@ -18,7 +18,7 @@ import java.util.Map;
 public interface FaceHandlers {
 
     /**
-     * - Dialog  Word  #Text  旁白文字
+     * - Dialog  Pound  #Text  旁白文字
      * - Dialog  Word  S  #Text  对话文字，使用名称？？？，以后都如此
      * - Dialog  Word  M  #Text  对话文字，以‘我’为名称，以后都如此
      * - Dialog  Word  DataId  #Text  对话文字,以id的人物名称，以后都如此
@@ -31,29 +31,28 @@ public interface FaceHandlers {
         public void handle(FaceData data, FaceHead head, Arg arg) {
             switch (arg.name()) {
                 case "Word":
-                    if (arg.data().length == 2) {
-                        if (arg.data()[0].equals("S")) {
-                            type = "S";
-                            _setName(data, "???");
-                        } else if (arg.data()[0].equals("M")) {
-                            type = "M";
-                            _setName(data, "我");
-                        } else {
-                            String pid = arg.data()[0];
-                            type = "@" + pid;
-                            Person p = GameFaceLife.playedPersons.get(pid);
-                            if (p != null) {
-                                _setName(data, p.getName());
-                            }
-                        }
-                        Clear(data);
-                        Word(data, arg.data()[1]);
+                    if (arg.data()[0].equals("S")) {
+                        type = "S";
+                        _setName(data, "???");
+                    } else if (arg.data()[0].equals("M")) {
+                        type = "M";
+                        _setName(data, "我");
                     } else {
-                        _setName(data, "");
-                        type = "P";
-                        Clear(data);
-                        Word(data, arg.data()[0]);
+                        String pid = arg.data()[0];
+                        type = "@" + pid;
+                        Person p = GameFaceLife.playedPersons.get(pid);
+                        if (p != null) {
+                            _setName(data, p.getName());
+                        }
                     }
+                    Clear(data);
+                    Word(data, arg.data()[1]);
+                    break;
+                case "Pound":
+                    _setName(data, "");
+                    type = "P";
+                    Clear(data);
+                    Word(data, arg.data()[0]);
                     break;
                 case "Open":
                     Open(data);

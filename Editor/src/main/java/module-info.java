@@ -3,7 +3,7 @@ module avg.editor {
     requires javafx.controls;
     requires javafx.fxml;
 
-    opens albertgame.avg.editor to javafx.fxml;
+    opens albertgame.avg.editor.n2 to javafx.fxml;
 
     exports albertgame.avg.editor;
 }

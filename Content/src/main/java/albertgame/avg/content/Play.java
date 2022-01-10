@@ -299,11 +299,11 @@ public class Play {
             for (i = 0; i != page - 1; ++i) {
                 String w = f.substring(
                         i * ConfigCenter.WORD_MAX_SIZE, (i + 1) * ConfigCenter.WORD_MAX_SIZE);
-                String[] cmd = new String[]{"Dialog", "Word", w};
+                String[] cmd = new String[]{"Dialog", "Pound", w};
                 arrayList.add(cmd);
             }
             String lastPage = f.substring(i * ConfigCenter.WORD_MAX_SIZE);
-            String[] cmd = new String[]{"Dialog", "Word", lastPage};
+            String[] cmd = new String[]{"Dialog", "Pound", lastPage};
             arrayList.add(cmd);
             return arrayList;
         } else return Collections.emptyList();

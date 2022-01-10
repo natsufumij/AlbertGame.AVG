@@ -259,10 +259,6 @@ public class Play {
         }
     }
 
-    //我是和好的一个人
-    //@S  你在说什么?
-    //[Person  In  DataId]
-    //,这是注释
     public static List<String[]> parseCmd(String s) {
         if (s.startsWith("[") && s.endsWith("]")) {
             String f = s.substring(1, s.length() - 1);
@@ -299,11 +295,11 @@ public class Play {
             for (i = 0; i != page - 1; ++i) {
                 String w = f.substring(
                         i * ConfigCenter.WORD_MAX_SIZE, (i + 1) * ConfigCenter.WORD_MAX_SIZE);
-                String[] cmd = new String[]{"Dialog", "Word", w};
+                String[] cmd = new String[]{"Dialog", "Pound", w};
                 arrayList.add(cmd);
             }
             String lastPage = f.substring(i * ConfigCenter.WORD_MAX_SIZE);
-            String[] cmd = new String[]{"Dialog", "Word", lastPage};
+            String[] cmd = new String[]{"Dialog", "Pound", lastPage};
             arrayList.add(cmd);
             return arrayList;
         } else return Collections.emptyList();
@@ -749,7 +745,7 @@ public class Play {
         for (Map.Entry<String, BodyStruck> bodys : play.bodyStruckMap.entrySet()) {
             lines.add("  >>" + bodys.getKey());
             for (String s : bodys.getValue().expressions) {
-                if(!s.isBlank()){
+                if (!s.isBlank()) {
                     lines.add("    " + changeToFileCommands(s));
                 }
             }
@@ -770,6 +766,7 @@ public class Play {
 
     private static String changeToFileCommands(String expression) {
         final String splitS = "Dialog  Word";
+        final String splitS2 = "Dialog  Pound";
         if (expression.startsWith(splitS)) {
             String s = "Dialog  Word  M";
             String a = "Dialog  Word  S";
@@ -787,9 +784,9 @@ public class Play {
                     return strings[2];
                 } else return "";
             }
-        } else {
-            return "[" + expression + "]";
-        }
+        } else if (expression.startsWith(splitS2)) {
+            return expression.substring(splitS.length());
+        } else return "[" + expression + "]";
     }
 
     private static void outputToLine(Chapter chapter, List<String> lines) {
@@ -826,7 +823,7 @@ public class Play {
             w.append(",");
         }
         w.deleteCharAt(w.length() - 1);
-        progress.add("  " + w.toString());
+        progress.add("  " + w);
 
         String oId = op.id;
         opts.add("  >>" + oId);
@@ -844,31 +841,31 @@ public class Play {
 
     private static void outputToLine(GlobalConfig globalConfig, List<String> lines) {
         String[] lineI = new String[]{"Info", "Progress", "Options", "PersonData"};
-        lines.add("#"+lineI[0]);
+        lines.add("#" + lineI[0]);
         lines.add(globalConfig.startChapter);
         lines.add("Global");
 
         lines.add("");
-        lines.add("#"+lineI[1]);
-        List<String> options=new ArrayList<>();
-        for (Map.Entry<String,OptionStruck> bodys : globalConfig.chapterOptionMap.entrySet()) {
+        lines.add("#" + lineI[1]);
+        List<String> options = new ArrayList<>();
+        for (Map.Entry<String, OptionStruck> bodys : globalConfig.chapterOptionMap.entrySet()) {
             String sourceId = bodys.getKey();
             outputOption(sourceId, bodys.getValue(), lines, options);
         }
 
         lines.add("");
-        lines.add("#"+lineI[2]);
+        lines.add("#" + lineI[2]);
         lines.addAll(options);
 
-        lines.add("#"+lineI[3]);
-        for(Map.Entry<String, GlobalConfig.PersonConfig> p:globalConfig.personConfigs.entrySet()){
-            lines.add("  >>"+p.getKey());
-            lines.add("    "+p.getValue().name);
-            StringBuilder builder=new StringBuilder();
-            for(String s:p.getValue().state){
+        lines.add("#" + lineI[3]);
+        for (Map.Entry<String, GlobalConfig.PersonConfig> p : globalConfig.personConfigs.entrySet()) {
+            lines.add("  >>" + p.getKey());
+            lines.add("    " + p.getValue().name);
+            StringBuilder builder = new StringBuilder();
+            for (String s : p.getValue().state) {
                 builder.append(s).append(",");
             }
-            lines.add("    "+builder);
+            lines.add("    " + builder);
         }
     }
 

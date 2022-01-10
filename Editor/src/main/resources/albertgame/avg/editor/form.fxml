@@ -34,7 +34,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Group?>
-<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
@@ -48,7 +47,7 @@
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.TreeView?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -56,7 +55,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.media.MediaView?>
 
-<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="albertgame.avg.editor.MainFormController">
+<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="albertgame.avg.editor.n2.MainFormController2">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -73,7 +72,7 @@
         </Menu>
       </menus>
     </MenuBar>
-      <SplitPane dividerPositions="0.2776292335115864" prefHeight="1980.0" prefWidth="899.0">
+      <SplitPane dividerPositions="0.22506678539626" prefHeight="1980.0" prefWidth="899.0">
         <items>
             <VBox nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="100.0">
                <children>
@@ -81,22 +80,22 @@
                     <panes>
                       <TitledPane alignment="TOP_RIGHT" animated="false" nodeOrientation="LEFT_TO_RIGHT" prefHeight="501.0" prefWidth="231.0">
                            <content>
-                              <ListView fx:id="storyAudioListV" prefHeight="200.0" prefWidth="230.0" />
+                              <ListView fx:id="audioLib" prefHeight="200.0" prefWidth="230.0" />
                            </content>
                            <graphic>
                               <HBox alignment="CENTER_RIGHT" nodeOrientation="RIGHT_TO_LEFT">
                                  <children>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onAudioEdit" text="E" textAlignment="CENTER">
+                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#audioEdit" text="E" textAlignment="CENTER">
                                        <HBox.margin>
                                           <Insets right="2.5" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onAudioRemove" text="-" textAlignment="CENTER">
+                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#audioRemove" text="-" textAlignment="CENTER">
                                        <HBox.margin>
                                           <Insets right="2.5" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onAudioAdd" text="+" textAlignment="CENTER" />
+                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#audioAdd" text="+" textAlignment="CENTER" />
                                     <Label contentDisplay="TOP" text="Audio">
                                        <HBox.margin>
                                           <Insets />
@@ -111,22 +110,22 @@
                       </TitledPane>
                       <TitledPane alignment="TOP_RIGHT" animated="false" nodeOrientation="LEFT_TO_RIGHT" prefHeight="453.0" prefWidth="231.0">
                            <content>
-                              <ListView fx:id="storyBgmListV" prefHeight="200.0" prefWidth="200.0" />
+                              <ListView fx:id="bgmLib" prefHeight="200.0" prefWidth="200.0" />
                            </content>
                            <graphic>
                               <HBox alignment="CENTER_RIGHT" nodeOrientation="RIGHT_TO_LEFT">
                                  <children>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onBgmEdit" text="E" textAlignment="CENTER">
+                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#bgmEdit" text="E" textAlignment="CENTER">
                                        <HBox.margin>
                                           <Insets right="2.5" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onBgmRemove" text="-" textAlignment="CENTER">
+                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#bgmRemove" text="-" textAlignment="CENTER">
                                        <HBox.margin>
                                           <Insets right="2.5" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onBgmAdd" text="+" textAlignment="CENTER" />
+                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#bgmAdd" text="+" textAlignment="CENTER" />
                                     <Label alignment="TOP_LEFT" contentDisplay="RIGHT" nodeOrientation="RIGHT_TO_LEFT" text="Bgm" textAlignment="CENTER">
                                        <padding>
                                           <Insets left="10.0" />
@@ -138,22 +137,22 @@
                       </TitledPane>
                       <TitledPane alignment="CENTER_RIGHT" animated="false" prefHeight="468.0" prefWidth="231.0">
                            <content>
-                              <ListView fx:id="storyPersonListV" prefHeight="200.0" prefWidth="200.0" />
+                              <ListView fx:id="personLib" prefHeight="200.0" prefWidth="200.0" />
                            </content>
                            <graphic>
                               <HBox alignment="CENTER_RIGHT" nodeOrientation="RIGHT_TO_LEFT">
                                  <children>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onPersonEdit" text="E" textAlignment="CENTER">
+                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#personEdit" text="E" textAlignment="CENTER">
                                        <HBox.margin>
                                           <Insets right="2.5" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onePersonRemove" text="-" textAlignment="CENTER">
+                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#personRemove" text="-" textAlignment="CENTER">
                                        <HBox.margin>
                                           <Insets right="2.5" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onPersonAdd" text="+" textAlignment="CENTER">
+                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#personAdd" text="+" textAlignment="CENTER">
                                        <HBox.margin>
                                           <Insets />
                                        </HBox.margin>
@@ -169,22 +168,22 @@
                       </TitledPane>
                         <TitledPane alignment="CENTER_RIGHT" animated="false" prefHeight="510.0" prefWidth="231.0">
                            <content>
-                              <ListView fx:id="storySceneListV" prefHeight="200.0" prefWidth="200.0" />
+                              <ListView fx:id="sceneLib" prefHeight="200.0" prefWidth="200.0" />
                            </content>
                            <graphic>
                               <HBox alignment="CENTER_RIGHT" nodeOrientation="RIGHT_TO_LEFT">
                                  <children>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onSceneEdit" text="E" textAlignment="CENTER">
+                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#sceneEdit" text="E" textAlignment="CENTER">
                                        <HBox.margin>
                                           <Insets right="2.5" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onSceneRemove" text="-" textAlignment="CENTER">
+                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#sceneRemove" text="-" textAlignment="CENTER">
                                        <HBox.margin>
                                           <Insets right="2.5" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onSceneAdd" text="+" textAlignment="CENTER" />
+                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#sceneAdd" text="+" textAlignment="CENTER" />
                                     <Label contentDisplay="TOP" text="Scene">
                                        <padding>
                                           <Insets left="10.0" />
@@ -196,7 +195,7 @@
                         </TitledPane>
                         <TitledPane alignment="CENTER_RIGHT" animated="false" prefHeight="477.0" prefWidth="231.0">
                            <content>
-                              <TreeView fx:id="storyTreeV" prefHeight="200.0" prefWidth="200.0" />
+                              <TreeView fx:id="storyLib" prefHeight="200.0" prefWidth="200.0" />
                            </content>
                            <graphic>
                               <HBox alignment="CENTER_RIGHT" nodeOrientation="RIGHT_TO_LEFT">
@@ -206,12 +205,12 @@
                                           <Insets right="2.5" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onStoryRemove" text="-" textAlignment="CENTER">
+                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#storyRemove" text="-" textAlignment="CENTER">
                                        <HBox.margin>
                                           <Insets right="2.5" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onStoryAdd" text="+" textAlignment="CENTER" />
+                                    <Button alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#storyAdd" text="+" textAlignment="CENTER" />
                                     <Label contentDisplay="TOP" text="Story">
                                        <padding>
                                           <Insets left="10.0" />
@@ -225,71 +224,130 @@
                   </Accordion>
                </children>
             </VBox>
-            <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+            <SplitPane dividerPositions="0.6058246828143021" prefHeight="302.0" prefWidth="661.0">
               <items>
-                  <AnchorPane prefHeight="280.0" prefWidth="1085.0">
+                  <VBox alignment="CENTER" prefHeight="750.0" prefWidth="300.0">
                      <children>
-                        <Canvas fx:id="shapeCanvas" height="280.0" width="640.0" />
-                        <Button fx:id="graphButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="C: Chapter" />
-                     </children>
-                  </AnchorPane>
-                  <SplitPane dividerPositions="0.46905940594059403" prefHeight="302.0" prefWidth="661.0">
-                    <items>
-                        <VBox alignment="CENTER">
+                        <VBox alignment="TOP_CENTER" prefHeight="235.0" prefWidth="300.0">
                            <children>
-                              <ListView fx:id="playsView">
-                                 <VBox.margin>
-                                    <Insets left="5.0" right="5.0" top="5.0" />
-                                 </VBox.margin></ListView>
-                              <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="37.0" prefWidth="291.0">
-                                <items>
-                                  <Button mnemonicParsing="false" onAction="#onAddCommand" text="+" />
-                                    <Button mnemonicParsing="false" onAction="#onRemoveCommand" text=" -" />
-                                </items>
-                              </ToolBar>
+                              <BorderPane nodeOrientation="LEFT_TO_RIGHT" prefHeight="41.0" prefWidth="300.0">
+                                 <left>
+                                    <Label text="Struck" BorderPane.alignment="CENTER">
+                                       <BorderPane.margin>
+                                          <Insets left="10.0" />
+                                       </BorderPane.margin>
+                                    </Label>
+                                 </left>
+                                 <right>
+                                    <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                       <children>
+                                          <Button mnemonicParsing="false" onAction="#struckAdd" text="+" />
+                                          <Button mnemonicParsing="false" onAction="#struckRemove" text="-" />
+                                       </children>
+                                    </HBox>
+                                 </right>
+                              </BorderPane>
+                              <GridPane fx:id="struckGrid">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                              </GridPane>
                            </children>
                         </VBox>
-                        <VBox alignment="TOP_CENTER" nodeOrientation="LEFT_TO_RIGHT">
+                        <ListView fx:id="cmdViews" prefHeight="438.0" prefWidth="408.0">
+                           <VBox.margin>
+                              <Insets left="5.0" right="5.0" top="5.0" />
+                           </VBox.margin>
+                        </ListView>
+                        <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="37.0" prefWidth="291.0">
+                          <items>
+                            <Button mnemonicParsing="false" onAction="#cmdAdd" text="+" />
+                              <Button mnemonicParsing="false" onAction="#cmdRemove" text=" -" />
+                              <Button mnemonicParsing="false" onAction="#cmdEdit" text="E" />
+                          </items>
+                        </ToolBar>
+                     </children>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="750.0" prefWidth="340.0">
+                     <children>
+                        <VBox prefHeight="441.0" prefWidth="340.0">
                            <children>
-                              <VBox alignment="TOP_CENTER" prefHeight="386.0" prefWidth="340.0">
-                                 <children>
-                                    <GridPane alignment="CENTER">
-                                      <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                      </columnConstraints>
-                                      <rowConstraints>
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                      </rowConstraints>
+                              <BorderPane nodeOrientation="LEFT_TO_RIGHT" prefHeight="27.0" prefWidth="340.0">
+                                 <left>
+                                    <Label text="Progress" BorderPane.alignment="CENTER">
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </Label>
+                                 </left>
+                                 <right>
+                                    <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                        <children>
-                                          <Label text="Type:" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-                                          <ChoiceBox fx:id="typeChoice" prefWidth="150.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-                                          <Label text="Name:" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-                                          <ChoiceBox fx:id="nameChoice" prefWidth="150.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                                          <Button mnemonicParsing="false" onAction="#progressAdd" text="+" />
+                                          <Button mnemonicParsing="false" onAction="#progressRemove" text="-" />
+                                          <Button mnemonicParsing="false" onAction="#progressEdit" text="E" />
                                        </children>
-                                    </GridPane>
-                                    <ScrollPane prefHeight="200.0">
-                                       <content>
-                                          <VBox fx:id="commands" alignment="CENTER" prefHeight="190.0" prefWidth="328.0">
-                                             <opaqueInsets>
-                                                <Insets />
-                                             </opaqueInsets>
-                                          </VBox>
-                                       </content>
-                                    </ScrollPane>
-                                 </children></VBox>
-                              <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="11.0" prefWidth="278.0">
-                                 <items>
-                                    <Button mnemonicParsing="false" onAction="#onWordEnter" text="Enter" />
-                                 </items>
+                                    </HBox>
+                                 </right>
+                              </BorderPane>
+                              <ScrollPane prefHeight="260.0" prefWidth="340.0">
+                                 <content>
+                                    <ListView fx:id="progresses" prefHeight="273.0" prefWidth="340.0" />
+                                 </content>
+                              </ScrollPane>
+                           </children>
+                        </VBox>
+                        <VBox alignment="TOP_CENTER" prefHeight="386.0" prefWidth="340.0">
+                           <children>
+                              <GridPane alignment="CENTER">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Label text="Type:" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                                    <ChoiceBox fx:id="typeChoice" prefWidth="150.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                                    <Label text="Name:" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                                    <ChoiceBox fx:id="nameChoice" prefWidth="150.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                                 </children>
                                  <VBox.margin>
-                                    <Insets />
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                  </VBox.margin>
-                              </ToolBar>
-                           </children></VBox>
-                    </items>
-                  </SplitPane>
+                              </GridPane>
+                              <ScrollPane prefHeight="200.0">
+                                 <content>
+                                    <VBox fx:id="cmdSettings" alignment="CENTER" prefHeight="190.0" prefWidth="328.0">
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                    </VBox>
+                                 </content>
+                              </ScrollPane>
+                           </children>
+                        </VBox>
+                        <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="11.0" prefWidth="278.0">
+                           <items>
+                              <Button mnemonicParsing="false" onAction="#cmdCompelete" text="Enter" />
+                           </items>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </ToolBar>
+                     </children>
+                  </VBox>
               </items>
             </SplitPane>
         </items>

@@ -16,6 +16,7 @@ public class MainEntry extends Application {
 
         primaryStage.setTitle(ConfigCenter.WINDOW_TITLE);
         primaryStage.getIcons().add(ConfigCenter.getSystemImage("Icon"));
+        primaryStage.setResizable(false);
 
         _controller =GameController.gameController(
                 ConfigCenter.WINDOW_WIDTH,ConfigCenter.WINDOW_HEIGHT,

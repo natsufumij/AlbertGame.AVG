@@ -102,7 +102,6 @@ public class FormController {
     }
 
 
-
     private static FormController _instance;
 
     public static FormController get() {
@@ -163,7 +162,6 @@ public class FormController {
     private TreeItem<StoryBody> global;
     private final Map<String, TreeItem<StoryBody>> chapterTree;
     private final Map<String, ObservableList<StoryBody>> playInChapterMap;
-    private final Map<String, GraphHelper.ShapeNode> shapeNodeMap;
 
     private Play.GlobalConfig globalConfig;
     private Play.Chapter nowChapter;
@@ -171,6 +169,9 @@ public class FormController {
     private Play.BodyStruck nowStruck;
 
     private StoryView nowEditExpression;
+    private StoryView newExpression;
+    private boolean isEditMode;
+    private boolean editEnd;
 
     private FormController() {
         audioMap = new HashMap<>();
@@ -179,7 +180,6 @@ public class FormController {
         personMap = new HashMap<>();
         playInChapterMap = new HashMap<>();
         chapterTree = new HashMap<>();
-        shapeNodeMap = new HashMap<>();
     }
 
     public Map<String, MediaC> getAudioMap() {
@@ -254,8 +254,36 @@ public class FormController {
         this.nowEditExpression = nowEditExpression;
     }
 
-    public Map<String, GraphHelper.ShapeNode> getShapeNodeMap() {
-        return shapeNodeMap;
+    public void createNewExpression(StoryView view) {
+        newExpression = new StoryView(view.bindLine, view.type, view.name,
+                new String[view.data == null ? 0 : view.data.length]);
+        if (view.data!=null && view.data.length>0) {
+            System.arraycopy(view.data, 0, newExpression.data, 0, view.data.length);
+        }
+    }
+
+    public void eraseNewExpression(){
+        newExpression=null;
+    }
+
+    public StoryView getNewExpression() {
+        return newExpression;
+    }
+
+    public boolean isEditMode() {
+        return isEditMode;
+    }
+
+    public void setEditMode(boolean editMode) {
+        isEditMode = editMode;
+    }
+
+    public boolean isEditEnd() {
+        return editEnd;
+    }
+
+    public void setEditEnd(boolean editEnd) {
+        this.editEnd = editEnd;
     }
 
     //1. Load Project Path
