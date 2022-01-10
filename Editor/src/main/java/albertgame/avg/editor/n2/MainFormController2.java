@@ -12,16 +12,16 @@ import javafx.scene.media.MediaView;
 public class MainFormController2 {
 
     @FXML
-    private ListView<LibResource> audioLib;
+    private ListView<LibAsset> audioLib;
 
     @FXML
-    private ListView<LibResource> bgmLib;
+    private ListView<LibAsset> bgmLib;
 
     @FXML
     private VBox cmdSettings;
 
     @FXML
-    private ListView<?> cmdViews;
+    private ListView<PlayCommand> cmdViews;
 
     @FXML
     private MediaView mediaView;
@@ -30,16 +30,16 @@ public class MainFormController2 {
     private ChoiceBox<String> nameChoice;
 
     @FXML
-    private ListView<LibResource> personLib;
+    private ListView<LibAsset> personLib;
 
     @FXML
-    private ListView<LibResource> progresses;
+    private ListView<LibAsset> progresses;
 
     @FXML
-    private ListView<LibResource> sceneLib;
+    private ListView<LibAsset> sceneLib;
 
     @FXML
-    private TreeView<?> storyLib;
+    private TreeView<LibAsset> storyLib;
 
     @FXML
     private GridPane struckGrid;
