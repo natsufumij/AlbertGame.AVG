@@ -123,14 +123,18 @@ public interface FaceHandlers {
                     } else {
                         //继续贴字
                         char c = destWords.charAt(index);
-                        if (c == '\\' || iy == ConfigCenter.WORD_LINE_COLUMN) {
+                        if (c == '\\') {
                             ++ix;
                             iy = 0;
+                            ++index;
+                        } else if (iy == ConfigCenter.WORD_LINE_COLUMN) {
+                            ++ix;
+                            iy=0;
                         } else {
                             d.strPro(GameFaceLife.findWordAt(ix, iy)).setValue(String.valueOf(c));
                             ++iy;
+                            ++index;
                         }
-                        ++index;
                     }
                 });
                 line.getKeyFrames().add(keyFrame);

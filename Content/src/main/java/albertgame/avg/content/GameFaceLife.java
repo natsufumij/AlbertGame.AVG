@@ -38,8 +38,8 @@ public class GameFaceLife implements FaceLife {
 
         @Override
         public void handle(MouseEvent event) {
-            IntegerProperty in=_d.intPro("gameState");
-            if(in.get()==GAME_STATE_WAIT_PRESS){
+            IntegerProperty in = _d.intPro("gameState");
+            if (in.get() == GAME_STATE_WAIT_PRESS) {
                 in.set(GAME_STATE_WAIT_NEXT);
             }
 
@@ -55,7 +55,7 @@ public class GameFaceLife implements FaceLife {
         public void handle(MouseEvent event) {
             Task<Void> task = new Task<>() {
                 @Override
-                protected Void call(){
+                protected Void call() {
                     int ind = Integer.parseInt(MainEntry.Controller().getData().get("index"));
                     ConfigCenter.saveCache(ind, _d.property("cache"));
                     ConfigCenter.saveSelects(ind, _d.property("selects"));
@@ -173,11 +173,11 @@ public class GameFaceLife implements FaceLife {
         String scene = properties.getProperty("scene");
         String bgm = properties.getProperty("bgm");
 
-        String[] personIn ;
-        if(properties.contains("personin")){
-            personIn=properties.getProperty("personin").split(",");
-        }else {
-            personIn=new String[0];
+        String[] personIn;
+        if (properties.contains("personin")) {
+            personIn = properties.getProperty("personin").split(",");
+        } else {
+            personIn = new String[0];
         }
         String leftP = properties.getProperty("leftp");
         String centerP = properties.getProperty("centerp");
@@ -281,7 +281,7 @@ public class GameFaceLife implements FaceLife {
             if (struck.optionStruck() != Play.OptionStruck.NONE_OPTION) {
                 //查找下一个body块
                 Play.BodyStruck nextStruck = GameFaceLife.play.nextBodyStruck(struck.id(), da);
-                if(nextStruck!= Play.BodyStruck.NONE_BODY){
+                if (nextStruck != Play.BodyStruck.NONE_BODY) {
                     resetStruck(data, GameFaceLife.chapter, GameFaceLife.play, nextStruck);
                 }
             } else {
@@ -562,7 +562,7 @@ public class GameFaceLife implements FaceLife {
     }
 
     private void initTool(FaceHead head) {
-       final List<EventHandler<MouseEvent>> eventHandlers = new ArrayList<>(Arrays.asList(
+        final List<EventHandler<MouseEvent>> eventHandlers = new ArrayList<>(Arrays.asList(
                 new SkipEventHandler(),
                 new AutoEventHandler(),
                 new SaveEventHandler(),
@@ -580,21 +580,21 @@ public class GameFaceLife implements FaceLife {
             button.setFill(ConfigCenter.getSystemColor("Button0"));
             button.setFont(ConfigCenter.getSystemFont("Word"));
             button.visibleProperty().bindBidirectional(wordPaneFrame.visibleProperty());
-            if(i==1){
+            if (i == 1) {
                 button.setUserData(true);
-                EventHandler<MouseEvent> e=(m)->{
+                EventHandler<MouseEvent> e = (m) -> {
                     //表示初始状态
-                    if((Boolean)button.getUserData()){
+                    if ((Boolean) button.getUserData()) {
                         button.setText("SLOW");
                         button.setUserData(false);
-                    }else {
+                    } else {
                         button.setText("AUTO");
                         button.setUserData(true);
                     }
                     eventHandlers.get(1).handle(m);
                 };
                 button.setOnMouseClicked(e);
-            }else {
+            } else {
                 button.setOnMouseClicked(eventHandlers.get(i));
             }
             prefX -= 55;
@@ -615,7 +615,8 @@ public class GameFaceLife implements FaceLife {
                     .bindBidirectional(selectText[i].visibleProperty());
             data.boolPro(findSelectAt(i))
                     .set(false);
-            data.boolPro(findSelectAt(i)).addListener((v, o, n) -> System.out.println("BoolProperty " + v + " Change From " + o + " to " + n + " ."));
+            data.boolPro(findSelectAt(i)).addListener((v, o, n) -> {
+            });
         }
 
         //WordPanelShow Bind
