@@ -97,15 +97,17 @@ public class GameFaceLife implements FaceLife {
     }
 
     @Override
-    public GameController.KeyInput handlerKeys() {
-        EventHandler<KeyEvent> p = event -> {
+    public GameController.MouseInput handlerKeys() {
+        EventHandler<MouseEvent> p = event -> {
         };
-        EventHandler<KeyEvent> r = event -> {
+        EventHandler<MouseEvent> r = event -> {
             if (_d.intPro("gameState").get() == GAME_STATE_WAIT_PRESS) {
                 _d.intPro("gameState").set(GAME_STATE_WAIT_NEXT);
             }
         };
-        return new GameController.KeyInput(p, r);
+        EventHandler<MouseEvent> rb=event -> {
+        };
+        return new GameController.MouseInput(p, r,rb);
     }
 
     FaceData _d;
@@ -495,6 +497,11 @@ public class GameFaceLife implements FaceLife {
                 ConfigCenter.WORD_PANEL_HEIGHT, Color.color(0.2, 0.2, 0.2, 0.5));
         wordPaneFrame.setTranslateY(ConfigCenter.WORD_PANEL_DISPLAY_Y);
         wordPaneFrame.setTranslateX(ConfigCenter.WORD_PANEL_DISPLAY_X);
+        wordPaneFrame.setOnMouseClicked(event -> {
+            if(event.getClickCount()==2){
+                FaceHandlers.DialogHandler.shiftWord();
+            }
+        });
         head.attach(wordPaneFrame);
         head.attach(name);
     }
@@ -529,8 +536,8 @@ public class GameFaceLife implements FaceLife {
             rectangle.setUserData((i + 1));
             Color selectC = ConfigCenter.getSystemColor("SelectRect0");
             Color noneC = ConfigCenter.getSystemColor("SelectRect1");
-            rectangle.setArcWidth(4.0);
-            rectangle.setArcHeight(3.0);
+            rectangle.setArcWidth(10.0);
+            rectangle.setArcHeight(10.0);
             rectangle.setFill(selectC);
             rectangle.setOnMouseEntered(event -> rectangle.setFill(noneC));
             rectangle.setOnMouseExited(event -> rectangle.setFill(selectC));
@@ -547,6 +554,17 @@ public class GameFaceLife implements FaceLife {
             });
 
             Text t = new Text("");
+            t.setOnMouseEntered(event -> rectangle.setFill(noneC));
+            t.setOnMouseExited(event -> rectangle.setFill(selectC));
+            t.setOnMouseClicked(event -> {
+                for (int j = 0; j != selectText.length; ++j) {
+                    Text desist = selectText[j];
+                    desist.visibleProperty().set(false);
+                }
+                data.property("selects").put(data.strPro("nowSelectId").get(),
+                        rectangle.getUserData());
+                data.intPro("gameState").set(GAME_STATE_WAIT_NEXT);
+            });
             t.setId(i + "");
             t.setFont(ConfigCenter.getSystemFont("Select"));
             t.setTranslateY(ty);
@@ -555,8 +573,8 @@ public class GameFaceLife implements FaceLife {
             selectText[i] = t;
             selectMasks[i] = rectangle;
             t.visibleProperty().bindBidirectional(rectangle.visibleProperty());
-            head.attach(t);
             head.attach(rectangle);
+            head.attach(t);
             head.mark(findSelectAt(i), FaceHead.THIS_FACE, t);
         }
     }

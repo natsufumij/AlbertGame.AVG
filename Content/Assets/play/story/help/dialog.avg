@@ -14,9 +14,11 @@
         对话框的简单使用
     
     >>Struck1
-        首先，你可以通过‘[Dialog  Open]’命令打开对话框\这个命令会打开关闭的对话框
-        然后用‘[Dialog  Close]’来关闭对话框，就像下面这样
+        首先，你可以通过‘[Dialog Open]’命令打开对话框\这个命令会打开关闭的对话框
+        然后用‘[Dialog Close]’来关闭对话框，就像下面这样
         [Dialog  Close]
+        这个时候你写的字，玩家是看不到的
+        [Dialog  Clear]
         [Dialog  Open]
         你将会看到对话框关闭，又打开。
 
@@ -41,14 +43,14 @@
         另外，如果你想使用某个已登场的人物的名称作为对话的主体\你需要使用‘@DataId  文字部分’来表示一个人物的对话
         ‘@’后的DataId的值为已登场的人物的Id。
         但是，这前提是，你已经把这个人物作为登场人物登记了。
-        登场人物使用‘[Person  In  #DataId]’，其中的‘#DataId’为你需要导入的人物Id。
+        登场人物使用‘[Person In #DataId]’，其中的‘#DataId’为你需要导入的人物Id。
         该人物Id会在global.avg总配置文件中指出，并且附带她的各个状态Id\人物Id和状态Id共同组成了人物状态的图片资源
-        接下来，使用‘[Person  In  bishojo]’命令，将美少女作为登场人物登记。
+        接下来，使用‘[Person In bishojo]’命令，将美少女作为登场人物登记。
         [Person  In  bishojo]
         如此一来，就能够使用她的名字作为对话的主体姓名了。
         比如如下：
         @bishojo  这是美少女说的话。
-        @bishojo  你也可以使用‘[Dialog  Clear]’来清除显示的名称和文字
+        @bishojo  你也可以使用‘[Dialog Clear]’来清除显示的名称和文字
         @bishojo  这经常用来在场景的结束。
         @bishojo  比如接下来，你会看到文字会被完全清楚
         [Dialog  Clear]

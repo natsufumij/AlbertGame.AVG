@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutionException;
 public class StoreLife implements FaceLife {
 
     @Override
-    public GameController.KeyInput handlerKeys() {
+    public GameController.MouseInput handlerKeys() {
         return null;
     }
 

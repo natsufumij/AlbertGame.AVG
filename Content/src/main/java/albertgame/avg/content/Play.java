@@ -263,50 +263,23 @@ public class Play {
     //@S  你在说什么?
     //[Person  In  DataId]
     //,这是注释
-    public static List<String[]> parseCmd(String s) {
+    public static String[] parseCmd(String s) {
         if (s.startsWith("[") && s.endsWith("]")) {
             String f = s.substring(1, s.length() - 1);
             f = f.strip();
-            ArrayList<String[]> arrayList = new ArrayList<>();
-            arrayList.add(f.split(" {2}"));
-            return arrayList;
+            return f.split(" {2}");
         } else if (s.startsWith("@")) {
             String f = s.substring(1);
             f = f.strip();
-            String[] x = f.split(" {2}");
-            if (x.length != 2) return Collections.emptyList();
-
-            ArrayList<String[]> arrayList = new ArrayList<>();
-            int page = x[1].length() / ConfigCenter.WORD_MAX_SIZE;
-            ++page;
-            int i;
-            for (i = 0; i != page - 1; ++i) {
-                String w = x[1].substring(
-                        i * ConfigCenter.WORD_MAX_SIZE, (i + 1) * ConfigCenter.WORD_MAX_SIZE);
-                String[] cmd = new String[]{"Dialog", "Word", x[0], w};
-                arrayList.add(cmd);
-            }
-            String lastPage = x[1].substring(i * ConfigCenter.WORD_MAX_SIZE);
-            String[] cmd = new String[]{"Dialog", "Word", x[0], lastPage};
-            arrayList.add(cmd);
-            return arrayList;
+            int index=f.indexOf("  ");
+            String fx=f.substring(index+2);
+            String id=f.substring(0,index);
+            return new String[]{"Dialog","Word",id,fx};
         } else if (!s.startsWith(",")) {
             String f = s.strip();
-            ArrayList<String[]> arrayList = new ArrayList<>();
-            int page = f.length() / ConfigCenter.WORD_MAX_SIZE;
-            ++page;
-            int i;
-            for (i = 0; i != page - 1; ++i) {
-                String w = f.substring(
-                        i * ConfigCenter.WORD_MAX_SIZE, (i + 1) * ConfigCenter.WORD_MAX_SIZE);
-                String[] cmd = new String[]{"Dialog", "Pound", w};
-                arrayList.add(cmd);
-            }
-            String lastPage = f.substring(i * ConfigCenter.WORD_MAX_SIZE);
-            String[] cmd = new String[]{"Dialog", "Pound", lastPage};
-            arrayList.add(cmd);
-            return arrayList;
-        } else return Collections.emptyList();
+            String[] cmd = new String[]{"Dialog", "Pound",f};
+            return cmd;
+        } else return null;
     }
 
     private static List<BodyNodeH> loadBodyNodeH(URL url) {
@@ -392,15 +365,13 @@ public class Play {
     private static void refreshBodyStruck(BodyStruck struck) {
         List<String> destList = new ArrayList<>();
         for (String s : struck.expressions) {
-            List<String[]> dest = parseCmd(s);
-            for (String[] sr : dest) {
-                StringBuilder ax = new StringBuilder("  ");
-                for (String sd : sr) {
-                    ax.append(sd).append("  ");
-                }
-                ax = new StringBuilder(ax.toString().strip());
-                destList.add(ax.toString());
+            String[] dest = parseCmd(s);
+            StringBuilder ax = new StringBuilder();
+            for (String sr : dest) {
+                ax.append(sr).append("  ");
             }
+            ax.delete(ax.length()-2,ax.length());
+            destList.add(ax.toString());
         }
         struck.expressions.clear();
         struck.expressions.addAll(destList);

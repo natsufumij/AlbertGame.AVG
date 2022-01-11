@@ -3,7 +3,7 @@ package albertgame.avg.content;
 import java.util.Map;
 
 public interface FaceLife {
-    GameController.KeyInput handlerKeys();
+    GameController.MouseInput handlerKeys();
 
     void init(FaceData d, FaceHead h, Map<String,FaceHandler> p);
     void update(FaceData d, FaceHead h);

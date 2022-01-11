@@ -66,11 +66,13 @@ public interface FaceHandlers {
             }
         }
 
-        Timeline line;
-        String destWords;
+        private static Timeline line;
+        private static String destWords;
+
         int index = 0, dest;
         int ix, iy;
         String type;
+        static FaceData _da;
 
         private void skipWord(FaceData d, String text) {
             StringBuilder builder = new StringBuilder();
@@ -84,15 +86,41 @@ public interface FaceHandlers {
             d.property("cache").put("wordtype", type);
         }
 
+
+        //在Word显示中，取消动画，一下子全部显示
+        public static void shiftWord(){
+            if(line!=null && !_da.boolPro("auto").get()){
+                line.stop();
+                int ix=0,iy=0;
+                for(int i=0;i!=destWords.length();++i){
+                    //到尽头了
+                    if(iy==ConfigCenter.WORD_LINE_COLUMN){
+                        ++ix;
+                        iy=0;
+                        char c=destWords.charAt(i);
+                        _da.strPro(GameFaceLife.findWordAt(ix,iy)).set(c+"");
+                    }else{
+                        char c=destWords.charAt(i);
+                        if(c=='\\'){
+                            ++ix;
+                            iy=0;
+                        }else {
+                            _da.strPro(GameFaceLife.findWordAt(ix,iy)).set(c+"");
+                            ++iy;
+                        }
+                    }
+                }
+                _da.intPro("gameState").set(GameFaceLife.GAME_STATE_WAIT_PRESS);
+            }
+        }
+
         //如果有\号，表示下面的需要换一行显示.
         private void Word(FaceData d, String text) {
+            _da=d;
             if (d.boolPro("skip").get()) {
                 skipWord(d, text);
                 return;
             }
-
-            final int[] line_first = new int[]{ConfigCenter.WORD_LINE_COLUMN,
-                    ConfigCenter.WORD_LINE_COLUMN * 2};
 
             index = 0;
             destWords = text;
@@ -120,6 +148,7 @@ public interface FaceHandlers {
                         d.property("cache").put("word", text);
                         d.property("cache").put("wordtype", type);
                         line.stop();
+                        line=null;
                     } else {
                         //继续贴字
                         char c = destWords.charAt(index);

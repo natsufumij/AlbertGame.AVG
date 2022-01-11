@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class StartLife implements FaceLife {
     @Override
-    public GameController.KeyInput handlerKeys() {
+    public GameController.MouseInput handlerKeys() {
         return null;
     }
 
