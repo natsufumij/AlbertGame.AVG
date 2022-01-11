@@ -86,10 +86,11 @@ public class GameFaceLife implements FaceLife {
     public static final Map<String, Person> playedPersons = new HashMap<>();
     public static final Map<String, Person.PersonData> personDataMap = new HashMap<>();
     public static Person leftPerson, centerPerson, rightPerson;
-    public static Play.GlobalConfig globalConfig;
-    public static Play.Chapter chapter;
-    public static Play play;
-    public static Play.BodyStruck bodyStruck;
+
+    private static Play.GlobalConfig globalConfig;
+    private static Play.Chapter chapter;
+    private static Play play;
+    private static Play.BodyStruck bodyStruck;
 
     public static void clearStaticCache() {
         playedPersons.clear();
@@ -105,9 +106,9 @@ public class GameFaceLife implements FaceLife {
                 _d.intPro("gameState").set(GAME_STATE_WAIT_NEXT);
             }
         };
-        EventHandler<MouseEvent> rb=event -> {
+        EventHandler<MouseEvent> rb = event -> {
         };
-        return new GameController.MouseInput(p, r,rb);
+        return new GameController.MouseInput(p, r, rb);
     }
 
     FaceData _d;
@@ -498,7 +499,7 @@ public class GameFaceLife implements FaceLife {
         wordPaneFrame.setTranslateY(ConfigCenter.WORD_PANEL_DISPLAY_Y);
         wordPaneFrame.setTranslateX(ConfigCenter.WORD_PANEL_DISPLAY_X);
         wordPaneFrame.setOnMouseClicked(event -> {
-            if(event.getClickCount()==2){
+            if (event.getClickCount() == 2) {
                 FaceHandlers.DialogHandler.shiftWord();
             }
         });
