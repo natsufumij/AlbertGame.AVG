@@ -1,6 +1,7 @@
 package albertgame.avg.editor;
 
-import albertgame.avg.editor.Play;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 
 import java.util.HashMap;
@@ -8,12 +9,15 @@ import java.util.Map;
 
 public class StruckH implements Struck.Handler{
 
-    GridPane pane;
+    private final FlowPane struckPane;
+    private final ChoiceBox<String> startChoice;
     Map<String, Struck> struckMap;
     Struck nowSelect;
 
-    public StruckH(GridPane pane) {
-        this.pane = pane;
+    public StruckH(FlowPane struckPane,
+                   ChoiceBox<String> startChoice) {
+        this.struckPane = struckPane;
+        this.startChoice = startChoice;
         struckMap=new HashMap<>();
     }
 

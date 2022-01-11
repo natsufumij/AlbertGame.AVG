@@ -2,9 +2,8 @@ package albertgame.avg.editor;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaView;
@@ -39,7 +38,7 @@ public class MainFormController2 {
     private ListView<LibAsset> personLib;
 
     @FXML
-    private ListView<LibAsset> progresses;
+    private ListView<Progress> progresses;
 
     @FXML
     private ListView<LibAsset> sceneLib;
@@ -48,14 +47,17 @@ public class MainFormController2 {
     private TreeView<LibAsset> storyLib;
 
     @FXML
-    private GridPane struckGrid;
+    private FlowPane struckFlow;
 
     @FXML
     private ChoiceBox<String> typeChoice;
 
     @FXML
-    void initialize(){
-        MainFormController2.controller2=this;
+    private ChoiceBox<String> startStruckChoice;
+
+    @FXML
+    void initialize() {
+        MainFormController2.controller2 = this;
     }
 
     @FXML
@@ -65,32 +67,32 @@ public class MainFormController2 {
 
     @FXML
     void audioAdd(ActionEvent event) {
-
+        LibAsset.findHandler(LibAsset.TYPE.AUDIO).create();
     }
 
     @FXML
     void audioEdit(ActionEvent event) {
-
+        LibAsset.findHandler(LibAsset.TYPE.AUDIO).edit();
     }
 
     @FXML
     void audioRemove(ActionEvent event) {
-
+        LibAsset.findHandler(LibAsset.TYPE.AUDIO).remove();
     }
 
     @FXML
     void bgmAdd(ActionEvent event) {
-
+        LibAsset.findHandler(LibAsset.TYPE.BGM).create();
     }
 
     @FXML
     void bgmEdit(ActionEvent event) {
-
+        LibAsset.findHandler(LibAsset.TYPE.BGM).edit();
     }
 
     @FXML
     void bgmRemove(ActionEvent event) {
-
+        LibAsset.findHandler(LibAsset.TYPE.BGM).remove();
     }
 
     @FXML
@@ -120,17 +122,17 @@ public class MainFormController2 {
 
     @FXML
     void personAdd(ActionEvent event) {
-
+        LibAsset.findHandler(LibAsset.TYPE.PERSON).create();
     }
 
     @FXML
     void personEdit(ActionEvent event) {
-
+        LibAsset.findHandler(LibAsset.TYPE.PERSON).edit();
     }
 
     @FXML
     void personRemove(ActionEvent event) {
-
+        LibAsset.findHandler(LibAsset.TYPE.PERSON).remove();
     }
 
     @FXML
@@ -170,27 +172,32 @@ public class MainFormController2 {
 
     @FXML
     void sceneAdd(ActionEvent event) {
-
+        LibAsset.findHandler(LibAsset.TYPE.SCENE).create();
     }
 
     @FXML
     void sceneEdit(ActionEvent event) {
-
+        LibAsset.findHandler(LibAsset.TYPE.SCENE).edit();
     }
 
     @FXML
     void sceneRemove(ActionEvent event) {
-
+        LibAsset.findHandler(LibAsset.TYPE.SCENE).remove();
     }
 
     @FXML
     void storyAdd(ActionEvent event) {
-
+        LibAsset.findHandler(LibAsset.TYPE.STORY).create();
     }
 
     @FXML
     void storyRemove(ActionEvent event) {
+        LibAsset.findHandler(LibAsset.TYPE.STORY).remove();
+    }
 
+    @FXML
+    void storyEdit(ActionEvent event){
+        LibAsset.findHandler(LibAsset.TYPE.STORY).edit();
     }
 
     @FXML
@@ -231,7 +238,7 @@ public class MainFormController2 {
         return personLib;
     }
 
-    public ListView<LibAsset> getProgresses() {
+    public ListView<Progress> getProgresses() {
         return progresses;
     }
 
@@ -243,11 +250,15 @@ public class MainFormController2 {
         return storyLib;
     }
 
-    public GridPane getStruckGrid() {
-        return struckGrid;
+    public FlowPane getStruckFlow() {
+        return struckFlow;
     }
 
     public ChoiceBox<String> getTypeChoice() {
         return typeChoice;
+    }
+
+    public ChoiceBox<String> getStartStruckChoice() {
+        return startStruckChoice;
     }
 }

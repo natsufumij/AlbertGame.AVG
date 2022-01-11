@@ -170,22 +170,26 @@ public class C {
         return projectPath + "/" + lib + "/" + id + "." + format;
     }
 
-    public static void moveFileTo(String destPath,String lib,String id){
-        File file=new File(destPath);
+    public static void moveFileTo(String sourcePath,String lib,String id){
+        File file=new File(sourcePath);
         if(file.exists()&&file.isFile()){
-            moveFileTo(file,lib,lib);
+            moveFileTo(file,lib,id);
         }
     }
 
     //把文件复制到 /lib/id.format里
     public static void moveFileTo(File file, String lib, String id) {
-        Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 String[] ss = file.getAbsolutePath().split("\\.");
                 String format = ss[ss.length - 1];
                 String destPath = getRealPath(lib, id, format);
                 File destF = new File(destPath);
+                File p=destF.getParentFile();
+                if(p.isDirectory()&&!p.exists()){
+                    p.mkdirs();
+                }
 
                 FileChannel inputChannel = null;
                 FileChannel outputChannel = null;
@@ -223,7 +227,7 @@ public class C {
             }
         };
         task.setOnSucceeded(e -> {
-            System.out.println("Move File To Asset Success");
+            System.out.println("Move File "+file.getPath() +" to "+ lib+"/"+id+" Success");
         });
         Platform.runLater(task);
     }

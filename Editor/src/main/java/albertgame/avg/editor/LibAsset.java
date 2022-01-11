@@ -24,15 +24,20 @@ public class LibAsset {
     }
 
     final String id;
+    final String format;
     String name;
     String path;
-    String format;
 
     public LibAsset(String id, String name, String path, String format) {
         this.id = id;
         this.name = name;
         this.path = path;
         this.format = format;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 
     interface Handler {

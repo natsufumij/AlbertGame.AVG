@@ -3,11 +3,12 @@ package albertgame.avg.editor;
 public class Editor {
 
     private static Editor _s;
-    private static final Object lock=new Object();
+    private static final Object lock = new Object();
+
     public static Editor get() {
-        if(_s==null){
-            synchronized (lock){
-                _s=new Editor();
+        if (_s == null) {
+            synchronized (lock) {
+                _s = new Editor();
             }
         }
         return _s;
@@ -19,10 +20,22 @@ public class Editor {
     private Progress.Handler progressH;
 
     private Editor() {
-
     }
 
-    public void init(){
+    private void init() {
+        LibAsset.addHandler(LibAsset.TYPE.AUDIO, new LibAssetH.ListH("audio", "wav",
+                con.getAudioLib()));
+        LibAsset.addHandler(LibAsset.TYPE.BGM, new LibAssetH.ListH("bgm", "mp3",
+                con.getBgmLib()));
+        LibAsset.addHandler(LibAsset.TYPE.PERSON, new LibAssetH.ListH("person", "png",
+                con.getPersonLib()));
+        LibAsset.addHandler(LibAsset.TYPE.SCENE, new LibAssetH.ListH("scene", "jpg",
+                con.getSceneLib()));
+        LibAsset.addHandler(LibAsset.TYPE.STORY, new LibAssetH.TreeH("story", "avg",
+                con.getStoryLib()));
+        struckH = new StruckH(con.getStruckFlow(), con.getStartStruckChoice());
+        playCommandH = new PlayCommandH(con.getCmdViews(), con.getCmdSettings(), con.getTypeChoice(), con.getNameChoice());
+        progressH = new ProgressH(con.getProgresses());
     }
 
     public MainFormController2 getController() {
@@ -31,5 +44,18 @@ public class Editor {
 
     public void setController(MainFormController2 controller2) {
         this.con = controller2;
+        init();
+    }
+
+    public Struck.Handler getStruckH() {
+        return struckH;
+    }
+
+    public PlayCommand.Handler getPlayCommandH() {
+        return playCommandH;
+    }
+
+    public Progress.Handler getProgressH() {
+        return progressH;
     }
 }

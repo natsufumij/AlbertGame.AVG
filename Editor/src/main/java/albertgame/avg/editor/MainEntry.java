@@ -29,7 +29,6 @@ public class MainEntry extends Application {
             primaryStage.setScene(scene);
             Editor.get().setController(
                     MainFormController2.getController2());
-            Editor.get().init();
             primaryStage.show();
         } catch (IOException e) {
             e.printStackTrace();

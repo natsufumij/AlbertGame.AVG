@@ -1,6 +1,8 @@
 package albertgame.avg.editor;
 
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,19 +10,26 @@ import java.util.List;
 public class PlayCommandH implements PlayCommand.Handler {
 
     private final List<PlayCommand> playCommands;
+
     private final ListView<PlayCommand> list;
+    private final VBox commandSettings;
+    private final ChoiceBox<String> typeChoice;
+    private final ChoiceBox<String> nameChoice;
+
     private PlayCommand selectItem;
 
-    public PlayCommandH(ListView<PlayCommand> list) {
+    public PlayCommandH(ListView<PlayCommand> list, VBox commandSettings,
+                        ChoiceBox<String> typeChoice, ChoiceBox<String> nameChoice) {
         this.list = list;
+        this.commandSettings = commandSettings;
+        this.typeChoice = typeChoice;
+        this.nameChoice = nameChoice;
         playCommands = new ArrayList<>();
         init();
     }
 
     void init(){
-        list.getSelectionModel().selectedItemProperty().addListener((v,o,n)->{
-            selectItem= n;
-        });
+        list.getSelectionModel().selectedItemProperty().addListener((v,o,n)-> selectItem= n);
     }
 
     @Override
