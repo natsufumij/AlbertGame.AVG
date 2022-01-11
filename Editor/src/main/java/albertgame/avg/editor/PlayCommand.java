@@ -1,4 +1,4 @@
-package albertgame.avg.editor.n2;
+package albertgame.avg.editor;
 
 import java.util.List;
 
@@ -13,17 +13,17 @@ public class PlayCommand {
 
         void remove();
 
+        PlayCommand copySelectItem();
+
         List<PlayCommand> allCommands();
     }
 
-    final int index;
     String type;
     String name;
     String[] data;
 
-    public PlayCommand(int index, String type,
+    public PlayCommand(String type,
                        String name, String[] data) {
-        this.index = index;
         this.type = type;
         this.name = name;
         this.data = data;
@@ -54,5 +54,22 @@ public class PlayCommand {
         builder.delete(builder.length() - 2, builder.length());
         builder.append("]");
         return builder.toString();
+    }
+
+    public static PlayCommand transfer(String expression){
+        String[] strings=expression.split(" {2}");
+        if(strings.length==2){
+            return new PlayCommand(strings[0],strings[1],new String[0]);
+        }
+        else if(strings.length>2){
+            String t=strings[0];
+            String n=strings[1];
+            String[] data=new String[strings.length-2];
+            System.arraycopy(strings,2,data,0,strings.length-2);
+            return new PlayCommand(t,n,data);
+        }else {
+            System.err.println("Invalid Expression: "+expression);
+            return null;
+        }
     }
 }

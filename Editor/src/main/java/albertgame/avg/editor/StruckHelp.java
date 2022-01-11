@@ -1,4 +1,4 @@
-package albertgame.avg.editor.n2;
+package albertgame.avg.editor;
 
 //帮助StruckHandler处理
 public class StruckHelp {

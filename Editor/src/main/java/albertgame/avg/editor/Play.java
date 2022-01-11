@@ -273,32 +273,32 @@ public class Play {
             if (x.length != 2) return Collections.emptyList();
 
             ArrayList<String[]> arrayList = new ArrayList<>();
-            int page = x[1].length() / ConfigCenter.WORD_MAX_SIZE;
+            int page = x[1].length() / C.WORD_MAX_SIZE;
             ++page;
             int i;
             for (i = 0; i != page - 1; ++i) {
                 String w = x[1].substring(
-                        i * ConfigCenter.WORD_MAX_SIZE, (i + 1) * ConfigCenter.WORD_MAX_SIZE);
+                        i * C.WORD_MAX_SIZE, (i + 1) * C.WORD_MAX_SIZE);
                 String[] cmd = new String[]{"Dialog", "Word", x[0], w};
                 arrayList.add(cmd);
             }
-            String lastPage = x[1].substring(i * ConfigCenter.WORD_MAX_SIZE);
+            String lastPage = x[1].substring(i * C.WORD_MAX_SIZE);
             String[] cmd = new String[]{"Dialog", "Word", x[0], lastPage};
             arrayList.add(cmd);
             return arrayList;
         } else if (!s.startsWith(",")) {
             String f = s.strip();
             ArrayList<String[]> arrayList = new ArrayList<>();
-            int page = f.length() / ConfigCenter.WORD_MAX_SIZE;
+            int page = f.length() / C.WORD_MAX_SIZE;
             ++page;
             int i;
             for (i = 0; i != page - 1; ++i) {
                 String w = f.substring(
-                        i * ConfigCenter.WORD_MAX_SIZE, (i + 1) * ConfigCenter.WORD_MAX_SIZE);
+                        i * C.WORD_MAX_SIZE, (i + 1) * C.WORD_MAX_SIZE);
                 String[] cmd = new String[]{"Dialog", "Pound", w};
                 arrayList.add(cmd);
             }
-            String lastPage = f.substring(i * ConfigCenter.WORD_MAX_SIZE);
+            String lastPage = f.substring(i * C.WORD_MAX_SIZE);
             String[] cmd = new String[]{"Dialog", "Pound", lastPage};
             arrayList.add(cmd);
             return arrayList;

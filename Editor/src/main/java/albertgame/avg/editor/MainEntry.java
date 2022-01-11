@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class MainEntry extends Application {
 
@@ -18,10 +19,17 @@ public class MainEntry extends Application {
     @Override
     public void start(Stage primaryStage) {
         _stage=primaryStage;
+
         try {
-            Parent parent=FXMLLoader.load(MainEntry.class.getResource("form.fxml"));
+            Parent parent=FXMLLoader.load(
+                    Objects.requireNonNull(
+                            MainEntry.class.getResource(
+                                    "form.fxml")));
             Scene scene = new Scene(parent);
             primaryStage.setScene(scene);
+            Editor.get().setController(
+                    MainFormController2.getController2());
+            Editor.get().init();
             primaryStage.show();
         } catch (IOException e) {
             e.printStackTrace();

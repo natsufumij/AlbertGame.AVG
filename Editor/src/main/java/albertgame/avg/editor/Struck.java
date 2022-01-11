@@ -1,6 +1,4 @@
-package albertgame.avg.editor.n2;
-
-import albertgame.avg.editor.Play;
+package albertgame.avg.editor;
 
 import java.util.ArrayList;
 import java.util.List;

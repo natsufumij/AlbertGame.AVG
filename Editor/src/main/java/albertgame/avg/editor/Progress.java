@@ -1,6 +1,4 @@
-package albertgame.avg.editor.n2;
-
-import albertgame.avg.editor.Play;
+package albertgame.avg.editor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +22,11 @@ public class Progress {
     static class Pair{
         String destId;
         String expression;
+
+        public Pair(String destId, String expression) {
+            this.destId = destId;
+            this.expression = expression;
+        }
     }
 
     final String id;
@@ -48,5 +51,15 @@ public class Progress {
             expressions[i]=pair.expression;
         }
         return new Play.OptionStruck(id,expressions,destId);
+    }
+
+    public Progress copy(){
+        List<Pair> pairs=new ArrayList<>();
+        for(Pair p:optionPairs){
+            pairs.add(new Pair(p.destId,p.expression));
+        }
+        Progress pg=new Progress(id,name,optionId);
+        pg.optionPairs=pairs;
+        return pg;
     }
 }

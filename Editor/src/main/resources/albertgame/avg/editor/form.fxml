@@ -55,7 +55,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.media.MediaView?>
 
-<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="albertgame.avg.editor.n2.MainFormController2">
+<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="albertgame.avg.editor.MainFormController2">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -72,7 +72,7 @@
         </Menu>
       </menus>
     </MenuBar>
-      <SplitPane dividerPositions="0.22506678539626" prefHeight="1980.0" prefWidth="899.0">
+      <SplitPane dividerPositions="0.2517809439002671" prefHeight="1980.0" prefWidth="899.0">
         <items>
             <VBox nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="100.0">
                <children>
@@ -231,21 +231,34 @@
                         <VBox alignment="TOP_CENTER" prefHeight="235.0" prefWidth="300.0">
                            <children>
                               <BorderPane nodeOrientation="LEFT_TO_RIGHT" prefHeight="41.0" prefWidth="300.0">
-                                 <left>
-                                    <Label text="Struck" BorderPane.alignment="CENTER">
-                                       <BorderPane.margin>
-                                          <Insets left="10.0" />
-                                       </BorderPane.margin>
-                                    </Label>
-                                 </left>
                                  <right>
-                                    <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                    <HBox alignment="CENTER_RIGHT" prefHeight="42.0" prefWidth="118.0" BorderPane.alignment="CENTER">
                                        <children>
+                                          <Button mnemonicParsing="false" onAction="#saveStruck" text="Save" />
                                           <Button mnemonicParsing="false" onAction="#struckAdd" text="+" />
                                           <Button mnemonicParsing="false" onAction="#struckRemove" text="-" />
                                        </children>
                                     </HBox>
                                  </right>
+                                 <left>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="42.0" prefWidth="240.0" BorderPane.alignment="CENTER">
+                                       <children>
+                                          <Label text="Start Struck">
+                                             <padding>
+                                                <Insets left="10.0" />
+                                             </padding>
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                          </Label>
+                                          <ChoiceBox fx:id="startStruckChoice" prefWidth="150.0">
+                                             <HBox.margin>
+                                                <Insets left="10.0" />
+                                             </HBox.margin>
+                                          </ChoiceBox>
+                                       </children>
+                                    </HBox>
+                                 </left>
                               </BorderPane>
                               <GridPane fx:id="struckGrid">
                                 <columnConstraints>
@@ -270,6 +283,7 @@
                         </ListView>
                         <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="37.0" prefWidth="291.0">
                           <items>
+                              <Button mnemonicParsing="false" onAction="#saveCommands" text="Save" />
                             <Button mnemonicParsing="false" onAction="#cmdAdd" text="+" />
                               <Button mnemonicParsing="false" onAction="#cmdRemove" text=" -" />
                               <Button mnemonicParsing="false" onAction="#cmdEdit" text="E" />
@@ -292,6 +306,7 @@
                                  <right>
                                     <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                        <children>
+                                          <Button mnemonicParsing="false" onAction="#saveProgress" text="Save" />
                                           <Button mnemonicParsing="false" onAction="#progressAdd" text="+" />
                                           <Button mnemonicParsing="false" onAction="#progressRemove" text="-" />
                                           <Button mnemonicParsing="false" onAction="#progressEdit" text="E" />

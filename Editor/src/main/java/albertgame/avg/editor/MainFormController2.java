@@ -1,4 +1,4 @@
-package albertgame.avg.editor.n2;
+package albertgame.avg.editor;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -10,6 +10,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaView;
 
 public class MainFormController2 {
+
+    private static MainFormController2 controller2;
+
+    public static MainFormController2 getController2() {
+        return controller2;
+    }
 
     @FXML
     private ListView<LibAsset> audioLib;
@@ -46,6 +52,11 @@ public class MainFormController2 {
 
     @FXML
     private ChoiceBox<String> typeChoice;
+
+    @FXML
+    void initialize(){
+        MainFormController2.controller2=this;
+    }
 
     @FXML
     void aboutEditor(ActionEvent event) {
@@ -138,6 +149,21 @@ public class MainFormController2 {
     }
 
     @FXML
+    void saveCommands(ActionEvent event) {
+
+    }
+
+    @FXML
+    void saveProgress(ActionEvent event) {
+
+    }
+
+    @FXML
+    void saveStruck(ActionEvent event) {
+
+    }
+
+    @FXML
     void saveProject(ActionEvent event) {
 
     }
@@ -175,5 +201,53 @@ public class MainFormController2 {
     @FXML
     void struckRemove(ActionEvent event) {
 
+    }
+
+    public ListView<LibAsset> getAudioLib() {
+        return audioLib;
+    }
+
+    public ListView<LibAsset> getBgmLib() {
+        return bgmLib;
+    }
+
+    public VBox getCmdSettings() {
+        return cmdSettings;
+    }
+
+    public ListView<PlayCommand> getCmdViews() {
+        return cmdViews;
+    }
+
+    public MediaView getMediaView() {
+        return mediaView;
+    }
+
+    public ChoiceBox<String> getNameChoice() {
+        return nameChoice;
+    }
+
+    public ListView<LibAsset> getPersonLib() {
+        return personLib;
+    }
+
+    public ListView<LibAsset> getProgresses() {
+        return progresses;
+    }
+
+    public ListView<LibAsset> getSceneLib() {
+        return sceneLib;
+    }
+
+    public TreeView<LibAsset> getStoryLib() {
+        return storyLib;
+    }
+
+    public GridPane getStruckGrid() {
+        return struckGrid;
+    }
+
+    public ChoiceBox<String> getTypeChoice() {
+        return typeChoice;
     }
 }

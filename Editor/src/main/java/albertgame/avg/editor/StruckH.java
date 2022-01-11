@@ -1,4 +1,4 @@
-package albertgame.avg.editor.n2;
+package albertgame.avg.editor;
 
 import albertgame.avg.editor.Play;
 import javafx.scene.layout.GridPane;

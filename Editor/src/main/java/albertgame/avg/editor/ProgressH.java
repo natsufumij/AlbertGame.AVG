@@ -1,19 +1,26 @@
-package albertgame.avg.editor.n2;
+package albertgame.avg.editor;
 
-import albertgame.avg.editor.Play;
 import javafx.scene.control.ListView;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProgressH implements Progress.Handler{
+public class ProgressH implements Progress.Handler {
 
-    private final Map<String,Progress> allProgress;
+    private final Map<String, Progress> allProgress;
     final ListView<Progress> pros;
+    private Progress selectItem;
 
     public ProgressH(ListView<Progress> pros) {
         this.pros = pros;
-        allProgress=new HashMap<>();
+        allProgress = new HashMap<>();
+        init();
+    }
+
+    void init() {
+        pros.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
+            selectItem = n;
+        });
     }
 
     @Override
@@ -43,7 +50,10 @@ public class ProgressH implements Progress.Handler{
 
     @Override
     public void remove() {
-        //TODO: 移除选中的分支选项
+        if(selectItem!=null){
+            allProgress.remove(selectItem.id);
+            pros.getItems().remove(selectItem);
+        }
     }
 
     @Override
@@ -53,6 +63,7 @@ public class ProgressH implements Progress.Handler{
 
     @Override
     public Progress copySelectItem() {
-        return null;
+        if (selectItem == null) return null;
+        return selectItem.copy();
     }
 }
