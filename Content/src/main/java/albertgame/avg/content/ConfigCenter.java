@@ -19,10 +19,15 @@ import java.util.Properties;
 
 public class ConfigCenter {
 
+    private static final boolean loadOnClassPath = false;
+    private static final String ASSET_PATH = "Assets";
+
     private static final Map<String, Font> fontMap = new HashMap<>();
     private static final Map<String, Image> imageMap = new HashMap<>();
     private static final Map<String, Color> colorMap = new HashMap<>();
     private static final Map<String, Media> bgmMap = new HashMap<>();
+
+    public static Play.SystemConfig config;
 
     static {
         Map<String, Double> systemFontSizeConfig = new HashMap<>();
@@ -31,8 +36,9 @@ public class ConfigCenter {
         systemFontSizeConfig.put("Select", 24.0);
         systemFontSizeConfig.put("CacheDate", 14.0);
 
-        Play.SystemConfig config = Play.loadSystemConfig(loadUrl("config", "system", "avg"));
+        config = Play.loadSystemConfig(loadUrl("config", "system", "avg"));
         assert config != null;
+
         colorMap.putAll(config.colorMap());
         loadFont(config.fontMap(), systemFontSizeConfig);
         loadImage(config.imageMap());
@@ -217,20 +223,34 @@ public class ConfigCenter {
     public static void saveCache(int index, Properties properties) {
         String dest = CACHE_PATH + index + ".properties";
         Calendar calendar = Calendar.getInstance();
-        properties.setProperty("year", String.valueOf(calendar.get(Calendar.YEAR) - 2000));
-        properties.setProperty("month", String.valueOf(calendar.get(Calendar.MONTH)));
-        properties.setProperty("day", String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
-        properties.setProperty("hour", String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)));
-        properties.setProperty("minute", String.valueOf(calendar.get(Calendar.MINUTE)));
-        properties.setProperty("second", String.valueOf(calendar.get(Calendar.SECOND)));
+        String ys, mos, ds, hs, ms, ss;
+        int year = calendar.get(Calendar.YEAR) - 2000;
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int second = calendar.get(Calendar.SECOND);
+        int minute = calendar.get(Calendar.MINUTE);
+        ys = String.valueOf(year);
+        mos = month < 10 ? "0" + month : "" + month;
+        ds = day < 10 ? "0" + day : "" + day;
+        hs = hour < 10 ? "0" + hour : "" + hour;
+        ms = minute < 10 ? "0" + minute : "" + minute;
+        ss = second < 10 ? "0" + second : "" + second;
+
+        properties.setProperty("year", ys);
+        properties.setProperty("month", mos);
+        properties.setProperty("day",ds);
+        properties.setProperty("hour", hs);
+        properties.setProperty("minute",ms);
+        properties.setProperty("second", ss);
 
         saveC(dest, "游戏存档", properties);
     }
 
     private static void saveC(String dest, String comment, Properties properties) {
         File file = new File(dest);
-        if(!file.exists()){
-            File f=file.getParentFile();
+        if (!file.exists()) {
+            File f = file.getParentFile();
             f.mkdirs();
             try {
                 file.createNewFile();
@@ -283,8 +303,7 @@ public class ConfigCenter {
     }
 
     private static Font loadSystemFont(String path, double size) {
-        Font font = Font.loadFont(loadFileUrl("config/fonts", path, "ttf"), size);
-        return font;
+        return Font.loadFont(loadFileUrl("config/fonts", path, "ttf"), size);
     }
 
     public static AudioClip loadAudio(String name) {
@@ -292,10 +311,21 @@ public class ConfigCenter {
     }
 
     private static String loadFileUrl(String lib, String name, String format) {
-        return ConfigCenter.class.getResource(lib + "/" + name + "." + format).toExternalForm();
+        return loadUrl(lib, name, format).toExternalForm();
     }
 
-    private static URL loadUrl(String lib,String name,String format){
-        return ConfigCenter.class.getResource(lib+"/"+name+"."+format);
+    private static URL loadUrl(String lib, String name, String format) {
+        if (!loadOnClassPath) {
+            File f = new File(ASSET_PATH + "/" + lib + "/" + name + "." + format);
+            try {
+                return f.toURI().toURL();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                System.err.println("File Not Found: " + f.getPath());
+                return null;
+            }
+        }
+
+        return ConfigCenter.class.getResource(lib + "/" + name + "." + format);
     }
 }

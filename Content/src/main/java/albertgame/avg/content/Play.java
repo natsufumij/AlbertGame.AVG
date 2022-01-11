@@ -497,13 +497,19 @@ public class Play {
         Map<String, Color> colorMap = new HashMap<>();
         Map<String, ImageC> imageMap = new HashMap<>();
         Map<String, String> bgmMap = new HashMap<>();
+        String title = "AlbertGame.AVG";
         for (BodyNodeH b : bodyNodeHS) {
             switch (b.name) {
                 case "Info":
-                    if (!b.texts.get(0).equals("System")) {
-                        System.out.println("系统配置导入失败");
+                    if (b.texts.size() < 2) {
+                        System.err.println("系统配置导入失败");
                         return null;
                     }
+                    if (!b.texts.get(1).equals("System")) {
+                        System.err.println("系统配置导入失败");
+                        return null;
+                    }
+                    title = b.texts.get(0);
                     break;
                 case "Fonts":
                     for (String s : b.texts) {
@@ -543,7 +549,7 @@ public class Play {
             }
         }
 
-        return new SystemConfig(fontMap, colorMap, imageMap, bgmMap);
+        return new SystemConfig(fontMap, colorMap, imageMap, bgmMap, title);
     }
 
     private static Map<String, OptionStruck> loadOptionStruckM(BodyNodeH progressH, Map<String, String[]> expressions) {
@@ -674,12 +680,21 @@ public class Play {
         Map<String, Color> colorMap;
         Map<String, ImageC> imageMap;
         Map<String, String> bgmMap;
+        String title;
 
-        public SystemConfig(Map<String, String> fontMap, Map<String, Color> colorMap, Map<String, ImageC> imageMap, Map<String, String> bgmMap) {
+        public SystemConfig(Map<String, String> fontMap,
+                            Map<String, Color> colorMap,
+                            Map<String, ImageC> imageMap,
+                            Map<String, String> bgmMap, String title) {
             this.fontMap = fontMap;
             this.colorMap = colorMap;
             this.imageMap = imageMap;
             this.bgmMap = bgmMap;
+            this.title = title;
+        }
+
+        public String title() {
+            return title;
         }
 
         public Map<String, String> fontMap() {

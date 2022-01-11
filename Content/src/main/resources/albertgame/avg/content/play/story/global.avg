@@ -2,9 +2,10 @@
     chapter0
     Global
 #Progress
-    chapter0->Option1->chapter1
+    chapter0->Option2->help,chapter1
 #Options
-    >>Option1
+    >>Option2
+        GoHelp=1
         Else
 #PersonData
     >>bishojo

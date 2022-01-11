@@ -14,7 +14,6 @@ public class MainEntry extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        primaryStage.setTitle(ConfigCenter.WINDOW_TITLE);
         primaryStage.getIcons().add(ConfigCenter.getSystemImage("Icon"));
         primaryStage.setResizable(false);
 
@@ -23,6 +22,7 @@ public class MainEntry extends Application {
                 primaryStage,new StartLife());
         _controller.initController();
 
+        primaryStage.setTitle(ConfigCenter.config.title);
         primaryStage.show();
     }
 

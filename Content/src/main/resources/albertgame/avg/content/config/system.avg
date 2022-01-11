@@ -1,4 +1,5 @@
 #Info
+  AlbertGame.AVG - 恋爱灯笼
   System
 #Fonts
   Name  simkai
@@ -6,7 +7,7 @@
   Select  simhei
   CacheDate  simkai
 #Colors
-  Name  0.2,0.3,0.4,0.6
+  Name  0.7,0.9,0.4,0.6
   Word  0.6,0.9,0.9,0.8
   Select  0.2,0.3,0.4,0.9
   SelectRect0  0.3,0.3,0.4,0.5

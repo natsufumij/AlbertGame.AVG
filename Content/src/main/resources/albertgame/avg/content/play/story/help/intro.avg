@@ -1,0 +1,46 @@
+#Info
+    intro
+    欢迎使用
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Lighting  3000]
+        [Dialog  Open]
+        欢迎来到AlbertGame.AVG项目\这是剧本脚本的使用说明章节
+        你将会在这里看到关于脚本命令，以及所有应该知道的东西
+        这是第一次正式写文档，所以有些不足还请多多见谅。
+    
+    >>Struck1
+        你会看到，Assets资源文件夹作为游戏的导入数据的地方
+        其中play/bgm文件夹是存放bgm文件的，后缀格式为mp3\文件名（除去后缀）即为bgm的资源Id
+        其中play/scene文件夹是存放场景图片的，后缀格式为jpg\文件名（除去后缀）即为scene的资源Id
+        其中play/person文件夹是存放人物状态图片的，后缀格式为png\文件名的和时间为人物Id和状态Id
+        当需要修改显示的人物的状态图片时，可以用到状态Id
+        其中play/story则是故事剧本存放的地方，目录下最重要的时global.avg\这个文件夹必须存在，且这个文件夹是剧本系统的重要数据源
+        其中会定义起始的章节名称，章节层面的分支选项，以及人物数据
+
+    >>Struck2
+        接下来简单介绍一下配置。
+        在此系统中不管是在那个脚本中\如果是用于分割一个命令格式里两个单词的空格皆为两个空格
+        如果空格打多了，会算进命令中，打少了，则命令显示会有问题。
+        一共有三种文件需要手动配置，一个是global.avg，这是总系统的配置
+        一个是chapter.avg，这是章节的配置，里面记载了启动剧本，剧本层面的分支选项
+        每个分支选项都会在剧本的后面用#Options里面声明\其文件名则为其章节的Id，并且放在和global.avg同目录下
+        可以声明多份分支选项，并且只在当前的配置中起作用。
+        一个是chapter/play.avg，这就是具体的每一个章节的一份剧本了。
+        其应该在其以所属的章节的Id为父目录的文件夹里，其文件名则代表其剧本Id。
+
+     >>End
+        [Dialog  Close]
+        [View  Darking  3000]
+    
+#Progress
+    begins->Option1->Struck1
+    Struck1->Option1->Struck2
+    Struck2->Option1->End
+
+#Options
+    >>Option1
+        Else

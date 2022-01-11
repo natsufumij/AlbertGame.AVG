@@ -1,0 +1,10 @@
+#Info
+    help
+    帮助
+    intro
+    Chapter
+#Progress
+    intro->Option1->dialog
+#Options
+    >>Option1
+        Else

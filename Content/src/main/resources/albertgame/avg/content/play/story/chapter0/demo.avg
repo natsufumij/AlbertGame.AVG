@@ -32,7 +32,8 @@
         [Select  Go  A  第二个剧本  第三个剧本]
 
     >>End
-        结束，进入下一个剧本
+        是否要进入帮助的章节？
+        [Select  Go  GoHelp  是  不是]
         [Person  No.Show  L]
         [Dialog  Clear]
         [Dialog  Close]
