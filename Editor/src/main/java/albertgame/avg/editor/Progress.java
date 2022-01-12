@@ -14,6 +14,7 @@ public class Progress {
         void create();
         void edit();
         void remove();
+        void save();
 
         Map<String,Progress> allProgresses();
         Progress copySelectItem();

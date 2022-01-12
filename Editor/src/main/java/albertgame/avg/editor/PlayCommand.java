@@ -13,6 +13,8 @@ public class PlayCommand {
 
         void remove();
 
+        void save();
+
         PlayCommand copySelectItem();
 
         List<PlayCommand> allCommands();

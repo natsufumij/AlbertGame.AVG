@@ -1,5 +1,6 @@
 package albertgame.avg.editor;
 
+import javafx.beans.value.ChangeListener;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
@@ -17,6 +18,9 @@ public class PlayCommandH implements PlayCommand.Handler {
     private final ChoiceBox<String> nameChoice;
 
     private PlayCommand selectItem;
+
+    private ChangeListener<String> typeChangeListener;
+    private ChangeListener<String> nameChangeListener;
 
     public PlayCommandH(ListView<PlayCommand> list, VBox commandSettings,
                         ChoiceBox<String> typeChoice, ChoiceBox<String> nameChoice) {
@@ -62,6 +66,11 @@ public class PlayCommandH implements PlayCommand.Handler {
             playCommands.remove(selectItem);
             selectItem=null;
         }
+    }
+
+    @Override
+    public void save() {
+        //TODO: 保存当前的剧本命令列表
     }
 
     @Override

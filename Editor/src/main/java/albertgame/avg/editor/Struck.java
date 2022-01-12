@@ -39,6 +39,8 @@ public class Struck {
 
         void remove();
 
+        void save();
+
         Map<String, Struck> allStruck();
 
         Struck copySelectItem();

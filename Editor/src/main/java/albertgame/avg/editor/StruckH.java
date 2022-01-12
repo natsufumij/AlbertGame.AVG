@@ -1,5 +1,6 @@
 package albertgame.avg.editor;
 
+import javafx.beans.value.ChangeListener;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -13,6 +14,8 @@ public class StruckH implements Struck.Handler{
     private final ChoiceBox<String> startChoice;
     Map<String, Struck> struckMap;
     Struck nowSelect;
+
+    private ChangeListener<String> startChangeListener;
 
     public StruckH(FlowPane struckPane,
                    ChoiceBox<String> startChoice) {
@@ -34,6 +37,11 @@ public class StruckH implements Struck.Handler{
     @Override
     public void remove() {
         //TODO: 移除选中的Struck
+    }
+
+    @Override
+    public void save() {
+        //TODO: 保存当前的Struck
     }
 
     @Override

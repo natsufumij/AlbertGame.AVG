@@ -58,6 +58,13 @@ public class MainFormController2 {
     @FXML
     void initialize() {
         MainFormController2.controller2 = this;
+        cmdViews.setCellFactory(l -> new PlayCommandHelp.PlayCommandListCell());
+        cmdViews.getItems().add(new PlayCommand("Dialog", "Open", null));
+        cmdViews.getItems().add(new PlayCommand("Dialog", "Word", new String[]{"You", "这是很好的一个体验"}));
+        cmdViews.getItems().add(new PlayCommand("Dialog", "Word", new String[]{"You",
+                "这是很好的一个体验这是很好的一个体验这是很好的一个体验这是很好的一个体验这是很好的一个体验这是很好的一个体验"}));
+        cmdViews.getItems().add(new PlayCommand("Dialog", "Pound", new String[]{
+                "这是很好的一个体验这是很好的一个体验这是很好的一个体验这是很好的一个体验这是很好的一个体验这是很好的一个体验\\这是很好的一个体验这是很好的一个体验这是很好的一个体验这是很好的一个体验这是很好的一个体验这是很好的一个体验"}));
     }
 
     @FXML
@@ -196,7 +203,7 @@ public class MainFormController2 {
     }
 
     @FXML
-    void storyEdit(ActionEvent event){
+    void storyEdit(ActionEvent event) {
         LibAsset.findHandler(LibAsset.TYPE.STORY).edit();
     }
 

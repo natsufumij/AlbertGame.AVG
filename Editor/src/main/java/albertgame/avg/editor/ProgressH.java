@@ -57,6 +57,11 @@ public class ProgressH implements Progress.Handler {
     }
 
     @Override
+    public void save() {
+        //TODO: 保存当前的选择分支
+    }
+
+    @Override
     public Map<String, Progress> allProgresses() {
         return null;
     }
