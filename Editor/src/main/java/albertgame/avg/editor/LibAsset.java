@@ -1,9 +1,23 @@
 package albertgame.avg.editor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LibAsset {
+
+    public static class Person{
+        String id;
+        String name;
+        List<String> states;
+
+        public Person(String id, String name) {
+            this.id = id;
+            this.name = name;
+            states=new ArrayList<>();
+        }
+    }
 
     public enum TYPE {
         AUDIO, BGM, PERSON, SCENE, STORY

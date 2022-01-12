@@ -5,7 +5,7 @@ import java.util.List;
 public class PlayCommand {
 
     interface Handler {
-        void loadCommands(List<String> expressions);
+        void loadCommands(String playId,List<String> expressions);
 
         void create();
 
@@ -13,9 +13,11 @@ public class PlayCommand {
 
         void remove();
 
+        void enter();
+
         void save();
 
-        PlayCommand copySelectItem();
+        String playId();
 
         List<PlayCommand> allCommands();
     }
@@ -29,6 +31,17 @@ public class PlayCommand {
         this.type = type;
         this.name = name;
         this.data = data;
+    }
+
+    public String toWord(){
+        String s=type+"  "+name+"\n";
+        if(data!=null){
+            for(String x:data){
+                s+=x+"  ";
+            }
+        }
+        s=s.strip();
+        return s;
     }
 
     //Dialog  Word  M  XXX -> @M  XXXX
@@ -59,6 +72,7 @@ public class PlayCommand {
     }
 
     public static PlayCommand transfer(String expression){
+        expression=expression.replace("\n","  ");
         String[] strings=expression.split(" {2}");
         if(strings.length==2){
             return new PlayCommand(strings[0],strings[1],new String[0]);

@@ -50,10 +50,10 @@ public class PlayCommandHelp {
             return hBox;
         }
 
-        static final Font commandF = Font.font("Console", FontPosture.ITALIC, 10.0);
-        static final Color commandC = Color.color(0.4, 0.3, 0.7, 0.9);
+        private static final Font commandF = Font.font("arial", FontPosture.ITALIC, 9.0);
+        private static final Color commandC = Color.color(0.4, 0.3, 0.7, 0.9);
 
-        static final Label _label(String w) {
+        private static Label _label(String w) {
             Label label = new Label(w);
             label.setFont(commandF);
             label.setTextFill(commandC);
@@ -61,8 +61,8 @@ public class PlayCommandHelp {
             return label;
         }
 
-        static final Font wordF = Font.font("simkai", 12.0);
-        static final Color wordC = Color.color(0.4, 0.3, 0, 0.8);
+        private static final Font wordF = Font.font("arial", 12.0);
+        private static final Color wordC = Color.color(0.4, 0.3, 0, 0.8);
 
         private static Node _createWords(PlayCommand command) {
             VBox vBox = new VBox();
@@ -81,7 +81,7 @@ public class PlayCommandHelp {
                 label.setTextFill(wordC);
                 vBox.getChildren().add(label);
             }
-            List<String> words = allString(word);
+            List<String> words = _allString(word);
             for (String s : words) {
                 Label label = new Label(s);
                 label.setFont(wordF);
@@ -90,11 +90,9 @@ public class PlayCommandHelp {
             }
             return vBox;
         }
-
-
     }
 
-    public static List<String> allString(String a) {
+    private static List<String> _allString(String a) {
         List<String> arr = new ArrayList<>();
         StringBuilder line = new StringBuilder();
         int ix = 0, iy = 0;

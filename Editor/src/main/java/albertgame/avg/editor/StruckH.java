@@ -41,7 +41,7 @@ public class StruckH implements Struck.Handler{
 
     @Override
     public void save() {
-        //TODO: 保存当前的Struck
+        //TODO: 保存当前的剧本
     }
 
     @Override

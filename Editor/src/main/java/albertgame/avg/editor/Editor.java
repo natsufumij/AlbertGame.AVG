@@ -1,5 +1,8 @@
 package albertgame.avg.editor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Editor {
 
     private static Editor _s;
@@ -18,8 +21,10 @@ public class Editor {
     private Struck.Handler struckH;
     private PlayCommand.Handler playCommandH;
     private Progress.Handler progressH;
+    private Map<String, LibAsset.Person> persons;
 
     private Editor() {
+        persons =new HashMap<>();
     }
 
     private void init() {
@@ -34,7 +39,7 @@ public class Editor {
         LibAsset.addHandler(LibAsset.TYPE.STORY, new LibAssetH.TreeH("story", "avg",
                 con.getStoryLib()));
         struckH = new StruckH(con.getStruckFlow(), con.getStartStruckChoice());
-        playCommandH = new PlayCommandH(con.getCmdViews(), con.getCmdSettings(), con.getTypeChoice(), con.getNameChoice());
+        playCommandH = new PlayCommandH(con.getCmdViews(), con.getCommandArea(), con.getCmdEnterBu());
         progressH = new ProgressH(con.getProgresses());
     }
 
@@ -57,5 +62,9 @@ public class Editor {
 
     public Progress.Handler getProgressH() {
         return progressH;
+    }
+
+    public Map<String, LibAsset.Person> getPersons() {
+        return persons;
     }
 }

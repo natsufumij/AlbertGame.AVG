@@ -4,8 +4,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaView;
 
 public class MainFormController2 {
@@ -23,16 +21,10 @@ public class MainFormController2 {
     private ListView<LibAsset> bgmLib;
 
     @FXML
-    private VBox cmdSettings;
-
-    @FXML
     private ListView<PlayCommand> cmdViews;
 
     @FXML
     private MediaView mediaView;
-
-    @FXML
-    private ChoiceBox<String> nameChoice;
 
     @FXML
     private ListView<LibAsset> personLib;
@@ -50,10 +42,13 @@ public class MainFormController2 {
     private FlowPane struckFlow;
 
     @FXML
-    private ChoiceBox<String> typeChoice;
+    private ChoiceBox<String> startStruckChoice;
 
     @FXML
-    private ChoiceBox<String> startStruckChoice;
+    private TextArea commandArea;
+
+    @FXML
+    private Button cmdEnterBu;
 
     @FXML
     void initialize() {
@@ -104,22 +99,22 @@ public class MainFormController2 {
 
     @FXML
     void cmdAdd(ActionEvent event) {
-
+        Editor.get().getPlayCommandH().create();
     }
 
     @FXML
     void cmdCompelete(ActionEvent event) {
-
+        Editor.get().getPlayCommandH().enter();
     }
 
     @FXML
     void cmdEdit(ActionEvent event) {
-
+        Editor.get().getPlayCommandH().edit();
     }
 
     @FXML
     void cmdRemove(ActionEvent event) {
-
+        Editor.get().getPlayCommandH().remove();
     }
 
     @FXML
@@ -225,20 +220,12 @@ public class MainFormController2 {
         return bgmLib;
     }
 
-    public VBox getCmdSettings() {
-        return cmdSettings;
-    }
-
     public ListView<PlayCommand> getCmdViews() {
         return cmdViews;
     }
 
     public MediaView getMediaView() {
         return mediaView;
-    }
-
-    public ChoiceBox<String> getNameChoice() {
-        return nameChoice;
     }
 
     public ListView<LibAsset> getPersonLib() {
@@ -261,11 +248,15 @@ public class MainFormController2 {
         return struckFlow;
     }
 
-    public ChoiceBox<String> getTypeChoice() {
-        return typeChoice;
-    }
-
     public ChoiceBox<String> getStartStruckChoice() {
         return startStruckChoice;
+    }
+
+    public TextArea getCommandArea() {
+        return commandArea;
+    }
+
+    public Button getCmdEnterBu() {
+        return cmdEnterBu;
     }
 }

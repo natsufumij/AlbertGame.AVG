@@ -1,9 +1,8 @@
 package albertgame.avg.editor;
 
-import javafx.beans.value.ChangeListener;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.TextArea;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,58 +12,97 @@ public class PlayCommandH implements PlayCommand.Handler {
     private final List<PlayCommand> playCommands;
 
     private final ListView<PlayCommand> list;
-    private final VBox commandSettings;
-    private final ChoiceBox<String> typeChoice;
-    private final ChoiceBox<String> nameChoice;
+    private final TextArea area;
+    private final Button enterBu;
 
     private PlayCommand selectItem;
+    private int selectIndex;
 
-    private ChangeListener<String> typeChangeListener;
-    private ChangeListener<String> nameChangeListener;
+    private boolean editMode;
 
-    public PlayCommandH(ListView<PlayCommand> list, VBox commandSettings,
-                        ChoiceBox<String> typeChoice, ChoiceBox<String> nameChoice) {
+    private String playId;
+    public PlayCommandH(ListView<PlayCommand> list, TextArea area, Button enterBu) {
         this.list = list;
-        this.commandSettings = commandSettings;
-        this.typeChoice = typeChoice;
-        this.nameChoice = nameChoice;
+        this.area = area;
+        this.enterBu = enterBu;
         playCommands = new ArrayList<>();
         init();
     }
 
-    void init(){
-        list.getSelectionModel().selectedItemProperty().addListener((v,o,n)-> selectItem= n);
+    void init() {
+        list.getSelectionModel().selectedIndexProperty().addListener((v, o, n) -> {
+            if (n != null && n.intValue() != -1) {
+                selectIndex = n.intValue();
+                selectItem = list.getItems().get(selectIndex);
+            }else {
+                selectIndex=-1;
+                selectItem=null;
+            }
+        });
+        enterBu.setDisable(true);
+        area.setDisable(true);
     }
 
     @Override
-    public void loadCommands(List<String> expressions) {
+    public void loadCommands(String playId,List<String> expressions) {
         playCommands.clear();
         list.getItems().clear();
-        for(String s:expressions){
-            PlayCommand c=PlayCommand.transfer(s);
-            if(c!=null){
+        for (String s : expressions) {
+            PlayCommand c = PlayCommand.transfer(s);
+            if (c != null) {
                 playCommands.add(c);
                 list.getItems().add(c);
             }
         }
+        this.playId=playId;
     }
 
     @Override
     public void create() {
-        //TODO: 创建一个PlayCommand
+        area.setDisable(false);
+        enterBu.setDisable(false);
+        editMode = false;
     }
 
     @Override
     public void edit() {
-        //TODO: 编辑选中的PlayCommand
+        area.setText(selectItem.toWord());
+        editMode = true;
+        area.setDisable(false);
+        enterBu.setDisable(false);
+    }
+
+    @Override
+    public void enter() {
+        PlayCommand command = PlayCommand.transfer(area.getText());
+        if(command!=null){
+            if (editMode) {
+                if(selectIndex!=-1){
+                    list.getItems().remove(selectIndex);
+                    list.getItems().add(selectIndex + 1, command);
+                }else {
+                    list.getItems().add(command);
+                }
+            } else {
+                if(selectIndex!=-1){
+                    list.getItems().add(selectIndex+1,command);
+                }else{
+                    list.getItems().add(command);
+                }
+            }
+            selectItem = null;
+            area.setDisable(true);
+            area.setText("");
+            enterBu.setDisable(true);
+        }
     }
 
     @Override
     public void remove() {
-        if(selectItem!=null){
+        if (selectItem != null) {
             list.getItems().remove(selectItem);
             playCommands.remove(selectItem);
-            selectItem=null;
+            selectItem = null;
         }
     }
 
@@ -74,19 +112,8 @@ public class PlayCommandH implements PlayCommand.Handler {
     }
 
     @Override
-    public PlayCommand copySelectItem() {
-        if (selectItem == null) return null;
-        int length = 0;
-        if (selectItem.data != null && selectItem.data.length > 0) {
-            length = selectItem.data.length;
-        }
-        PlayCommand command = new PlayCommand(selectItem.type, selectItem.name,
-                new String[length]);
-        if (selectItem.data != null) {
-            System.arraycopy(selectItem.data, 0, command.data, 0, length);
-        }
-
-        return command;
+    public String playId() {
+        return playId;
     }
 
     @Override
