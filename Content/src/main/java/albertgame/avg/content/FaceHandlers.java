@@ -75,14 +75,27 @@ public interface FaceHandlers {
         static FaceData _da;
 
         private void skipWord(FaceData d, String text) {
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i != text.length(); ++i) {
-                int cx = i / ConfigCenter.WORD_LINE_COLUMN;
-                int cy = i % ConfigCenter.WORD_LINE_COLUMN;
-                d.strPro(GameFaceLife.findWordAt(cx, cy)).setValue(text.charAt(i) + "");
-                builder.append(d.strPro(GameFaceLife.findWordAt(cx, cy)).get());
+            Clear(d);
+            int ix=0,iy=0;
+            for(int i=0;i!=text.length();++i){
+                //到尽头了
+                if(iy==ConfigCenter.WORD_LINE_COLUMN){
+                    ++ix;
+                    iy=0;
+                    char c=text.charAt(i);
+                    _da.strPro(GameFaceLife.findWordAt(ix,iy)).set(c+"");
+                }else{
+                    char c=text.charAt(i);
+                    if(c=='\\'){
+                        ++ix;
+                        iy=0;
+                    }else {
+                        _da.strPro(GameFaceLife.findWordAt(ix,iy)).set(c+"");
+                        ++iy;
+                    }
+                }
             }
-            d.property("cache").put("word", builder.toString());
+            d.property("cache").put("word", text);
             d.property("cache").put("wordtype", type);
         }
 
@@ -130,12 +143,7 @@ public interface FaceHandlers {
             if (line == null) {
                 line = new Timeline();
                 line.setCycleCount(Timeline.INDEFINITE);
-                Duration period;
-                if (d.boolPro("auto").get()) {
-                    period = Duration.millis(30);
-                } else {
-                    period = Duration.millis(100);
-                }
+                Duration period=Duration.millis(100);
                 KeyFrame keyFrame = new KeyFrame(period, "WordDisplaying", event -> {
                     if (index == dest || ix >= ConfigCenter.WORD_LINE_ROW) {
                         //如果是普通文字显示状态，则切换为等待输入状态

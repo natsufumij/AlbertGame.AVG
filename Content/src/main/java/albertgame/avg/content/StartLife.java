@@ -13,10 +13,6 @@ import javafx.scene.text.Text;
 import java.util.Map;
 
 public class StartLife implements FaceLife {
-    @Override
-    public GameController.MouseInput handlerKeys() {
-        return null;
-    }
 
     @Override
     public void init(FaceData d, FaceHead h, Map<String, FaceHandler> p) {

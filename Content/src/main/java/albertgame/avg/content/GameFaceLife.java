@@ -97,7 +97,6 @@ public class GameFaceLife implements FaceLife {
         personDataMap.clear();
     }
 
-    @Override
     public GameController.MouseInput handlerKeys() {
         EventHandler<MouseEvent> p = event -> {
         };
@@ -508,7 +507,7 @@ public class GameFaceLife implements FaceLife {
     }
 
     private void initPanelWord(FaceHead head) {
-        Font f;
+        Font f=ConfigCenter.getSystemFont("Word");
         for (int i = 0; i != ConfigCenter.WORD_MAX_SIZE; ++i) {
             int row = i / ConfigCenter.WORD_LINE_COLUMN;
             int column = i % ConfigCenter.WORD_LINE_COLUMN;
@@ -527,6 +526,23 @@ public class GameFaceLife implements FaceLife {
             words[i] = t;
             head.attach(t);
         }
+        Rectangle mouseClickRect=new Rectangle();
+        mouseClickRect.setTranslateY(ConfigCenter.WORD_START_Y - f.getSize());
+        mouseClickRect.setWidth(ConfigCenter.WINDOW_WIDTH);
+        mouseClickRect.setHeight(ConfigCenter.WORD_LINE_ROW * f.getSize() * 3.0);
+        mouseClickRect.setFill(Color.color(0.0,0.0,0.0,0.0));
+        mouseClickRect.setOnMouseClicked(event -> {
+            if(event.getClickCount()==1){
+                if(_d.intPro("gameState").get()==GAME_STATE_WAIT_PRESS){
+                    _d.intPro("gameState").set(GAME_STATE_WAIT_NEXT);
+                }
+            }else {
+                if(_d.intPro("gameState").get()==GAME_STATE_WORD_DISPLAYING){
+                    FaceHandlers.DialogHandler.shiftWord();
+                }
+            }
+        });
+        head.attach(mouseClickRect);
     }
 
     private void initSelectPanel(FaceHead head, FaceData data) {
@@ -550,7 +566,7 @@ public class GameFaceLife implements FaceLife {
                     desist.visibleProperty().set(false);
                 }
                 data.property("selects").put(data.strPro("nowSelectId").get(),
-                        rectangle.getUserData());
+                        String.valueOf(rectangle.getUserData()));
                 data.intPro("gameState").set(GAME_STATE_WAIT_NEXT);
             });
 

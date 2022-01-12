@@ -156,7 +156,6 @@ public class GameController {
         FaceHeadIm head = new FaceHeadIm();
         FaceDataIm data = new FaceDataIm();
         Map<String, FaceHandler> handlerMap = new HashMap<>();
-        MouseInput input;
         FaceLife life;
     }
 
@@ -164,7 +163,6 @@ public class GameController {
         return new GameController(width, height, stage, initFaceLife);
     }
 
-    private final Scene _scene;
     private final Group _allGroup;
     private final MediaView mediaView;
     private Parent _headNode;
@@ -197,14 +195,13 @@ public class GameController {
         data.put("index", "0");
         packs = new Stack<>();
 
-        _scene = new Scene(_allGroup, width, height);
+        Scene _scene = new Scene(_allGroup, width, height);
         stage.setScene(_scene);
     }
 
     public void initController() {
         pushFace(_life);
         initControlLine();
-        initKeys();
     }
 
     public void pushFace(FaceLife life) {
@@ -216,7 +213,6 @@ public class GameController {
 
         FaceC c = new FaceC();
         c.life = life;
-        c.input = life.handlerKeys();
 
         if (_headNode != null) {
             _allGroup.getChildren().remove(_headNode);
@@ -225,7 +221,6 @@ public class GameController {
         this.faceLife = c.life;
         faceData = c.data;
         faceHead = c.head;
-        keyInput = c.input;
         handlerMap = c.handlerMap;
 
         _headNode = c.head;
@@ -245,7 +240,6 @@ public class GameController {
             faceLife = c.life;
             faceData = c.data;
             faceHead = c.head;
-            keyInput = c.input;
             handlerMap = c.handlerMap;
 
             _allGroup.getChildren().remove(_headNode);
@@ -272,27 +266,6 @@ public class GameController {
 
     public MediaView getMediaView() {
         return mediaView;
-    }
-
-    private void initKeys() {
-        _scene.setOnMouseReleased(event -> {
-            if (keyInput != null && keyInput.release != null && !faceData.animating) {
-                keyInput.release.handle(event);
-            }
-        });
-        _scene.setOnMousePressed(event -> {
-            if (keyInput != null && keyInput.press != null && !faceData.animating) {
-                keyInput.press.handle(event);
-            }
-        });
-        _scene.setOnMouseClicked(event -> {
-            if(event.getClickCount()==2){
-                if(keyInput!=null && keyInput.doubleClick!=null){
-                    keyInput.doubleClick.handle(event);
-                }
-                System.out.println("Double Click.");
-            }
-        });
     }
 
     private void initControlLine() {

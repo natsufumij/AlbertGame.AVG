@@ -170,7 +170,7 @@ public class ConfigCenter {
     }
 
     public static boolean clearCacheData(int index) {
-        String dest = CACHE_PATH + index + ".data.properties";
+        String dest = CACHE_PATH + index + "_data.properties";
         File file = new File(dest);
         if (file.exists()) {
             Path path = Path.of(file.toURI());
@@ -205,12 +205,12 @@ public class ConfigCenter {
     }
 
     public static Properties loadSelects(int index) {
-        String dest = CACHE_PATH + index + ".data.properties";
+        String dest = CACHE_PATH + index + "_data.properties";
         return loadP(dest);
     }
 
     public static Map<String, String> loadCacheData(int index) {
-        String dest = CACHE_PATH + index + ".data.properties";
+        String dest = CACHE_PATH + index + "_data.properties";
         Map<String, String> map = new HashMap<>();
         Properties p = loadP(dest);
         for (Map.Entry<Object, Object> s : p.entrySet()) {
@@ -258,15 +258,16 @@ public class ConfigCenter {
                 e.printStackTrace();
             }
         }
-        try (FileOutputStream stream = new FileOutputStream(file)) {
-            properties.store(new OutputStreamWriter(stream, StandardCharsets.UTF_8), comment);
-        } catch (IOException e) {
+        try (FileOutputStream stream = new FileOutputStream(file);
+            OutputStreamWriter writer=new OutputStreamWriter(stream,StandardCharsets.UTF_8)) {
+            properties.store(writer, comment);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public static void saveSelects(int index, Properties properties) {
-        String dest = CACHE_PATH + index + ".data.properties";
+        String dest = CACHE_PATH + index + "_data.properties";
         saveC(dest, "游戏选择分支存档", properties);
     }
 
