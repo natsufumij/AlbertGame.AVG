@@ -29,8 +29,11 @@ public class GameFaceLife implements FaceLife {
 
         @Override
         public void handle(MouseEvent event) {
-            _d.boolPro("skip").set(true);
-            _d.intPro("gameState").set(GAME_STATE_WAIT_NEXT);
+            if (_d.boolPro("skip").get()) {
+                _d.boolPro("skip").set(false);
+            } else {
+                _d.boolPro("skip").set(true);
+            }
         }
     }
 
@@ -119,7 +122,7 @@ public class GameFaceLife implements FaceLife {
         p.put("View", new FaceHandlers.ViewHandler());
         p.put("Person", new FaceHandlers.PersonHandle());
         p.put("Audio", new FaceHandlers.AudioHandler());
-        p.put("Store", new FaceHandlers.StoreHandler());
+        p.put("Storage", new FaceHandlers.StoreHandler());
         p.put("Select", new FaceHandlers.SelectHandler());
 
         clearStaticCache();
@@ -507,7 +510,7 @@ public class GameFaceLife implements FaceLife {
     }
 
     private void initPanelWord(FaceHead head) {
-        Font f=ConfigCenter.getSystemFont("Word");
+        Font f = ConfigCenter.getSystemFont("Word");
         for (int i = 0; i != ConfigCenter.WORD_MAX_SIZE; ++i) {
             int row = i / ConfigCenter.WORD_LINE_COLUMN;
             int column = i % ConfigCenter.WORD_LINE_COLUMN;
@@ -526,18 +529,18 @@ public class GameFaceLife implements FaceLife {
             words[i] = t;
             head.attach(t);
         }
-        Rectangle mouseClickRect=new Rectangle();
+        Rectangle mouseClickRect = new Rectangle();
         mouseClickRect.setTranslateY(ConfigCenter.WORD_START_Y - f.getSize());
         mouseClickRect.setWidth(ConfigCenter.WINDOW_WIDTH);
         mouseClickRect.setHeight(ConfigCenter.WORD_LINE_ROW * f.getSize() * 3.0);
-        mouseClickRect.setFill(Color.color(0.0,0.0,0.0,0.0));
+        mouseClickRect.setFill(Color.color(0.0, 0.0, 0.0, 0.0));
         mouseClickRect.setOnMouseClicked(event -> {
-            if(event.getClickCount()==1){
-                if(_d.intPro("gameState").get()==GAME_STATE_WAIT_PRESS){
+            if (event.getClickCount() == 1) {
+                if (_d.intPro("gameState").get() == GAME_STATE_WAIT_PRESS) {
                     _d.intPro("gameState").set(GAME_STATE_WAIT_NEXT);
                 }
-            }else {
-                if(_d.intPro("gameState").get()==GAME_STATE_WORD_DISPLAYING){
+            } else {
+                if (_d.intPro("gameState").get() == GAME_STATE_WORD_DISPLAYING) {
                     FaceHandlers.DialogHandler.shiftWord();
                 }
             }

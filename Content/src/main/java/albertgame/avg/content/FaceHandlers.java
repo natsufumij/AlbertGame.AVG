@@ -189,6 +189,7 @@ public interface FaceHandlers {
 
         private void Open(FaceData _d) {
             _d.boolPro("wordPanelShow").set(true);
+            _d.property("cache").put("wordpanelshow","true");
         }
 
         private void Clear(FaceData data) {
@@ -201,6 +202,7 @@ public interface FaceHandlers {
 
         private void Close(FaceData _d) {
             _d.boolPro("wordPanelShow").set(false);
+            _d.property("cache").put("wordpanelshow","false");
         }
     }
 
@@ -263,7 +265,9 @@ public interface FaceHandlers {
             Map<String, Person> playedPersons = GameFaceLife.playedPersons;
             playedPersons.keySet().forEach(id -> builder.append(id).append(","));
             builder.deleteCharAt(0);
-            builder.deleteCharAt(builder.length() - 1);
+            if(!builder.isEmpty()){
+                builder.deleteCharAt(builder.length()-1);
+            }
             d.property("cache").put("personin", builder.toString());
         }
 
@@ -354,6 +358,7 @@ public interface FaceHandlers {
                     }
                     p.changeStateTo(newState);
                     d.property("cache").put("leftstate", p.getNowState());
+                    d.property("cache").put("leftp",p.getId());
                     ((ImageView) head.fetch("leftPerson")).setImage(p.getNowStateImage());
                     break;
                 case "C":
@@ -363,6 +368,7 @@ public interface FaceHandlers {
                     }
                     p.changeStateTo(newState);
                     d.property("cache").put("centerstate", p.getNowState());
+                    d.property("cache").put("centerp",p.getId());
                     ((ImageView) head.fetch("centerPerson")).setImage(p.getNowStateImage());
                     break;
                 case "R":
@@ -372,6 +378,7 @@ public interface FaceHandlers {
                     }
                     p.changeStateTo(newState);
                     d.property("cache").put("rightstate", p.getNowState());
+                    d.property("cache").put("rightp",p.getId());
                     ((ImageView) head.fetch("rightPerson")).setImage(p.getNowStateImage());
                     break;
             }
@@ -387,13 +394,13 @@ public interface FaceHandlers {
         public void handle(FaceData data, FaceHead head, Arg arg) {
             switch (arg.name()) {
                 case "Save":
-                    Save(data, arg.name(), arg.data()[0]);
+                    Save(data, arg.data()[0], arg.data()[1]);
                     break;
                 case "Plus":
-                    Plus(data, arg.name(), Integer.parseInt(arg.data()[0]));
+                    Plus(data, arg.data()[0], Integer.parseInt(arg.data()[1]));
                     break;
                 case "Minus":
-                    Minus(data, arg.name(), Integer.parseInt(arg.data()[0]));
+                    Minus(data, arg.data()[0], Integer.parseInt(arg.data()[1]));
                     break;
             }
         }
