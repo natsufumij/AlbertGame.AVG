@@ -31,6 +31,7 @@ public interface FaceHandlers {
         public void handle(FaceData data, FaceHead head, Arg arg) {
             switch (arg.name()) {
                 case "Word":
+                    Clear(data);
                     if (arg.data()[0].equals("S")) {
                         type = "S";
                         _setName(data, "???");
@@ -45,13 +46,12 @@ public interface FaceHandlers {
                             _setName(data, p.getName());
                         }
                     }
-                    Clear(data);
                     Word(data, arg.data()[1]);
                     break;
                 case "Pound":
-                    _setName(data, "");
                     type = "P";
                     Clear(data);
+                    _setName(data, "");
                     Word(data, arg.data()[0]);
                     break;
                 case "Open":
@@ -76,21 +76,21 @@ public interface FaceHandlers {
 
         private void skipWord(FaceData d, String text) {
             Clear(d);
-            int ix=0,iy=0;
-            for(int i=0;i!=text.length();++i){
+            int ix = 0, iy = 0;
+            for (int i = 0; i != text.length(); ++i) {
                 //到尽头了
-                if(iy==ConfigCenter.WORD_LINE_COLUMN){
+                if (iy == ConfigCenter.WORD_LINE_COLUMN) {
                     ++ix;
-                    iy=0;
-                    char c=text.charAt(i);
-                    _da.strPro(GameFaceLife.findWordAt(ix,iy)).set(c+"");
-                }else{
-                    char c=text.charAt(i);
-                    if(c=='\\'){
+                    iy = 0;
+                    char c = text.charAt(i);
+                    _da.strPro(GameFaceLife.findWordAt(ix, iy)).set(c + "");
+                } else {
+                    char c = text.charAt(i);
+                    if (c == '\\') {
                         ++ix;
-                        iy=0;
-                    }else {
-                        _da.strPro(GameFaceLife.findWordAt(ix,iy)).set(c+"");
+                        iy = 0;
+                    } else {
+                        _da.strPro(GameFaceLife.findWordAt(ix, iy)).set(c + "");
                         ++iy;
                     }
                 }
@@ -101,24 +101,24 @@ public interface FaceHandlers {
 
 
         //在Word显示中，取消动画，一下子全部显示
-        public static void shiftWord(){
-            if(line!=null && !_da.boolPro("auto").get()){
+        public static void shiftWord() {
+            if (line != null && !_da.boolPro("auto").get()) {
                 line.stop();
-                int ix=0,iy=0;
-                for(int i=0;i!=destWords.length();++i){
+                int ix = 0, iy = 0;
+                for (int i = 0; i != destWords.length(); ++i) {
                     //到尽头了
-                    if(iy==ConfigCenter.WORD_LINE_COLUMN){
+                    if (iy == ConfigCenter.WORD_LINE_COLUMN) {
                         ++ix;
-                        iy=0;
-                        char c=destWords.charAt(i);
-                        _da.strPro(GameFaceLife.findWordAt(ix,iy)).set(c+"");
-                    }else{
-                        char c=destWords.charAt(i);
-                        if(c=='\\'){
+                        iy = 0;
+                        char c = destWords.charAt(i);
+                        _da.strPro(GameFaceLife.findWordAt(ix, iy)).set(c + "");
+                    } else {
+                        char c = destWords.charAt(i);
+                        if (c == '\\') {
                             ++ix;
-                            iy=0;
-                        }else {
-                            _da.strPro(GameFaceLife.findWordAt(ix,iy)).set(c+"");
+                            iy = 0;
+                        } else {
+                            _da.strPro(GameFaceLife.findWordAt(ix, iy)).set(c + "");
                             ++iy;
                         }
                     }
@@ -129,7 +129,7 @@ public interface FaceHandlers {
 
         //如果有\号，表示下面的需要换一行显示.
         private void Word(FaceData d, String text) {
-            _da=d;
+            _da = d;
             if (d.boolPro("skip").get()) {
                 skipWord(d, text);
                 return;
@@ -143,7 +143,7 @@ public interface FaceHandlers {
             if (line == null) {
                 line = new Timeline();
                 line.setCycleCount(Timeline.INDEFINITE);
-                Duration period=Duration.millis(100);
+                Duration period = Duration.millis(100);
                 KeyFrame keyFrame = new KeyFrame(period, "WordDisplaying", event -> {
                     if (index == dest || ix >= ConfigCenter.WORD_LINE_ROW) {
                         //如果是普通文字显示状态，则切换为等待输入状态
@@ -156,7 +156,7 @@ public interface FaceHandlers {
                         d.property("cache").put("word", text);
                         d.property("cache").put("wordtype", type);
                         line.stop();
-                        line=null;
+                        line = null;
                     } else {
                         //继续贴字
                         char c = destWords.charAt(index);
@@ -166,7 +166,7 @@ public interface FaceHandlers {
                             ++index;
                         } else if (iy == ConfigCenter.WORD_LINE_COLUMN) {
                             ++ix;
-                            iy=0;
+                            iy = 0;
                         } else {
                             d.strPro(GameFaceLife.findWordAt(ix, iy)).setValue(String.valueOf(c));
                             ++iy;
@@ -189,10 +189,11 @@ public interface FaceHandlers {
 
         private void Open(FaceData _d) {
             _d.boolPro("wordPanelShow").set(true);
-            _d.property("cache").put("wordpanelshow","true");
+            _d.property("cache").put("wordpanelshow", "true");
         }
 
         private void Clear(FaceData data) {
+            data.strPro("nameDisplay").setValue("");
             for (int i = 0; i != ConfigCenter.WORD_MAX_SIZE; ++i) {
                 int cx = i / ConfigCenter.WORD_LINE_COLUMN;
                 int cy = i % ConfigCenter.WORD_LINE_COLUMN;
@@ -202,7 +203,7 @@ public interface FaceHandlers {
 
         private void Close(FaceData _d) {
             _d.boolPro("wordPanelShow").set(false);
-            _d.property("cache").put("wordpanelshow","false");
+            _d.property("cache").put("wordpanelshow", "false");
         }
     }
 
@@ -212,6 +213,7 @@ public interface FaceHandlers {
     //  - Person  No.Show  #Position(L/C/R)  去掉显示的人物位置
     //  - Person  Hide  #Position(L/R) 隐藏左边、右边
     //  - Person  Change.State  #Position(L/R)  #newState 改变左边、右边人物的状态
+    //  - Person  State.Change  #Id  #newState
     class PersonHandle implements FaceHandler {
 
         @Override
@@ -235,6 +237,24 @@ public interface FaceHandlers {
                 case "Change.State":
                     ChangeState(data, head, arg.data()[0], arg.data()[1]);
                     break;
+                case "State.Change":
+                    StateChange(data, head, arg.data[0], arg.data[1]);
+            }
+        }
+
+        private void StateChange(FaceData data, FaceHead head, String datum, String datum1) {
+            Map<String, Person> personMap = GameFaceLife.playedPersons;
+            Person p = personMap.get(datum);
+            if (p == null) return;
+
+            if (GameFaceLife.leftPerson == p) {
+                ChangeState(data, head, "L", datum1);
+            } else if (GameFaceLife.centerPerson == p) {
+                ChangeState(data, head, "C", datum1);
+            } else if (GameFaceLife.rightPerson == p) {
+                ChangeState(data, head, "R", datum1);
+            } else {
+                p.changeStateTo(datum1);
             }
         }
 
@@ -265,8 +285,8 @@ public interface FaceHandlers {
             Map<String, Person> playedPersons = GameFaceLife.playedPersons;
             playedPersons.keySet().forEach(id -> builder.append(id).append(","));
             builder.deleteCharAt(0);
-            if(!builder.isEmpty()){
-                builder.deleteCharAt(builder.length()-1);
+            if (!builder.isEmpty()) {
+                builder.deleteCharAt(builder.length() - 1);
             }
             d.property("cache").put("personin", builder.toString());
         }
@@ -312,6 +332,7 @@ public interface FaceHandlers {
                     v = (ImageView) h.fetch("leftPerson");
                     v.setImage(p.getNowStateImage());
                     v.setVisible(true);
+                    d.property("cache").put("leftstate", p.getNowState());
                     d.property("cache").put("leftp", p.getId());
                     break;
                 case "C":
@@ -319,6 +340,7 @@ public interface FaceHandlers {
                     v = (ImageView) h.fetch("centerPerson");
                     v.setImage(p.getNowStateImage());
                     v.setVisible(true);
+                    d.property("cache").put("centerstate", p.getNowState());
                     d.property("cache").put("centerp", p.getId());
                     break;
                 case "R":
@@ -326,6 +348,7 @@ public interface FaceHandlers {
                     v = (ImageView) h.fetch("rightPerson");
                     v.setImage(p.getNowStateImage());
                     v.setVisible(true);
+                    d.property("cache").put("rightstate", p.getNowState());
                     d.property("cache").put("rightp", p.getId());
                     break;
             }
@@ -358,7 +381,7 @@ public interface FaceHandlers {
                     }
                     p.changeStateTo(newState);
                     d.property("cache").put("leftstate", p.getNowState());
-                    d.property("cache").put("leftp",p.getId());
+                    d.property("cache").put("leftp", p.getId());
                     ((ImageView) head.fetch("leftPerson")).setImage(p.getNowStateImage());
                     break;
                 case "C":
@@ -368,7 +391,7 @@ public interface FaceHandlers {
                     }
                     p.changeStateTo(newState);
                     d.property("cache").put("centerstate", p.getNowState());
-                    d.property("cache").put("centerp",p.getId());
+                    d.property("cache").put("centerp", p.getId());
                     ((ImageView) head.fetch("centerPerson")).setImage(p.getNowStateImage());
                     break;
                 case "R":
@@ -378,7 +401,7 @@ public interface FaceHandlers {
                     }
                     p.changeStateTo(newState);
                     d.property("cache").put("rightstate", p.getNowState());
-                    d.property("cache").put("rightp",p.getId());
+                    d.property("cache").put("rightp", p.getId());
                     ((ImageView) head.fetch("rightPerson")).setImage(p.getNowStateImage());
                     break;
             }

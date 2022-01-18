@@ -100,19 +100,6 @@ public class GameFaceLife implements FaceLife {
         personDataMap.clear();
     }
 
-    public GameController.MouseInput handlerKeys() {
-        EventHandler<MouseEvent> p = event -> {
-        };
-        EventHandler<MouseEvent> r = event -> {
-            if (_d.intPro("gameState").get() == GAME_STATE_WAIT_PRESS) {
-                _d.intPro("gameState").set(GAME_STATE_WAIT_NEXT);
-            }
-        };
-        EventHandler<MouseEvent> rb = event -> {
-        };
-        return new GameController.MouseInput(p, r, rb);
-    }
-
     FaceData _d;
 
     @Override
@@ -582,7 +569,7 @@ public class GameFaceLife implements FaceLife {
                     desist.visibleProperty().set(false);
                 }
                 data.property("selects").put(data.strPro("nowSelectId").get(),
-                        rectangle.getUserData());
+                        String.valueOf(rectangle.getUserData()));
                 data.intPro("gameState").set(GAME_STATE_WAIT_NEXT);
             });
             t.setId(i + "");
