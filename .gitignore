@@ -1,14 +1,8 @@
 
 /Content/.gradle/
-/Content/gradle/
 /Content/build/
-/Content/gradlew.bat
-/Content/gradlew
 /Content/.idea/
 
 /Editor/.gradle/
-/Editor/gradle/
 /Editor/build/
-/Editor/gradlew.bat
-/Editor/gradlew
 /Editor/.idea/
