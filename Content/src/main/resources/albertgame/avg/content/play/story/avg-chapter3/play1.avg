@@ -1,0 +1,46 @@
+#Info
+    play1
+    第一节
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Scene  classroom]
+        [Audio  Bgm.Play  littlesad]
+        [View  Lighting  3000]
+        [Person  In  okasan0]
+        [Dialog  Open]
+
+    >>Struck1
+        昨天中午陪了小红去买了面包。她喜欢的似乎是红豆面包，\虽然我也很喜欢吃，但是我最喜欢的还是菠萝味面包。
+        我们在食堂的一角的吃完了午餐之后，就无聊漫步在校园里。
+        在那之后的事情记得不太清了，要问为什么，\是因为这是至今为止我第一次和女生说那么久的话，\脑子都有些烧坏了。
+        或许我的话语多少有些颤抖，不知道她有没有注意到。
+        我起了床，来到了客厅，看到了母亲正穿着衣服。
+        [Person  Show  C  okasan0]
+        [Person  Change.State  C  happy]
+        @okasan0  啊，你怎么看起来很开心啊？
+        @M  是吗？你也是，这么早起床了？是要去上班吗？
+        我看起来很开心吗？有这么表现在表面吗？
+        @okasan0  上班？在说什么啊，我要去学校啊，\不是说好了要去和老师见一面吗？
+        我愣了一下。
+        @M  是真的吗？你的工作怎么办？
+        @okasan0  当然是翘掉了啊，虽然确实请了今天的假，\也确实又被安排了工作，但是又有什么关系了？\和工作相比，还是儿子的事情更重要啊！
+        我再次愣了一下。一时之间说不出什么。
+        怎么说？因为从记事以来，这是我第一次听到的，最具亲情的话语。
+        [Person  No.Show  C]
+
+    >>End
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]
+        [Audio  Bgm.Stop]
+    
+#Progress
+    begins->Option1->Struck1
+    Struck1->Option1->End
+
+#Options
+    >>Option1
+        Else

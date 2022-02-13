@@ -19,7 +19,7 @@ import java.util.Properties;
 
 public class ConfigCenter {
 
-    private static final boolean loadOnClassPath = false;
+    private static final boolean loadOnClassPath = true;
     private static final String ASSET_PATH = "Assets";
 
     private static final Map<String, Font> fontMap = new HashMap<>();

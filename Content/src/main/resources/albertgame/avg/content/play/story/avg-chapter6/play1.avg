@@ -1,0 +1,45 @@
+#Info
+    play1
+    第一节
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Scene  school]
+        [View  Lighting  3000]
+        [Audio  Bgm.Play  lesuire]
+        [Person  In  xiaoming]
+        [Dialog  Open]
+
+    >>Struck1
+        [Person  Show  C  xiaoming]
+        @xiaoming  今天能和我一起出去玩吗？
+        我在早晨上学的时候，在路途中突然遇到了满头大汗的小明。
+        @M  为什么这么突然？
+        我并没有告诉小明关于我今天就要消失的事情。但是我还是想着能够在今天的放学最后见他一次，最后再和他说说话。
+        @xiaoming  每个人都会有这种突然的想法吧？而且我也一次都没有逃过学，想尝试一下……
+        @M  你是傻瓜吗？
+        虽然他确实是傻瓜，但是我还是忍不住问出口了。
+        原本……原本以为能跟他最后说话的时间只有半个小时了，但是这样看来，我似乎可以和他待一起更久的……
+        为什么我要和小明待在一起啊？这是数学难题吗？
+        @xiaoming  要去吗？
+        可能是看到我沉默了很久，他战战兢兢地看着我。
+        那副样子简直就像女生不是吗？亏你还是个男生。就让小红大人宽宏大量地原谅你吧。
+        @M  嗯，也可以。
+        @xiaoming  那，我们现在就走吧？
+        @M  欸？现在？
+
+    >>End
+        [Person  No.Show  C]
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]
+
+#Progress
+    begins->Option1->Struck1
+    Struck1->Option1->End
+
+#Options
+    >>Option1
+        Else        

@@ -1,0 +1,58 @@
+#Info   
+    play3
+    第三节
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Scene  cinema]
+        [View  Lighting  3000]
+        [Dialog  Open]
+        [Person  In  xiaoming]
+
+
+    >>Struck1
+        虽然电影的名字很奇怪，但是电影的内容却过分的严肃。
+        好吧……小明看到一半就已经睡着了。右手还放在爆米花桶里。
+        他的脑袋靠在了我的肩膀，呼吸声在我的面庞附近躲窜。
+        嗯，电影好像很有趣……不过不知道为什么，我的心脏跳得很快？
+        是因为电影迎来大高潮了吗？
+        施瓦辛格的一堆机器人排成队伍把忍者神龟塞进下水道里之后，响起了胜利的背景音乐。
+
+    >>Struck2
+        @M  醒醒！醒醒！小明！小明！
+        @xiaoming  嗯呣~
+        @M  真是的，太让人难为情了！
+        我用力地拍了一下他的额头。他才总算醒了过来。
+        @xiaoming  嗯？电影结束了？
+        我点了点头。
+        @xiaoming  啊，不好意思我睡着了
+        他拿起了爆米花，和我一同走出了电影院。
+        电影院外的光线在一瞬间照进了眼睛，刺眼之外还有些温和。
+        @M  已经五点了，是时候分别了
+        小明听到我说的话之后，身体微微地震了一下。
+        @xiaoming  一定要分别吗？
+        @M  嗯？这是肯定的呀，难道你和我一起回家？
+        @xiaoming  嗯，也是
+        @M  ……你有女朋友吗？
+        @xiaoming  嗯？怎么了？这么突然？要是我有的话，还会和你这样出来玩吗？
+        @M  说的也是，你最好还是找个女朋友吧！
+        @xiaoming  如果……
+        @M  那我走了！
+        @xiaoming  那明天见！
+
+    >>End
+        [Person  Out  xiaoming]
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]
+
+#Progress
+    begins->Option1->Struck1
+    Struck1->Option1->Struck2
+    Struck2->Option1->End
+
+#Options
+    >>Option1
+        Else

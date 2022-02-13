@@ -1,0 +1,38 @@
+#Info
+    play4
+    第四节
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Scene  cinema]
+        [View  Lighting  3000]
+        [Dialog  Open]
+
+    >>Struck1
+        她没有对我的话语做出任何回复，仅仅只是挥舞着手，便消失在了转角处。
+        我对今天自己的表现感到失望极了。虽然我有想过和小红出来玩，但是却没有做详细地计划，导致一整天都在四处游逛，最后居然在电影院里睡着了……
+        最终，我们在黄昏下，在街角处分了别。
+        ……才怪，我假装也走回去了，但实际上，从后面悄悄跟着小红。
+        这次已经不管那么多了，看她刚才的表情，应该还是想要去寻死吧。这可不是我所能允许的。
+        居然还让我交女朋友？要是她能够做我的女朋友，说不定也挺好。
+        这次就算叫我跟踪狂，我也不会怕了！
+        从一开始拿到那封信的时候，我就已经下定了决心。
+        我不会让你再次陷入死亡的螺旋！我会拯救你！
+        为了你，也为了我自己。
+
+
+    >>End
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]
+        [Audio  Bgm.Stop]
+
+#Progress
+    begins->Option1->Struck1
+    Struck1->Option1->End
+
+#Options
+    >>Option1
+        Else

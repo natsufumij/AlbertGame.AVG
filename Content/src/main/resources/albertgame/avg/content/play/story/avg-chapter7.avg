@@ -1,0 +1,12 @@
+#Info
+    avg-chapter7
+    第七章
+    play1
+    Chapter 
+
+#Progress
+    play1->Option1->play2
+
+#Options
+    >>Option1  
+        Else

@@ -1,0 +1,44 @@
+#Info
+    avg-chapter0
+    Global
+#Progress
+    avg-chapter0->Option1->avg-chapter1
+    avg-chapter1->C1Option1->avg-chapter2,avg-fin
+    avg-chapter2->C2Option1->avg-chapter3,avg-fin
+    avg-chapter3->C3Option1->avg-fin,avg-chapter4
+    avg-chapter4->Option1->avg-chapter5
+    avg-chapter5->C5Option1->avg-chapter1,avg-chapter6
+    avg-chapter6->Option1->avg-chapter7
+    avg-chapter7->Option1->avg-fin
+#Options
+    >>Option1
+        Else
+    >>C1Option1
+        IfHelp=1
+        Else
+    >>C2Option1
+        IfRun=1
+        Else
+    >>C3Option1
+        IfHelp2=3
+        Else
+    >>C5Option1
+        IfHelp3=1
+        Else
+        
+#PersonData
+    >>xiaoming
+        小明
+        normal,sad,happy,mad
+    >>xiaohong
+        小红
+        normal,sad,happy,mad
+    >>okasan0
+        母亲
+        normal,sad,happy,mad
+    >>hana
+        小花
+        normal,sad
+    >>worker
+        工作人员
+        normal,

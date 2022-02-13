@@ -1,0 +1,66 @@
+#Info
+    play1
+    第一节
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Scene  school]
+        [View  Lighting  3000]
+        [Dialog  Open]
+        [Person  In  xiaoming]
+        [Audio  Bgm.Play  lightsad]
+
+    >>Struck1
+        在我被那些小混混掌掴的时候，他出现了。
+        虽然并不像是英雄一般，但也还是挺身而出，保护了我。
+        在小混混走了之后，他一脸轻松地样子甩了甩手。
+        [Person  State.Change  xiaoming  happy]
+        [Person  Show  C  xiaoming]
+        @S  看来我来着真是时候啊
+        @M  明明早就在那里看了很久
+        @S  原来被你发现了啊
+        一直有股视线就是从那个转角处传来的，\我不会发现才奇怪吧？
+        不过这么说起来，我刚才明明在哭泣，\现在不知道为什么，心里确实特别舒畅的感觉。
+        我再次擦了擦眼睛。
+        @M  你的名字……
+        @S  什么？
+        @M  你的名字叫什么？
+        @S  啊，我叫小明
+        虽然他知道我的名字，但是我却一直不知道他的名字，\不知怎得，觉得很不公平。
+        所以我就语气稍微强了些地询问了名字。
+        @M  小明啊，嗯，小明……我记住了
+        @xiaoming  我这名字经常被说是大众化……
+        @M  真要这么说，其实我的名字也是。
+        @xiaoming  小红……
+        @M  怎么了？
+        @xiaoming  你的背上有灰尘，我来帮你拍掉吧？
+        @M  嗯？哦，好……
+        我站了起来，然后不假思索地转了身。
+        他一边拍着我的背，一边和我进行着对话。
+        @xiaoming  要不要和我成为朋友？
+        @M  哈？
+        @xiaoming  就是成为朋友，没有特别的意思……
+        @M  我知道，不过你这么一解释反倒让人觉得可疑……
+        @xiaoming  欸？可……可是……
+        @M  那就成为吧
+        @xiaoming  嗯？什么东西？
+        @M  我说成为朋友，朋友，你没有听到吗？
+        @xiaoming  哦……怎么没有实感啊……
+        [Person  No.Show  C]
+
+    >>End
+        [Person  Out  xiaoming]
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]
+        [Audio  Bgm.Stop]
+
+#Progress
+    begins->Option1->Struck1
+    Struck1->Option1->End
+
+#Options
+    >>Option1
+        Else

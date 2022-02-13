@@ -1,0 +1,97 @@
+#Info
+    begins
+    终结
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Scene  scene0.1]
+        [View  Lighting  3000]
+    
+    >>HD
+        [View  Scene  tree]
+        [Audio  Bgm.Play  light]    
+        [Person  In  xiaohong]    
+        [Dialog  Open]
+        从那之后过了大概一个星期。
+        小红和我也日常着上着学，不过和以前不一样的，\是我们早晨是一起上学，放学后是一起回家。
+        我那天像小红告白的那一件事，没有被她再提过，\也被我抛在了脑后。
+        小红喜不喜欢我是另外一回事，只要我喜欢小红，\我就会竭尽全力地去保护她。
+        不过现在的问题已经远远不只是这些了。\那天想劝说小红寻死的那个人还没有找到，\也不能说很安全，
+        不过我已经和小红一起向老师解释了关于所遭受的校园暴力的事情。
+        一个人说的话老师未必会相信，但是如果两个人说的话，\她们就有些怀疑了。
+        虽然并没有给我们具体的行动计划，\她们似乎已经开始行动了。
+        好吧，现在是时候正视一下现状了\——我被小红交代在我们一开始交谈的那棵树下等她。
+        或许是吃午饭，因为最近她都会给我准备午餐，\虽然并不是十分美味，但我总会全部吞下去。\但之前吃午饭也不会特地叫我等她呀？
+        在我等了将近二十分钟，她也没有出现。
+        难道是碰到了奇怪的事情？
+        在我有些慌张地站起来的时候，\突然被一个人给用力地抱住了。
+        虽然我害怕是什么奇怪的人，\但是听到声音后还是松懈了下。
+        [Person  Show  C  xiaohong]
+        @xiaohong  谢谢你
+        @M  午餐带来了吗？
+        @xiaohong  午餐？
+        @M  不是吗？这次叫我来不是这个吗？
+        @xiaohong  嗯，当然不是，有另外的事。
+        @M  什么事吗？现在是吃午饭的时间吧，去外边写生什么的也……
+        @xiaohong  那天的告白，我要给你答复。
+        我一瞬间摆起了严肃脸。
+        @xiaohong  瞧你那么严肃……嗯，我答应你
+        @M  ……这是……
+        @xiaohong  我也喜欢你，小明，我想成为你的女朋友，我想和你永远在一起！
+        @M  这是……真的吗？
+        小红的脸颊还印有红晕，在我的提问之后，她认真地点了点头。
+
+    >>BD1
+        [View  Scene  scene0.1]
+        [Audio  Bgm.Play  lightsad]
+        [Dialog  Open]
+        到某一天，突然从老师的口中得知了小红死亡的消息。
+        @M  要是当时，我能够好好地去拯救她，或许就会有不一样的结果了。
+
+    >>BD2
+        [View  Scene  scene0.1]
+        [Audio  Bgm.Play  lightsad]
+        [Dialog  Open]
+        突然从老师的口中得知了小红死亡的消息。
+        但是……
+        @M  实际上，这也不和我有太多关系吧？\我还是只顾着自己就好了。
+
+    >>BD3
+        [View  Scene  scene0.1]
+        [Audio  Bgm.Play  lightsad]
+        [Dialog  Open]
+        突然有一天，一个打扮夸张的女孩子把我叫到了教学楼的后面。
+        [Person  In  hana]
+        [Person  Show  C  hana]
+        [Person  Change.State  C  sad]
+        虽然打扮夸张，但是她的脸颊印有两行的泪珠。
+        @S  对不起，对不起！是我不好！是我不该叫人去把小红做掉的！对不起！
+        @M  什么意思？
+        @S  是我！是我一直喜欢你，我嫉妒小红，所以才叫人让她自己去寻死！对不起！
+        @M  原来是你……
+        @S  对不起……
+        她站在我的面前，哭泣的泪水已经把脸上的妆容给融化了。
+
+    >>End
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]
+        [Audio  Bgm.Stop]
+
+#Progress
+    begins->FinOption->BD1,BD2,BD3,HD
+    HD->Option1->End
+    BD1->Option1->End
+    BD2->Option1->End
+    BD3->Option1->End
+
+#Options
+    >>Option1
+        Else
+    >>FinOption
+        Fin.Op=1
+        Fin.Op=2
+        Fin.Op=3
+        Else

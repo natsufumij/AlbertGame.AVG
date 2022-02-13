@@ -1,0 +1,11 @@
+#Info
+    avg-chapter2
+    第二章
+    play1
+    Chapter
+#Progress
+    play1->Option1->play2
+    play2->Option1->play3
+#Options
+    >>Option1
+        Else

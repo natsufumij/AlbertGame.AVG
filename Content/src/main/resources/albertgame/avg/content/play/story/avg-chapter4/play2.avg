@@ -1,0 +1,69 @@
+#Info
+    play2
+    第二节
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Scene  hospital]
+        [View  Lighting  3000]
+        [Dialog  Open]
+        [Person  In  xiaohong]
+        [Person  In  okasan0]
+        [Audio  Bgm.Play  light]
+    
+    >>Struck1
+        其实我受到的伤害远比我想象的要重。
+        我的肋骨受到了骨折，脑部也有了轻微的脑震荡，\最终闹到了住院了。
+        除了母亲会定期来看我之外，还有一个客人会时不时地来给我送些水果。
+        [Person  State.Change  xiaohong  normal]
+        [Person  Show  C  xiaohong]
+        @xiaohong  看起来脸色好很多了
+        @M  真是很麻烦你，每次都拿水果来，你的父母不会说什么吗？
+        小红听了我的话，眉头一蹙。
+        [Person  State.Change  xiaohong  sad]
+        @xiaohong  我的父母早就已经不在人世了，我现在寄住在阿姨的家里。
+        突然之间就好像踩到了地雷？
+        @M  对……对不起……
+        [Person  State.Change  xiaohong  normal]
+        @xiaohong  你没有必要说对不起，本来这就不是会说的话题，\非要说的话，我还得说对不起，因为帮我，你都已经住院了。
+        关于小红来为我探病的事情，我是瞒着母亲的，\甚至连为什么会受这么严重的原因也是瞒着了。\小红帮我联系来了班主任之后，就立即联系了急救车送我来医院了。
+        @M  没有啦，虽然我母亲很想知道这其中的故事，但是……
+        就在我想说母亲还不知道关于小红的事情，门被打了开来……
+        [Person  No.Show  C]
+        [Person  Show  L  xiaohong]
+        [Person  State.Change  okasan0  normal]
+        [Person  Show  R  okasan0]
+        @okasan0  你是？
+        @xiaohong  欸？
+        糟糕，最糟糕的状况就在这样的时机发生了。\我明明说过下午不用来看我，为什么……
+        @M  妈，她是……
+        @okasan0  不用说的，我都懂的……午饭就放在这里了，啊，还多了一份，\就给女孩子吃吧，我接下来要去上班了，你们小两口好好聊
+        [Person  No.Show  R]
+        虽然小红看起来想要纠正母亲的一些猜测。但……
+        已经晚了，母亲唱着一溜小曲消失在了门口。
+        在沉寂了大概五分钟之后。
+        [Person  No.Show  L]
+        [Person  Show  C  xiaohong]
+        @xiaohong  你的母亲还真是活泼
+        @M  啊？哦……嗯，是的……
+        @M  我们，看起来像情侣吗？
+        @xiaohong  哪里有啊……完全不像吧……？大概……
+        [Person  No.Show  C]
+        我们再次陷入了沉寂。 
+        在一周后，我平安无事地出了院。
+
+    >>End
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]
+        [Audio  Bgm.Stop]
+
+>>Progress
+    begins->Option1->Struck1
+    Struck1->Option1->End
+
+#Options
+    >>Option1
+        Else

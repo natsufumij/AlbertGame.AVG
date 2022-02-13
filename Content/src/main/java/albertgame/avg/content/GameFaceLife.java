@@ -444,22 +444,20 @@ public class GameFaceLife implements FaceLife {
     }
 
     private void initPersons(FaceHead head) {
-        Image ona = ConfigCenter.loadPersonState("onna", "1");
-        Image otoko = ConfigCenter.loadPersonState("otoko", "1");
-        Image bishojo = ConfigCenter.loadPersonState("bishojo", "1");
+        Image ona = ConfigCenter.loadPersonState("_onna", "1");
 
         leftPersonImage = new ImageView(ona);
         leftPersonImage.setFitWidth(ConfigCenter.PERSON_WIDTH);
         leftPersonImage.setFitHeight(ConfigCenter.PERSON_HEIGHT);
         leftPersonImage.imageProperty().set(null);
 
-        centerPersonImage = new ImageView(bishojo);
+        centerPersonImage = new ImageView(ona);
         centerPersonImage.setFitWidth(ConfigCenter.PERSON_WIDTH);
         centerPersonImage.setFitHeight(ConfigCenter.PERSON_HEIGHT);
         centerPersonImage.setTranslateX(ConfigCenter.PERSON_WIDTH);
         centerPersonImage.imageProperty().set(null);
 
-        rightPersonImage = new ImageView(otoko);
+        rightPersonImage = new ImageView(ona);
         rightPersonImage.setFitWidth(ConfigCenter.PERSON_WIDTH);
         rightPersonImage.setFitHeight(ConfigCenter.PERSON_HEIGHT);
         rightPersonImage.setTranslateX(ConfigCenter.PERSON_WIDTH * 2);

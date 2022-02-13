@@ -1,0 +1,70 @@
+#Info
+    play2
+    第二节
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Scene  classroom]
+        [View  Lighting  3000]    
+        [Dialog  Open]
+        [Person  In  xiaoming]
+
+    >>Struck1
+        我准备前往小卖部，去购入今天的午餐。
+        但是准备出教室门的时候，看到一个打扮很普通的男生朝着里面看。
+        他并不是这个班级的学生，大概是找朋友有什么急事吧。
+        也许是要借什么歌手的专辑CD，又或者是教科书或者笔记吧。说真的，我并不太懂男生。不过这些怎么样都没有关系。
+        反正和我没有一点关系。
+        我挺起了胸膛，准备走向门口。
+    
+    >>Struck2
+        [Person  Show  C  xiaoming]
+        @S  喂，你知道小红是谁吗？
+        他突然拦住了我的去路。表情有些为难。
+        @M  你找小红做什么？
+        我的警觉感告诉我，他不是来做什么好事的。
+        ——因为我的名字就叫做小红。
+        @S  我想劝一劝她，不要做傻事。
+        我皱起了眉头。我什么时候做过傻事？
+        是指昨天和那个女生打架？还是前几天被小混混缠上？
+        @M  你说不要做傻事，是什么意思？
+        @S  在那之前，我想找到小红，你知道她在哪里吗？
+        @M  我就是小红
+        他一瞬间愣了一下，然后抓着我的手就往外面走。
+        又要被施加暴力了吗？
+        @M  你要做什么？快放开我！
+        @S  不行，到没有人的地方去。
+        [Person  No.Show  C]
+        他看起来神神秘秘地。不知怎得，突然觉得他应该不会对我施加暴力。
+        还是说……他想要告……
+
+    >>Struck3
+        他带我走到了昨天我去过的那个大树下。
+        [Person  Show  C  xiaoming]
+        @M  好了，到底是什么事？
+        我环顾四周，提高自己的警觉度。
+        毕竟把我带到这里，大多还是因为昨天的那个吧？
+        @S  我收到了一封信，上面写着你会在不久之前就去寻死，所以我想来救你！
+        他的表情很夸张，好像有些担心。
+        但是我……我并没有写过什么信啊？
+        @M  我没有写过什么信。
+        @S  你就是小红吧？你不相信的话，我把信拿给你……
+        [Person  No.Show  C]
+
+    >>End
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]
+        [Audio  Bgm.Stop]
+
+#Progress
+    begins->Option1->Struck1
+    Struck1->Option1->Struck2
+    Struck2->Option1->Struck3
+    Struck3->Option1->End
+
+#Options
+    >>Option1
+        Else

@@ -1,0 +1,47 @@
+#Info
+    play1
+    第一节
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Scene  post]
+        [View  Lighting  3000]
+        [Audio  Bgm.Play  sad]
+        [Dialog  Open]
+        [Person  In  worker]
+
+    >>Struck1
+        在我和小明分别后不久，天空就开始下起了雨。
+        雨下得挺大，一下子就把我的头发淋湿了。
+        但是我并不觉得这有什么碍事，因为我马上就不会在这个世界了。
+        或许我多感受一下这个世界的雨也是一种不错的留念方式。
+        我走在鲜有行人的路上，看到了邮政局门口道路边的邮筒，想起了小明所说的话。
+        他说过我以前写过信。可是我从来也没有写过。
+        要不现在就写一下吧？就算没有留在这个世界也没有关系，就算没有接收人也没有关系，我只是想要把心中所想的一些事情简单的记录下来。
+        我走进了邮政局。
+        @M  请问一下，有信纸可以写信吗？
+        @worker  好像有，您想写信吗小姐？
+        @M  嗯，我想写一下，最好信封、邮票也给我吧
+        @worker  好的，这个邮票只能寄到相邻城市没关系吧？
+        @M  嗯，没有关系，还有……我想在旁边写一下，没有关系吧？
+        @worker  请您自便
+        我在旁边……实际上是空着的保安的位置上开始写着信。
+        写起来很流畅，并没有什么纠结的地方，大概花了十分钟，就写完了。
+        我没有写收件人、收件地址，就这样扔进了邮筒了。
+
+    >>End
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]
+        [Audio  Bgm.Stop]
+        [Person  Out  worker]
+
+#Progress
+    begins->Option1->Struck1
+    Struck1->Option1->End
+
+#Options
+    >>Option1
+        Else

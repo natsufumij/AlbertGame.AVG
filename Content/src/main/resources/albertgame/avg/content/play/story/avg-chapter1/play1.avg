@@ -1,0 +1,50 @@
+#Info
+    play1
+    第一节
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Scene  xiaoming_ie] 
+        [View  Lighting  3000]
+        [Audio  Bgm.Play  lightsad]
+        [Dialog  Open]
+        [Person  In  okasan0]
+
+        母亲又是很晚才回到家。
+        今天原本是家长会的一天，母亲前天已经答应过我会好好地出席家长会。
+        但是今天一天下来甚至连母亲的脸都没有看到\学校老师也狠狠地对我进行了批评，\后来尝试和家长联系也打不通电话。
+        想必一定是工作的缘故吧。
+        我已经受够了这样的日子了，所以等到我回家一定会好好地和她沟通，
+        让他不能再这样下去了，可是回到家也不见她的踪影，直到现在。
+        ——凌晨两点才看到她推开门，背着个山地背包走进家门。
+        我和她面对面地坐在了桌子两边。
+
+    >>Struck1
+        [Person  Show  C  okasan0]
+        @M  为什么今天没有来家长会
+        @okasan0  今天突然被安排了工作，也就只能硬着头皮上了,\今年老师有没有什么变化？
+        我愤怒极了，不关心自己的儿子，还关心老师？
+        @M  老师也没有什么变化，只是比上一次更严厉了，\说这次要你亲自去一趟学校和老师单独谈谈，\不然的话，我很有可能会退学。
+        [Person  Change.State  L  sad]
+        她愣了一下，随后终于还是叹了一口气。
+        @okasan0  那好吧，我这阵子就向领导申请，\不过到时候要是突然又被安排了工作的话，那我也没有办法……
+        [Person  No.Show  C]
+        我蹬了她一眼，不再说什么话地就走向了自己的房间。
+        于是火气值一直囤积在了心里，一个晚上都睡不着了。
+
+    >>End
+        [Person  Out  okasan0]
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]    
+        [Audio  Bgm.Stop]
+
+#Progress
+    begins->Option1->Struck1
+    Struck1->Option1->End
+#Options
+    >>Option1
+        Else
+        

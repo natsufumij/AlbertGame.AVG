@@ -1,0 +1,75 @@
+#Info
+    play2
+    第二节
+    begins
+    Play 
+
+#Body
+    >>begins
+        [View  Scene  building]
+        [View  Lighting  3000]
+        [Dialog  Open]
+        [Audio  Bgm.Play  sad]
+        [Person  In  xiaohong]
+
+    >>Struck1
+        邮政局旁有一个高耸的公寓。
+        我看着小红投了信封之后不久就进入了那个公寓。
+        我轻轻地跟在后面。
+        她好像走到了楼顶，我躲在楼顶的房门后面，静静地窥视着她的举动。
+        她站在栏杆旁边良久，然后终于有了动作——她抓着栏杆。
+        不行，这绝对不是好征兆！我冲出了房门，全力地冲向了她。
+        临危之际，我仅仅只能抓着她的一只手。
+        @M  小红！别放弃啊！我不允许你死！
+    
+    >>Struck2
+        @xiaohong  呣……
+        @M  快睁开眼！
+        @xiaohong  嗯？你是……小明？
+        @M  ……嗯，是我……快点上来吧
+        @xiaohong  我……对不起，我选择了……
+        @M  没事的，没事的！
+        @xiaohong  我……
+        @M  没事的！
+        不管怎么说，我也不想让她消失在这个世界。
+        @xiaohong  因为我，你受了很多灾难……
+        @M  没有的事，没有你，我会受到更多的灾难！
+        @xiaohong  没有我？
+        @M  ……因为我喜欢你啊！
+        @xiaohong  ……欸？我？欸……？！
+        @M  快上来吧！我快坚持不住了！
+        @xiaohong  我……可是……
+        @M  没有可是！我绝不允许你消失！没有我的允许你不可以消失！
+        @xiaohong  我……
+        我的双手已经严重脱力了，感觉随时都会麻木，但是就算如此，我也不想失去小红，我竭尽全力地输出着自己的力量。
+        等我回过神，小红已经抓着栏杆在我的旁边站着了。
+        她的眼角流着晶莹的泪珠反射着光芒，脸颊有些许泛红。
+        @xiaohong  小明……你真的不希望我消失吗？
+        @M  嗯……因为我喜欢你，我希望你能好好地活着。
+        @xiaohong  ……嗯……可是，我会伤害你……
+        @M  没关系，尽情地伤害我吧！我一定会全部扛下来！因为我喜欢你呀！
+        @xiaohong  太狡猾了……
+        @M  嗯？
+        @xiaohong  总是说什么喜欢喜欢的。
+        @M  我……
+        @xiaohong  为什么会找到我呢？
+        @M  因为我跟踪了你
+        @xiaohong  跟踪？
+        @M  因为我一开始就知道你也许会走这条路
+        @xiaohong  ……是吗……我……
+        抱着我的胸口的小红，终于还是爆出了哭泣之声。
+
+    >>End
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]
+        [Audio  Bgm.Stop]
+    
+#Progress
+    begins->Option1->Struck1
+    Struck1->Option1->Struck2
+    Struck2->Option1->End
+
+#Options
+    >>Option1
+        Else

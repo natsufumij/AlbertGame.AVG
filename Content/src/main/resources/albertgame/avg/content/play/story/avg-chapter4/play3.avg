@@ -1,0 +1,39 @@
+#Info
+    play3
+    第三节
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Scene  school]
+        [View  Lighting  3000]
+        [Audio  Bgm.Play  sad]
+        [Dialog  Open]
+    
+    >>Struck1
+        为什么……为什么他会和那个女生走在一起？
+        为什么他们很开心地说着话？\明明我都没有那样子……
+        都怪那个奇怪的男生向我告白，\我现在都受到了各种视线。
+        不然，我早就向他告白了！
+        为什么！为什么！为什么！
+        为什么不看看我！
+        那个偷腥猫怪……
+        为什么他会为那个偷腥猫怪受苦？
+        那个偷腥猫怪，看我不搞死你！
+        我要让你为触碰到我的男生而后悔，\我会让你为出生在世这件事情后悔。
+        我一定要让你付出代价！
+
+    >>End
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]
+        [Audio  Bgm.Stop]
+
+#Progress
+    begins->Option1->Struck1
+    Struck1->Option1->End
+
+#Options
+    >>Option1
+        Else

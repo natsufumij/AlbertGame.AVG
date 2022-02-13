@@ -1,0 +1,79 @@
+#Info
+    play3
+    第三节
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Scene  school]
+        [View  Lighting  3000]
+        [Dialog  Open]
+        [Audio  Bgm.Play  lightsad]
+        [Person  In  xiaohong]
+    
+    >>Struck1
+        [Person  State.Change  xiaohong  mad]
+        [Person  Show  C  xiaohong]
+        @xiaohong  别打了别打了！
+        @S  你是谁？
+        @S  想拦我们，就连你也一起打！
+        @xiaohong  哼，我已经把老师叫来了，再过两分钟，\你们就要完蛋了，停学处分是最少的了，\还是说，你们想要一辈子都坐牢呢？
+        @S  要不我们回去吧？
+        @S  开什么玩笑，都到现在这个时候了，老大都吩咐过我们的……
+        @S  现在还来得急，不然老师来了的话……
+        @S  好好，我们就先暂时放了你们，下次就是你们的死期了！
+        [Person  No.Show  C]
+
+    >>Struck2
+        小红扶着我走到了医务室，和老师联系了家长，很快我就请了假，在家里休息。
+        晚上出来买点餐点的时候，在街角碰到了穿着便服的小红。原本以为可能只是连很像的一个女生，但是直到她和另一个戴着鸭舌帽遮住脸的人对话时，对方称呼她为小红的时候，我才回过神来。
+        @xiaohong  为什么要伤害小明？你明明直到他和我没有很大的关系的
+        @S  你说他和你没有很大关系？
+        @xiaohong  对，要是你恨我的话，就来报复我就好了，为什么要对付一个无辜的人
+        @S  我报复的从来就只有你而已。对了……我们做个交易怎么样？
+        @xiaohong  交易？
+        @S  要是你从这个世界上消失了，那么我就不会报复你和你身边的人，包括小明
+        小红沉默了两分钟。
+        @xiaohong  真的吗？
+        @S  那是当然，不过我也是很善良的，就给你明天一天的准备时间吧，如果后天我没有知道你的死讯的话，我想下次受到伤害的可能要包括小明的母亲和你的阿姨了哦？
+        @xiaohong  ……我答应你。我答应你，我要明天一天的准备时间。
+        @S  那真是太好了。你要记得你的诺言，不要忘记自己说的话。
+
+    >>Struck3
+        后天要小红的死讯？小红即将步入死亡？
+        这难道不是在最初收到信的时候，上面写的吗？
+        我该不该上去阻止？
+        [Select  Go  IfHelp3  阻止  不阻止]    
+
+    >>F1
+        我准备冲进去，阻止小红和那个神秘人的交易。
+        但是大脑却被什么狠狠地砸了一下，失去了意识。
+
+    >>F2
+        没有关系，明天一天我都会好好地和她在一起，不会让她受伤。
+        在我生命垂危的时候，是她救了我。
+        所以，我也想在她面临生死存亡的时候，在她身边，拯救她。
+
+    >>End
+        [Dialog  Clear]
+        [Dialog  Close]
+        [Person  Out  xiaohong]
+        [View  Darking  3000]
+        [Audio  Bgm.Stop]
+
+#Progress
+    begins->Option1->Struck1
+    Struck1->Option1->Struck2
+    Struck2->Option1->Struck3
+    Struck3->Option2->F1,F2
+    F1->Option1->End
+    F2->Option1->End
+
+#Options    
+    >>Option1
+        Else
+    >>Option2
+        IfHelp3=1
+        Else
+

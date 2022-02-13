@@ -1,0 +1,55 @@
+#Info
+    play1
+    第一节
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Scene  xiaohong_ie]
+        [Audio  Bgm.Play  sad2]
+        [View  Lighting  3000]
+        [Dialog  Open]
+        [Person  In  hana]
+
+    >>Struck1
+        睁开了眼睛，我看到了尚有几条裂缝的天花板。
+        回想起了昨天的境遇，心中不乏有苦闷。
+        在正午的大树下，我目睹到了一个表白的场景。
+        如果说这是正常的，那的确，到此为止都是如此。
+        但是在那之后，便不对劲了。
+        表白以失败结束，男生灰心丧气地离开了原地，\而女生则煞有介事地皱着眉头地看着我。
+        
+    >>Struck2
+        [Person  Show  C  hana]    
+        @S  你在偷看？
+        她用右手的手指指着我的方向，我转了转头……
+        @S  说的就是你！为什么要偷看？
+        我闻言也皱起了眉头——为什么说偷看？我也只是在小卖部买了喜欢的面包和牛奶躲在一个名不见经传的大树下准备进食罢了……
+        @M  我并没有偷看，我反应过来的时候你们就已经在了，不如说，是你们闯进来的。
+        [Person  No.Show  C]
+
+    >>Struck3
+        没错——我并没有偷看。我坚持自己的正义。
+        但就是这么正义的事情，让我受到了惩罚。
+        她很轻松地推倒了我，然后朝着我的脸上吐了一口唾沫，大骂我是婊子。但是我也不是吃素地，很快就反推了她，于是……
+        在放学的时候，我再次收到了报复。
+        报复是——我的书桌包括里面所有的东西都被仍在了教学楼第一层的楼梯边。并且上面沾满了各种排泄物。
+        现在回想起来，这样的报复已经多到数不清了。
+
+    >>End
+        [Person  Out  hana]
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]
+        [Audio  Bgm.Stop]
+        
+#Progress
+    begins->Option1->Struck1
+    Struck1->Option1->Struck2
+    Struck2->Option1->Struck3
+    Struck3->Option1->End
+
+#Options
+    >>Option1
+        Else

@@ -1,0 +1,68 @@
+#Info
+    play3
+    第三节
+    begins
+    Play
+
+#Body
+    >>begins
+        [View  Scene  tree]
+        [View  Lighting  3000]
+        [Audio  Bgm.Play  light]
+        [Dialog  Open]
+        [Person  In  xiaohong]
+    
+    >>Struck1
+        从那封信上得出的唯一一个线索，就是她和我同校。
+        为此，我特意在上课的时候溜了出来，辗转各个年级的各个办公室之间，\不断地询问着关于小红的信息。
+        那封写着小红会死亡的信，为了可以随时拿到，\我直接塞到了自己的口袋里，并且也直接拿给老师看，\但是他们也都没有相信我和信，只是随便敷衍几句而已。
+        虽然这样，但我还是获得了唯一的信息——那就是小红所在的班级以及样貌特征。
+        我的眼前站着我所找到的女生，我正往自己的口袋处摸索着，\想将那封信拿出来给她看，但是不论怎么摸都找不到。
+        奇怪了？为什么会这样？
+    
+    >>Struck2
+        [Person  Show  C  xiaohong]
+        @xiaohong  你到底怎么了？
+        @M  我想找一下那封信，就是你写给我的那封信。
+        她的表情看起来不太好，或许是由于我浪费了她不少时间的缘故。
+        @xiaohong  所以说，我根本就没有写信！而且我好端端地，为什么会去死呢？你开玩笑也太过分了吧？
+        她的表情变得严肃，语气也变得凶狠了。
+        @M  可是你确实给我写了信啊！还把日期写错了的！
+        @xiaohong  那你把信拿出来给我看啊！你太不可理喻了，简直是浪费时间，我现在要去买面包吃早饭了。
+        说我不可理喻？我可是在担心你啊。难道这有错吗？
+        我该继续来拯救她吗？还是说，这一切只是我的个人游戏？
+        @xiaohong  别拦着我了，我要去买面包了。
+        [Person  No.Show  C]
+        看着她渐渐远去，我……现在应该做的是
+        [Select  Go  IfRun  追上去，一起去买面包  不再插手这件事了]
+
+    >>F1
+        @M  等等我！我也要去买面包。
+        @xiaohong  随便你了。
+
+    >>F2
+        算了，就这样放弃吧。
+        至少看到她其实并没有想要去寻死，这样子不是挺好的吗？
+        [Storage  Save  Fin.Op  2]
+
+    >>End
+        [Person  Out  xiaohong]
+        [Dialog  Clear]
+        [Dialog  Close]
+        [View  Darking  3000]
+        [Audio  Bgm.Stop]
+
+#Progress
+    begins->Option1->Struck1
+    Struck1->Option1->Struck2
+    Struck2->Option2->F1,F2
+    F1->Option1->End
+    F2->Option1->End
+
+#Options
+    >>Option1
+        Else
+    >>Option2
+        IfRun=1
+        Else
+        
