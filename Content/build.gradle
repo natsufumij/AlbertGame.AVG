@@ -12,9 +12,9 @@ javafx {
     modules = ['javafx.controls', 'javafx.media']
 }
 
-mainClassName = "albertgame.avg.content.MainEntry"
-
 application.mainModule = "$moduleName"
+
+mainClassName = "albertgame.avg.content.MainEntry"
 
 repositories {
     mavenCentral()
@@ -27,10 +27,16 @@ tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
 
-
 jlink {
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
-        name = 'avg.content'
+        name = 'AlbertGame.AVG'
     }
+}
+
+jpackage {
+    jpackageData.installerOptions = ['--win-dir-chooser','--win-menu']
+    jpackageData.appVersion = '1.0'
+    jpackageData.icon="src/main/resources/favicon.ico"
+    jpackageData.installerName = 'AlbertGame.AVG'
 }

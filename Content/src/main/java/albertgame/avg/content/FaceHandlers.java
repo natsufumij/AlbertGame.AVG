@@ -104,23 +104,29 @@ public interface FaceHandlers {
         public static void shiftWord() {
             if (line != null && !_da.boolPro("auto").get()) {
                 line.stop();
+
+                //Clear Word
+                for (int i = 0; i != ConfigCenter.WORD_MAX_SIZE; ++i) {
+                    int cx = i / ConfigCenter.WORD_LINE_COLUMN;
+                    int cy = i % ConfigCenter.WORD_LINE_COLUMN;
+                    _da.strPro(GameFaceLife.findWordAt(cx, cy)).setValue("");
+                }
+
                 int ix = 0, iy = 0;
-                for (int i = 0; i != destWords.length(); ++i) {
+                for (int i = 0; i != destWords.length();) {
+                    char c = destWords.charAt(i);
                     //到尽头了
-                    if (iy == ConfigCenter.WORD_LINE_COLUMN) {
+                    if (c == '\\') {
                         ++ix;
                         iy = 0;
-                        char c = destWords.charAt(i);
-                        _da.strPro(GameFaceLife.findWordAt(ix, iy)).set(c + "");
+                        ++i;
+                    } else if (iy == ConfigCenter.WORD_LINE_COLUMN) {
+                        ++ix;
+                        iy = 0;
                     } else {
-                        char c = destWords.charAt(i);
-                        if (c == '\\') {
-                            ++ix;
-                            iy = 0;
-                        } else {
-                            _da.strPro(GameFaceLife.findWordAt(ix, iy)).set(c + "");
-                            ++iy;
-                        }
+                        _da.strPro(GameFaceLife.findWordAt(ix, iy)).setValue(String.valueOf(c));
+                        ++iy;
+                        ++i;
                     }
                 }
                 _da.intPro("gameState").set(GameFaceLife.GAME_STATE_WAIT_PRESS);
